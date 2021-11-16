@@ -54,6 +54,13 @@ class SwlCrypto: CryptoProvider {
 		return plaintext
 	}
 
+	func encrypt(_ string: String) -> Data? {
+		guard let utf16leData = string.data(using: .utf16LittleEndian) else {
+			return nil
+		}
+		return encrypt(data: utf16leData)
+	}
+
 	func lock() {
 		key = nil
 	}
@@ -96,5 +103,47 @@ class SwlCrypto: CryptoProvider {
 
 		dataOut.count = successBytes - Int(paddingSize)
 		return dataOut
+	}
+
+	private func encrypt(data: Data) -> Data? {
+		guard let key = key else { return nil }
+		var dataIn = data
+		var paddingSize: UInt8 = 0
+		while dataIn.count % 16 > 0 {
+			dataIn.append(0)
+			paddingSize += 1
+		}
+		var dataOut = Data(count: dataIn.count)
+		var numBytesDecrypted: size_t = 0
+		var successBytes = 0
+		dataOut.withUnsafeMutableBytes { dataOut in
+			dataIn.withUnsafeBytes { dataIn in
+				key.withUnsafeBytes { key in
+					let success = CCCrypt(CCOperation(kCCEncrypt),
+					                      CCAlgorithm(kCCAlgorithmAES),
+					                      CCOptions(kCCOptionECBMode),
+					                      key.baseAddress,
+					                      key.count,
+					                      nil,
+					                      dataIn.baseAddress,
+					                      dataIn.count,
+					                      dataOut.baseAddress,
+					                      dataIn.count,
+					                      &numBytesDecrypted)
+
+					guard Int32(success) == UInt32(kCCSuccess) else { return }
+
+					successBytes = numBytesDecrypted
+				}
+			}
+		}
+
+		guard successBytes > 0 else { return nil }
+		dataOut.count = successBytes + 4
+
+		var response = Data(count: 0)
+		response.append(contentsOf: [paddingSize, 0, 0, 0])
+		response.append(dataOut)
+		return response
 	}
 }
