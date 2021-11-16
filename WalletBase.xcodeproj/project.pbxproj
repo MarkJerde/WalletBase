@@ -8,12 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		8D50F3AC273CBF1D00A754CB /* WalletBaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3AB273CBF1D00A754CB /* WalletBaseApp.swift */; };
-		8D50F3AE273CBF1D00A754CB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3AD273CBF1D00A754CB /* ContentView.swift */; };
+		8D50F3AE273CBF1D00A754CB /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3AD273CBF1D00A754CB /* MainView.swift */; };
 		8D50F3B0273CBF1F00A754CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D50F3AF273CBF1F00A754CB /* Assets.xcassets */; };
 		8D50F3B3273CBF1F00A754CB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D50F3B2273CBF1F00A754CB /* Preview Assets.xcassets */; };
 		8D50F3BE273CBF1F00A754CB /* WalletBaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3BD273CBF1F00A754CB /* WalletBaseTests.swift */; };
 		8D50F3C8273CBF1F00A754CB /* WalletBaseUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3C7273CBF1F00A754CB /* WalletBaseUITests.swift */; };
 		8D50F3CA273CBF2000A754CB /* WalletBaseUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3C9273CBF2000A754CB /* WalletBaseUITestsLaunchTests.swift */; };
+		8D50F3D7273CC0AD00A754CB /* SwlDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */; };
+		8D50F3D8273CC0AD00A754CB /* SwlDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */; };
+		8D50F3DA274196BB00A754CB /* SwlCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D9274196BB00A754CB /* SwlCrypto.swift */; };
+		8D50F3DB274196BB00A754CB /* SwlCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D9274196BB00A754CB /* SwlCrypto.swift */; };
+		8D50F3DD2741974B00A754CB /* CryptoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3DC2741974B00A754CB /* CryptoProvider.swift */; };
+		8D50F3DE2741974B00A754CB /* CryptoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3DC2741974B00A754CB /* CryptoProvider.swift */; };
+		8D50F3E327419BF000A754CB /* PasswordPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3E227419BF000A754CB /* PasswordPrompt.swift */; };
+		8D50F3E427419BF000A754CB /* PasswordPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3E227419BF000A754CB /* PasswordPrompt.swift */; };
+		8D50F3E527419BF700A754CB /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3AD273CBF1D00A754CB /* MainView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,7 +45,7 @@
 /* Begin PBXFileReference section */
 		8D50F3A8273CBF1D00A754CB /* WalletBase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WalletBase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D50F3AB273CBF1D00A754CB /* WalletBaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletBaseApp.swift; sourceTree = "<group>"; };
-		8D50F3AD273CBF1D00A754CB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		8D50F3AD273CBF1D00A754CB /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		8D50F3AF273CBF1F00A754CB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8D50F3B2273CBF1F00A754CB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		8D50F3B4273CBF1F00A754CB /* WalletBase.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WalletBase.entitlements; sourceTree = "<group>"; };
@@ -45,6 +54,10 @@
 		8D50F3C3273CBF1F00A754CB /* WalletBaseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WalletBaseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D50F3C7273CBF1F00A754CB /* WalletBaseUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletBaseUITests.swift; sourceTree = "<group>"; };
 		8D50F3C9273CBF2000A754CB /* WalletBaseUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletBaseUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlDatabase.swift; sourceTree = "<group>"; };
+		8D50F3D9274196BB00A754CB /* SwlCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlCrypto.swift; sourceTree = "<group>"; };
+		8D50F3DC2741974B00A754CB /* CryptoProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoProvider.swift; sourceTree = "<group>"; };
+		8D50F3E227419BF000A754CB /* PasswordPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordPrompt.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,8 +108,10 @@
 		8D50F3AA273CBF1D00A754CB /* WalletBase */ = {
 			isa = PBXGroup;
 			children = (
+				8D50F3E027419B7000A754CB /* Crypto */,
+				8D50F3DF27419B5A00A754CB /* Database */,
+				8D50F3E127419B8F00A754CB /* UI */,
 				8D50F3AB273CBF1D00A754CB /* WalletBaseApp.swift */,
-				8D50F3AD273CBF1D00A754CB /* ContentView.swift */,
 				8D50F3AF273CBF1F00A754CB /* Assets.xcassets */,
 				8D50F3B4273CBF1F00A754CB /* WalletBase.entitlements */,
 				8D50F3B1273CBF1F00A754CB /* Preview Content */,
@@ -127,6 +142,32 @@
 				8D50F3C9273CBF2000A754CB /* WalletBaseUITestsLaunchTests.swift */,
 			);
 			path = WalletBaseUITests;
+			sourceTree = "<group>";
+		};
+		8D50F3DF27419B5A00A754CB /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		8D50F3E027419B7000A754CB /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				8D50F3DC2741974B00A754CB /* CryptoProvider.swift */,
+				8D50F3D9274196BB00A754CB /* SwlCrypto.swift */,
+			);
+			path = Crypto;
+			sourceTree = "<group>";
+		};
+		8D50F3E127419B8F00A754CB /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				8D50F3AD273CBF1D00A754CB /* MainView.swift */,
+				8D50F3E227419BF000A754CB /* PasswordPrompt.swift */,
+			);
+			path = UI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -259,8 +300,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D50F3AE273CBF1D00A754CB /* ContentView.swift in Sources */,
+				8D50F3AE273CBF1D00A754CB /* MainView.swift in Sources */,
+				8D50F3DD2741974B00A754CB /* CryptoProvider.swift in Sources */,
+				8D50F3E327419BF000A754CB /* PasswordPrompt.swift in Sources */,
+				8D50F3DA274196BB00A754CB /* SwlCrypto.swift in Sources */,
 				8D50F3AC273CBF1D00A754CB /* WalletBaseApp.swift in Sources */,
+				8D50F3D7273CC0AD00A754CB /* SwlDatabase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +314,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D50F3BE273CBF1F00A754CB /* WalletBaseTests.swift in Sources */,
+				8D50F3D8273CC0AD00A754CB /* SwlDatabase.swift in Sources */,
+				8D50F3E527419BF700A754CB /* MainView.swift in Sources */,
+				8D50F3DB274196BB00A754CB /* SwlCrypto.swift in Sources */,
+				8D50F3E427419BF000A754CB /* PasswordPrompt.swift in Sources */,
+				8D50F3DE2741974B00A754CB /* CryptoProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
