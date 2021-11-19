@@ -55,10 +55,10 @@ class SQLiteDatabase {
 		}
 	}
 
-	func select(columns: [String], fromTable table: String) throws -> [[UInt8]?] {
+	func select(columns: [String], fromTable table: String, where whereClause: String? = nil) throws -> [[UInt8]?] {
 		var statement: OpaquePointer?
 
-		guard sqlite3_prepare_v2(database, "select \(columns.joined(separator: ", ")) from \(table)", -1, &statement, nil) == SQLITE_OK else {
+		guard sqlite3_prepare_v2(database, "select \(columns.joined(separator: ", ")) from \(table) \((whereClause != nil) ? "where" : "") \(whereClause ?? "")", -1, &statement, nil) == SQLITE_OK else {
 			throw DatabaseError(site: .prepare, database: database)
 		}
 
