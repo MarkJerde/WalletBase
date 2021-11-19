@@ -28,9 +28,9 @@ class SwlDatabase {
 	func test() -> String? {
 		guard let crypto = crypto else { return nil }
 		do {
-			let byteses: [[UInt8]?] = try database.select(columns: ["Name"], fromTable: "spbwlt_Category", where: "ParentCategoryID = ''")
-			return byteses.map {
-				guard let bytes: [UInt8] = $0 else { return "<data error>" }
+			let categories: [Category?] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: "spbwlt_Category", where: "ParentCategoryID = ''")
+			return categories.map {
+				guard let bytes: [UInt8] = $0?.name else { return "<data error>" }
 				let data = Data(bytes)
 				guard let plaintext = crypto.decryptString(data: data) else { return "<decryption error>" }
 				return plaintext
@@ -42,4 +42,17 @@ class SwlDatabase {
 	}
 
 	private var crypto: CryptoProvider?
+
+	struct Category: SQLiteDatabaseRow {
+		let id: String
+		let name: [UInt8]
+		let parent: String
+
+		static func decode(from statement: OpaquePointer, column: Int32 = 0) -> SwlDatabase.Category? {
+			guard let id: String = .decode(from: statement, column: column) else { return nil }
+			guard let name: [UInt8] = .decode(from: statement, column: column + 1) else { return nil }
+			guard let parent: String = .decode(from: statement, column: column + 2) else { return nil }
+			return .init(id: id, name: name, parent: parent)
+		}
+	}
 }

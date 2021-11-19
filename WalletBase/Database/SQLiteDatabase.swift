@@ -9,19 +9,29 @@ import Foundation
 import SQLite3
 
 protocol SQLiteDatabaseRow {
-	static func decode(from statement: OpaquePointer) -> Self?
+	static func decode(from statement: OpaquePointer, column: Int32) -> Self?
 }
 
 extension Array: SQLiteDatabaseRow where Element == UInt8 {
-	static func decode(from statement: OpaquePointer) -> Self? {
-		let length = sqlite3_column_bytes(statement, 0)
-		let pointer = sqlite3_column_blob(statement, 0)
+	static func decode(from statement: OpaquePointer, column: Int32 = 0) -> Self? {
+		let length = sqlite3_column_bytes(statement, column)
+		let pointer = sqlite3_column_blob(statement, column)
 		guard pointer != nil else {
 			return nil
 		}
 		let data = NSData(bytes: pointer, length: Int(length))
 		let array = [UInt8](data)
 		return array
+	}
+}
+
+extension String: SQLiteDatabaseRow {
+	static func decode(from statement: OpaquePointer, column: Int32 = 0) -> String? {
+		guard let cString = sqlite3_column_text(statement, column) else {
+			return nil
+		}
+		let value = String(cString: cString)
+		return value
 	}
 }
 
@@ -83,13 +93,7 @@ class SQLiteDatabase {
 
 		var response: [T?] = []
 		while sqlite3_step(statement) == SQLITE_ROW {
-			response.append(T.decode(from: statement))
-			/* guard let cString = sqlite3_column_text(statement, 0) else {
-			 	response.append(nil)
-			 	continue
-			 }
-			 	let value = String(cString: cString)
-			 response.append(value) */
+			response.append(T.decode(from: statement, column: 0))
 		}
 
 		guard sqlite3_finalize(statement) == SQLITE_OK else {
