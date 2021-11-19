@@ -8,9 +8,9 @@
 import Foundation
 
 class SwlDatabase {
-	var file: String
+	let file: URL
 
-	init(file: String) {
+	init(file: URL) {
 		self.file = file
 	}
 
