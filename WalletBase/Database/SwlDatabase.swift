@@ -28,7 +28,7 @@ class SwlDatabase {
 	func test() -> String? {
 		guard let crypto = crypto else { return nil }
 		do {
-			let byteses = try database.select(columns: ["Name"], fromTable: "spbwlt_Category", where: "ParentCategoryID = ''")
+			let byteses: [[UInt8]?] = try database.select(columns: ["Name"], fromTable: "spbwlt_Category", where: "ParentCategoryID = ''")
 			return byteses.map {
 				guard let bytes: [UInt8] = $0 else { return "<data error>" }
 				let data = Data(bytes)

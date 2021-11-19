@@ -8,6 +8,23 @@
 import Foundation
 import SQLite3
 
+protocol SQLiteDatabaseRow {
+	static func decode(from statement: OpaquePointer) -> Self?
+}
+
+extension Array: SQLiteDatabaseRow where Element == UInt8 {
+	static func decode(from statement: OpaquePointer) -> Self? {
+		let length = sqlite3_column_bytes(statement, 0)
+		let pointer = sqlite3_column_blob(statement, 0)
+		guard pointer != nil else {
+			return nil
+		}
+		let data = NSData(bytes: pointer, length: Int(length))
+		let array = [UInt8](data)
+		return array
+	}
+}
+
 class SQLiteDatabase {
 	let file: URL
 	private var database: OpaquePointer? {
@@ -55,24 +72,18 @@ class SQLiteDatabase {
 		}
 	}
 
-	func select(columns: [String], fromTable table: String, where whereClause: String? = nil) throws -> [[UInt8]?] {
+	func select<T: SQLiteDatabaseRow>(columns: [String], fromTable table: String, where whereClause: String? = nil) throws -> [T?] {
 		var statement: OpaquePointer?
 
-		guard sqlite3_prepare_v2(database, "select \(columns.joined(separator: ", ")) from \(table) \((whereClause != nil) ? "where" : "") \(whereClause ?? "")", -1, &statement, nil) == SQLITE_OK else {
+		guard sqlite3_prepare_v2(database, "select \(columns.joined(separator: ", ")) from \(table) \((whereClause != nil) ? "where" : "") \(whereClause ?? "")", -1, &statement, nil) == SQLITE_OK,
+		      let statement = statement
+		else {
 			throw DatabaseError(site: .prepare, database: database)
 		}
 
-		var response: [[UInt8]?] = []
+		var response: [T?] = []
 		while sqlite3_step(statement) == SQLITE_ROW {
-			let length = sqlite3_column_bytes(statement, 0)
-			let pointer = sqlite3_column_blob(statement, 0)
-			guard pointer != nil else {
-				response.append(nil)
-				continue
-			}
-			let data = NSData(bytes: pointer, length: Int(length))
-			let array = [UInt8](data)
-			response.append(array)
+			response.append(T.decode(from: statement))
 			/* guard let cString = sqlite3_column_text(statement, 0) else {
 			 	response.append(nil)
 			 	continue
