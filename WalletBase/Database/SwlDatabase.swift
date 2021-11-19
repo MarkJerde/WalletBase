@@ -8,10 +8,11 @@
 import Foundation
 
 class SwlDatabase {
-	let file: URL
+	let database: SQLiteDatabase
+	var file: URL { database.file }
 
 	init(file: URL) {
-		self.file = file
+		self.database = SQLiteDatabase(file: file)
 	}
 
 	func open(password: (@escaping (String) -> Void) -> Void, completion: @escaping (Bool) -> Void) {
@@ -26,10 +27,18 @@ class SwlDatabase {
 
 	func test() -> String? {
 		guard let crypto = crypto else { return nil }
-		let bytes: [UInt8] = [0x06, 0x00, 0x00, 0x00, 0xF0, 0x64, 0x98, 0xC8, 0x2F, 0xFE, 0x9B, 0x03, 0xC0, 0xD1, 0xC7, 0x4C, 0xEE, 0x9B, 0x7B, 0x7E, 0x7A, 0x69, 0x22, 0xD7, 0xCC, 0x23, 0x9A, 0xCF, 0x06, 0xF9, 0x45, 0xF1, 0x82, 0xB2, 0xB5, 0x53]
-		let data = Data(bytes)
-		guard let plaintext = crypto.decryptString(data: data) else { return nil }
-		return plaintext
+		do {
+			let byteses = try database.select(columns: ["Name"], fromTable: "spbwlt_Category")
+			return byteses.map {
+				guard let bytes: [UInt8] = $0 else { return "<data error>" }
+				let data = Data(bytes)
+				guard let plaintext = crypto.decryptString(data: data) else { return "<decryption error>" }
+				return plaintext
+			}.joined(separator: "\n")
+		}
+		catch {
+			return error.localizedDescription
+		}
 	}
 
 	private var crypto: CryptoProvider?
