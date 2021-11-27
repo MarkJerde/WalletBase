@@ -13,11 +13,13 @@ struct MainView: View {
 		case buttonToUnlock(databaseFile: URL)
 		case unlocking(database: SwlDatabase)
 		case passwordPrompt(database: SwlDatabase, completion: (String) -> Void)
-		case browseContent(database: SwlDatabase)
+		case browseContent(database: SwlDatabase, category: SwlDatabase.Item?)
 		indirect case error(message: String, then: MyState)
 	}
 
 	@State private var state: MyState = .loadingDatabase
+	@State private var category: SwlDatabase.Item?
+	@State private var items: [SwlDatabase.Item] = []
 
 	var body: some View {
 		switch state {
@@ -47,7 +49,9 @@ struct MainView: View {
 							return
 						}
 
-						state = .browseContent(database: database)
+						category = nil
+						items = database.items(in: category?.category).sorted(by: \.name)
+						state = .browseContent(database: database, category: nil)
 					}
 				}
 		case .passwordPrompt(let database, let completion):
@@ -59,15 +63,27 @@ struct MainView: View {
 				}
 				completion(password)
 			}
-		case .browseContent(let database):
+		case .browseContent(let database, _):
 			VStack {
-				Text("Decrypted:")
-				Text(database.test() ?? "ERROR")
+				ItemGrid(items: $items,
+				         container: $category) { item in
+					state = .browseContent(database: database, category: item)
+					category = item
+					items = database.items(in: category?.category).sorted(by: \.name)
+				} onBackTap: {
+					guard let parentId = category?.category.parent else { return }
+					let parent = database.categoryItem(forId: parentId)
+					state = .browseContent(database: database, category: parent)
+					category = parent
+					items = database.items(in: category?.category).sorted(by: \.name)
+				}
 				Button("Lock") {
+					items = []
+					category = nil
 					state = .buttonToUnlock(databaseFile: database.file)
 				}
+				.padding(.all, 20)
 			}
-			.padding(.all, 20)
 		case .error(let message, let then):
 			VStack {
 				Text("Error:")

@@ -15,7 +15,6 @@
 		8D50F3C8273CBF1F00A754CB /* WalletBaseUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3C7273CBF1F00A754CB /* WalletBaseUITests.swift */; };
 		8D50F3CA273CBF2000A754CB /* WalletBaseUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3C9273CBF2000A754CB /* WalletBaseUITestsLaunchTests.swift */; };
 		8D50F3D7273CC0AD00A754CB /* SwlDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */; };
-		8D50F3D8273CC0AD00A754CB /* SwlDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */; };
 		8D50F3DA274196BB00A754CB /* SwlCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D9274196BB00A754CB /* SwlCrypto.swift */; };
 		8D50F3DB274196BB00A754CB /* SwlCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D9274196BB00A754CB /* SwlCrypto.swift */; };
 		8D50F3DD2741974B00A754CB /* CryptoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3DC2741974B00A754CB /* CryptoProvider.swift */; };
@@ -24,6 +23,18 @@
 		8D50F3E427419BF000A754CB /* PasswordPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3E227419BF000A754CB /* PasswordPrompt.swift */; };
 		8D50F3E527419BF700A754CB /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3AD273CBF1D00A754CB /* MainView.swift */; };
 		8D5D6134274757C900F95986 /* SQLiteDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6133274757C900F95986 /* SQLiteDatabase.swift */; };
+		8D5D61362748A62A00F95986 /* ItemGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61352748A62A00F95986 /* ItemGrid.swift */; };
+		8D5D61372748AAD300F95986 /* SQLiteDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6133274757C900F95986 /* SQLiteDatabase.swift */; };
+		8D5D61382749AF3900F95986 /* SwlDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */; };
+		8D5D61392749AF4400F95986 /* ItemGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61352748A62A00F95986 /* ItemGrid.swift */; };
+		8D5D613C275193EF00F95986 /* SwlID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D613B275193EF00F95986 /* SwlID.swift */; };
+		8D5D613E2751942B00F95986 /* SwlCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D613D2751942B00F95986 /* SwlCategory.swift */; };
+		8D5D6140275194C500F95986 /* SwlItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D613F275194C500F95986 /* SwlItem.swift */; };
+		8D5D61432751954600F95986 /* Array+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61422751954600F95986 /* Array+SQLiteDatabaseItem.swift */; };
+		8D5D61452751956700F95986 /* String+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61442751956700F95986 /* String+SQLiteDatabaseItem.swift */; };
+		8D5D61472751959900F95986 /* SwlID+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61462751959900F95986 /* SwlID+SQLiteDatabaseItem.swift */; };
+		8D5D61492751960800F95986 /* SwlCategory+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61482751960700F95986 /* SwlCategory+SQLiteDatabaseItem.swift */; };
+		8D5D614D2751E65B00F95986 /* Sequence+Sorted.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D614C2751E65B00F95986 /* Sequence+Sorted.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +71,15 @@
 		8D50F3DC2741974B00A754CB /* CryptoProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoProvider.swift; sourceTree = "<group>"; };
 		8D50F3E227419BF000A754CB /* PasswordPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordPrompt.swift; sourceTree = "<group>"; };
 		8D5D6133274757C900F95986 /* SQLiteDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteDatabase.swift; sourceTree = "<group>"; };
+		8D5D61352748A62A00F95986 /* ItemGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemGrid.swift; sourceTree = "<group>"; };
+		8D5D613B275193EF00F95986 /* SwlID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlID.swift; sourceTree = "<group>"; };
+		8D5D613D2751942B00F95986 /* SwlCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlCategory.swift; sourceTree = "<group>"; };
+		8D5D613F275194C500F95986 /* SwlItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlItem.swift; sourceTree = "<group>"; };
+		8D5D61422751954600F95986 /* Array+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
+		8D5D61442751956700F95986 /* String+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
+		8D5D61462751959900F95986 /* SwlID+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlID+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
+		8D5D61482751960700F95986 /* SwlCategory+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCategory+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
+		8D5D614C2751E65B00F95986 /* Sequence+Sorted.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sorted.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +132,7 @@
 			children = (
 				8D50F3E027419B7000A754CB /* Crypto */,
 				8D50F3DF27419B5A00A754CB /* Database */,
+				8D5D614B2751E62E00F95986 /* Util */,
 				8D50F3E127419B8F00A754CB /* UI */,
 				8D50F3AB273CBF1D00A754CB /* WalletBaseApp.swift */,
 				8D50F3AF273CBF1F00A754CB /* Assets.xcassets */,
@@ -149,8 +170,10 @@
 		8D50F3DF27419B5A00A754CB /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */,
 				8D5D6133274757C900F95986 /* SQLiteDatabase.swift */,
+				8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */,
+				8D5D61412751952400F95986 /* SQLiteItems */,
+				8D5D613A275193D100F95986 /* Swl */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -169,8 +192,46 @@
 			children = (
 				8D50F3AD273CBF1D00A754CB /* MainView.swift */,
 				8D50F3E227419BF000A754CB /* PasswordPrompt.swift */,
+				8D5D61352748A62A00F95986 /* ItemGrid.swift */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		8D5D613A275193D100F95986 /* Swl */ = {
+			isa = PBXGroup;
+			children = (
+				8D5D613B275193EF00F95986 /* SwlID.swift */,
+				8D5D613D2751942B00F95986 /* SwlCategory.swift */,
+				8D5D613F275194C500F95986 /* SwlItem.swift */,
+				8D5D614A2751963E00F95986 /* SQLiteDatabaseItem */,
+			);
+			path = Swl;
+			sourceTree = "<group>";
+		};
+		8D5D61412751952400F95986 /* SQLiteItems */ = {
+			isa = PBXGroup;
+			children = (
+				8D5D61422751954600F95986 /* Array+SQLiteDatabaseItem.swift */,
+				8D5D61442751956700F95986 /* String+SQLiteDatabaseItem.swift */,
+			);
+			path = SQLiteItems;
+			sourceTree = "<group>";
+		};
+		8D5D614A2751963E00F95986 /* SQLiteDatabaseItem */ = {
+			isa = PBXGroup;
+			children = (
+				8D5D61462751959900F95986 /* SwlID+SQLiteDatabaseItem.swift */,
+				8D5D61482751960700F95986 /* SwlCategory+SQLiteDatabaseItem.swift */,
+			);
+			path = SQLiteDatabaseItem;
+			sourceTree = "<group>";
+		};
+		8D5D614B2751E62E00F95986 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				8D5D614C2751E65B00F95986 /* Sequence+Sorted.swift */,
+			);
+			path = Util;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -304,11 +365,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D50F3AE273CBF1D00A754CB /* MainView.swift in Sources */,
+				8D5D613E2751942B00F95986 /* SwlCategory.swift in Sources */,
 				8D50F3DD2741974B00A754CB /* CryptoProvider.swift in Sources */,
 				8D50F3E327419BF000A754CB /* PasswordPrompt.swift in Sources */,
 				8D50F3DA274196BB00A754CB /* SwlCrypto.swift in Sources */,
+				8D5D614D2751E65B00F95986 /* Sequence+Sorted.swift in Sources */,
+				8D5D61472751959900F95986 /* SwlID+SQLiteDatabaseItem.swift in Sources */,
+				8D5D61492751960800F95986 /* SwlCategory+SQLiteDatabaseItem.swift in Sources */,
+				8D5D61432751954600F95986 /* Array+SQLiteDatabaseItem.swift in Sources */,
+				8D5D6140275194C500F95986 /* SwlItem.swift in Sources */,
+				8D5D613C275193EF00F95986 /* SwlID.swift in Sources */,
 				8D50F3AC273CBF1D00A754CB /* WalletBaseApp.swift in Sources */,
+				8D5D61452751956700F95986 /* String+SQLiteDatabaseItem.swift in Sources */,
 				8D50F3D7273CC0AD00A754CB /* SwlDatabase.swift in Sources */,
+				8D5D61362748A62A00F95986 /* ItemGrid.swift in Sources */,
 				8D5D6134274757C900F95986 /* SQLiteDatabase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -318,11 +388,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D50F3BE273CBF1F00A754CB /* WalletBaseTests.swift in Sources */,
-				8D50F3D8273CC0AD00A754CB /* SwlDatabase.swift in Sources */,
 				8D50F3E527419BF700A754CB /* MainView.swift in Sources */,
 				8D50F3DB274196BB00A754CB /* SwlCrypto.swift in Sources */,
 				8D50F3E427419BF000A754CB /* PasswordPrompt.swift in Sources */,
 				8D50F3DE2741974B00A754CB /* CryptoProvider.swift in Sources */,
+				8D5D61372748AAD300F95986 /* SQLiteDatabase.swift in Sources */,
+				8D5D61392749AF4400F95986 /* ItemGrid.swift in Sources */,
+				8D5D61382749AF3900F95986 /* SwlDatabase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

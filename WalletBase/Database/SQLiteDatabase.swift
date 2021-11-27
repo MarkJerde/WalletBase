@@ -8,35 +8,21 @@
 import Foundation
 import SQLite3
 
-protocol SQLiteDatabaseRow {
+/// A type that can be decoded from an SQLite statement beginning at a given column.
+protocol SQLiteDatabaseItem {
+	/// Creates a new instance by decoding from the given statement.
+	/// - Parameters:
+	///   - statement: The statement to decode from.
+	///   - column: The column at which to start decoding. Multiple columns may be consumed if it is a composite type.
+	/// - Returns: The decoded instance.
 	static func decode(from statement: OpaquePointer, column: Int32) -> Self?
 }
 
-extension Array: SQLiteDatabaseRow where Element == UInt8 {
-	static func decode(from statement: OpaquePointer, column: Int32 = 0) -> Self? {
-		let length = sqlite3_column_bytes(statement, column)
-		let pointer = sqlite3_column_blob(statement, column)
-		guard pointer != nil else {
-			return nil
-		}
-		let data = NSData(bytes: pointer, length: Int(length))
-		let array = [UInt8](data)
-		return array
-	}
-}
-
-extension String: SQLiteDatabaseRow {
-	static func decode(from statement: OpaquePointer, column: Int32 = 0) -> String? {
-		guard let cString = sqlite3_column_text(statement, column) else {
-			return nil
-		}
-		let value = String(cString: cString)
-		return value
-	}
-}
-
+/// A wrapper around an SQLite database session.
 class SQLiteDatabase {
+	/// The database file.
 	let file: URL
+
 	private var database: OpaquePointer? {
 		if let database = _database { return database }
 
@@ -53,12 +39,17 @@ class SQLiteDatabase {
 
 	private var _database: OpaquePointer?
 
+	/// Creates and returns an SQLite database session wrapper for the specified database file.
+	/// - Parameter file: The database file.
 	init(file: URL) {
 		self.file = file
 	}
 
+	/// An error that occurs during the execution of database commands.
 	struct DatabaseError: Error {
+		/// The database command that was being called.
 		let site: Site
+		/// The problem that occurred.
 		let problem: Problem
 
 		init(site: Site, database: OpaquePointer?) {
@@ -82,10 +73,17 @@ class SQLiteDatabase {
 		}
 	}
 
-	func select<T: SQLiteDatabaseRow>(columns: [String], fromTable table: String, where whereClause: String? = nil) throws -> [T?] {
+	/// Performs a select operation on the database, selecting the named columns from the named table with the given where clause (if any).
+	/// - Parameters:
+	///   - columns: The columns to select.
+	///   - fromTable: The table to select from.
+	///   - where: The where clause to filter by. (No filtering if nil.)
+	/// - Returns: An array containing the selected items from the database.
+	func select<T: SQLiteDatabaseItem>(columns: [String], fromTable table: String, where whereClause: String? = nil) throws -> [T?] {
 		var statement: OpaquePointer?
 
-		guard sqlite3_prepare_v2(database, "select \(columns.joined(separator: ", ")) from \(table) \((whereClause != nil) ? "where" : "") \(whereClause ?? "")", -1, &statement, nil) == SQLITE_OK,
+		let statementText = "select \(columns.joined(separator: ", ")) from \(table) \((whereClause != nil) ? "where" : "") \(whereClause ?? "")"
+		guard sqlite3_prepare_v2(database, statementText, -1, &statement, nil) == SQLITE_OK,
 		      let statement = statement
 		else {
 			throw DatabaseError(site: .prepare, database: database)
