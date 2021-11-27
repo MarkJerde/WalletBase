@@ -21,6 +21,25 @@ struct MainView: View {
 	@State private var category: SwlDatabase.Item?
 	@State private var items: [SwlDatabase.Item] = []
 
+	fileprivate func navigate(toCategory item: SwlDatabase.Item?, database: SwlDatabase) {
+		category = item
+		var swlCategory: SwlDatabase.Category?
+		if let item = item,
+		   case .category(let category) = item.itemType
+		{
+			swlCategory = category
+		}
+		let categories = database.categories(in: swlCategory).sorted(by: \.name)
+		let cards: [SwlDatabase.Item]
+		if let swlCategory = swlCategory {
+			cards = database.cards(in: swlCategory).sorted(by: \.name)
+		} else {
+			cards = []
+		}
+		items = categories + cards
+		state = .browseContent(database: database, category: item)
+	}
+
 	var body: some View {
 		switch state {
 		case .loadingDatabase:
@@ -49,9 +68,7 @@ struct MainView: View {
 							return
 						}
 
-						category = nil
-						items = database.items(in: category?.category).sorted(by: \.name)
-						state = .browseContent(database: database, category: nil)
+						navigate(toCategory: nil, database: database)
 					}
 				}
 		case .passwordPrompt(let database, let completion):
@@ -67,15 +84,16 @@ struct MainView: View {
 			VStack {
 				ItemGrid(items: $items,
 				         container: $category) { item in
-					state = .browseContent(database: database, category: item)
-					category = item
-					items = database.items(in: category?.category).sorted(by: \.name)
+					guard item.type == .category else {
+						return
+					}
+					navigate(toCategory: item, database: database)
 				} onBackTap: {
-					guard let parentId = category?.category.parent else { return }
+					guard let category = category,
+					      case .category(let swlCategory) = category.itemType else { return }
+					let parentId = swlCategory.parent
 					let parent = database.categoryItem(forId: parentId)
-					state = .browseContent(database: database, category: parent)
-					category = parent
-					items = database.items(in: category?.category).sorted(by: \.name)
+					navigate(toCategory: parent, database: database)
 				}
 				Button("Lock") {
 					items = []

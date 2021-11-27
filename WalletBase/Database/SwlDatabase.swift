@@ -60,7 +60,7 @@ class SwlDatabase {
 			let data = Data(bytes)
 			guard let plaintext = crypto.decryptString(data: data) else { return nil }
 
-			return .init(name: plaintext, category: category)
+			return .init(name: plaintext, type: .category(category: category))
 		}
 		catch {
 			return nil
@@ -71,6 +71,18 @@ class SwlDatabase {
 	/// - Parameter category: The category.
 	/// - Returns: The items.
 	func items(in category: Category?) -> [Item] {
+		let categories = categories(in: category)
+		guard let category = category else {
+			return categories
+		}
+		let cards = cards(in: category)
+		return categories + cards
+	}
+
+	/// Obtains the decrypted category items in a given category, or the root category if nil.
+	/// - Parameter category: The category.
+	/// - Returns: The items.
+	func categories(in category: Category?) -> [Item] {
 		guard let crypto = crypto else { return [] }
 		do {
 			// Find everything that matches.
@@ -90,7 +102,32 @@ class SwlDatabase {
 				let bytes: [UInt8] = category.name
 				let data = Data(bytes)
 				guard let plaintext = crypto.decryptString(data: data) else { return nil }
-				return .init(name: plaintext, category: category)
+				return .init(name: plaintext, type: .category(category: category))
+			}
+		}
+		catch {
+			return []
+		}
+	}
+
+	/// Obtains the decrypted card items in a given category, or the root category if nil.
+	/// - Parameter category: The category.
+	/// - Returns: The items.
+	func cards(in category: Category) -> [Item] {
+		guard let crypto = crypto else { return [] }
+		do {
+			// Find everything that matches.
+			let cards: [Card] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: "spbwlt_Card", where: "ParentCategoryID \(category.id.queryCondition)").compactMap { $0 }
+
+			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
+			let filteredCards: [Card] = category.id.filter(results: cards, \.parent)
+
+			// Decrypt the item names and return.
+			return filteredCards.compactMap { card in
+				let bytes: [UInt8] = card.name
+				let data = Data(bytes)
+				guard let plaintext = crypto.decryptString(data: data) else { return nil }
+				return .init(name: plaintext, type: .card(card: card))
 			}
 		}
 		catch {

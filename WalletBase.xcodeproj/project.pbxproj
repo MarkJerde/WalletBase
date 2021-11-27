@@ -35,6 +35,8 @@
 		8D5D61472751959900F95986 /* SwlID+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61462751959900F95986 /* SwlID+SQLiteDatabaseItem.swift */; };
 		8D5D61492751960800F95986 /* SwlCategory+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61482751960700F95986 /* SwlCategory+SQLiteDatabaseItem.swift */; };
 		8D5D614D2751E65B00F95986 /* Sequence+Sorted.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D614C2751E65B00F95986 /* Sequence+Sorted.swift */; };
+		8D5D614F2751E89C00F95986 /* SwlCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D614E2751E89C00F95986 /* SwlCard.swift */; };
+		8D5D61512751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61502751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +82,8 @@
 		8D5D61462751959900F95986 /* SwlID+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlID+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
 		8D5D61482751960700F95986 /* SwlCategory+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCategory+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
 		8D5D614C2751E65B00F95986 /* Sequence+Sorted.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sorted.swift"; sourceTree = "<group>"; };
+		8D5D614E2751E89C00F95986 /* SwlCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlCard.swift; sourceTree = "<group>"; };
+		8D5D61502751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCard+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -201,8 +205,9 @@
 			isa = PBXGroup;
 			children = (
 				8D5D613B275193EF00F95986 /* SwlID.swift */,
-				8D5D613D2751942B00F95986 /* SwlCategory.swift */,
 				8D5D613F275194C500F95986 /* SwlItem.swift */,
+				8D5D614E2751E89C00F95986 /* SwlCard.swift */,
+				8D5D613D2751942B00F95986 /* SwlCategory.swift */,
 				8D5D614A2751963E00F95986 /* SQLiteDatabaseItem */,
 			);
 			path = Swl;
@@ -222,6 +227,7 @@
 			children = (
 				8D5D61462751959900F95986 /* SwlID+SQLiteDatabaseItem.swift */,
 				8D5D61482751960700F95986 /* SwlCategory+SQLiteDatabaseItem.swift */,
+				8D5D61502751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift */,
 			);
 			path = SQLiteDatabaseItem;
 			sourceTree = "<group>";
@@ -370,12 +376,14 @@
 				8D50F3E327419BF000A754CB /* PasswordPrompt.swift in Sources */,
 				8D50F3DA274196BB00A754CB /* SwlCrypto.swift in Sources */,
 				8D5D614D2751E65B00F95986 /* Sequence+Sorted.swift in Sources */,
+				8D5D61512751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift in Sources */,
 				8D5D61472751959900F95986 /* SwlID+SQLiteDatabaseItem.swift in Sources */,
 				8D5D61492751960800F95986 /* SwlCategory+SQLiteDatabaseItem.swift in Sources */,
 				8D5D61432751954600F95986 /* Array+SQLiteDatabaseItem.swift in Sources */,
 				8D5D6140275194C500F95986 /* SwlItem.swift in Sources */,
 				8D5D613C275193EF00F95986 /* SwlID.swift in Sources */,
 				8D50F3AC273CBF1D00A754CB /* WalletBaseApp.swift in Sources */,
+				8D5D614F2751E89C00F95986 /* SwlCard.swift in Sources */,
 				8D5D61452751956700F95986 /* String+SQLiteDatabaseItem.swift in Sources */,
 				8D50F3D7273CC0AD00A754CB /* SwlDatabase.swift in Sources */,
 				8D5D61362748A62A00F95986 /* ItemGrid.swift in Sources */,
