@@ -13,7 +13,7 @@ struct MainView: View {
 		case buttonToUnlock(databaseFile: URL)
 		case unlocking(database: SwlDatabase)
 		case passwordPrompt(database: SwlDatabase, completion: (String) -> Void)
-		case browseContent(database: SwlDatabase, category: SwlDatabase.Item?)
+		case browseContent(database: SwlDatabase)
 		indirect case error(message: String, then: MyState)
 	}
 
@@ -37,7 +37,7 @@ struct MainView: View {
 			cards = []
 		}
 		items = categories + cards
-		state = .browseContent(database: database, category: item)
+		state = .browseContent(database: database)
 	}
 
 	var body: some View {
@@ -80,7 +80,7 @@ struct MainView: View {
 				}
 				completion(password)
 			}
-		case .browseContent(let database, _):
+		case .browseContent(let database):
 			VStack {
 				ItemGrid(items: $items,
 				         container: $category) { item in
