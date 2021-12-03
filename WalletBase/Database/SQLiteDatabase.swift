@@ -18,6 +18,10 @@ protocol SQLiteDatabaseItem {
 	static func decode(from statement: OpaquePointer, column: Int32) -> Self?
 }
 
+protocol SQLiteTable {
+	var name: String { get }
+}
+
 /// A wrapper around an SQLite database session.
 class SQLiteDatabase {
 	/// The database file.
@@ -79,10 +83,10 @@ class SQLiteDatabase {
 	///   - fromTable: The table to select from.
 	///   - where: The where clause to filter by. (No filtering if nil.)
 	/// - Returns: An array containing the selected items from the database.
-	func select<T: SQLiteDatabaseItem>(columns: [String], fromTable table: String, where whereClause: String? = nil) throws -> [T?] {
+	func select<T: SQLiteDatabaseItem>(columns: [String], fromTable table: SQLiteTable, where whereClause: String? = nil) throws -> [T?] {
 		var statement: OpaquePointer?
 
-		let statementText = "select \(columns.joined(separator: ", ")) from \(table) \((whereClause != nil) ? "where" : "") \(whereClause ?? "")"
+		let statementText = "select \(columns.joined(separator: ", ")) from \(table.name) \((whereClause != nil) ? "where" : "") \(whereClause ?? "")"
 		guard sqlite3_prepare_v2(database, statementText, -1, &statement, nil) == SQLITE_OK,
 		      let statement = statement
 		else {

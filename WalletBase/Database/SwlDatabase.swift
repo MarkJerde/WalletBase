@@ -45,7 +45,7 @@ class SwlDatabase {
 		      let crypto = crypto else { return nil }
 		do {
 			// Find everything that matches.
-			let categories: [Category] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: "spbwlt_Category", where: "ID \(categoryId.queryCondition)").compactMap { $0 }
+			let categories: [Category] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: Tables.categories, where: "ID \(categoryId.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCategories = categoryId.filter(results: categories, \.id)
@@ -86,7 +86,7 @@ class SwlDatabase {
 		guard let crypto = crypto else { return [] }
 		do {
 			// Find everything that matches.
-			let categories: [Category] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: "spbwlt_Category", where: "ParentCategoryID \(category?.id.queryCondition ?? "like ''")").compactMap { $0 }
+			let categories: [Category] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: Tables.categories, where: "ParentCategoryID \(category?.id.queryCondition ?? "like ''")").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCategories: [Category]
@@ -110,14 +110,14 @@ class SwlDatabase {
 		}
 	}
 
-	/// Obtains the decrypted card items in a given category, or the root category if nil.
+	/// Obtains the decrypted card items in a given category.
 	/// - Parameter category: The category.
 	/// - Returns: The items.
 	func cards(in category: Category) -> [Item] {
 		guard let crypto = crypto else { return [] }
 		do {
 			// Find everything that matches.
-			let cards: [Card] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: "spbwlt_Card", where: "ParentCategoryID \(category.id.queryCondition)").compactMap { $0 }
+			let cards: [Card] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: Tables.cards, where: "ParentCategoryID \(category.id.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCards: [Card] = category.id.filter(results: cards, \.parent)
@@ -135,6 +135,34 @@ class SwlDatabase {
 		}
 	}
 
+	/// Obtains the encrypted card field values of a given card.
+	/// - Parameter category: The category.
+	/// - Returns: The items.
+	func fieldValues(in card: Card) -> [CardFieldValue] {
+		do {
+			// Find everything that matches.
+			let fieldValues: [CardFieldValue] = try database.select(columns: ["ID", "CardID", "TemplateFieldID", "ValueString"], fromTable: Tables.cardFieldValue, where: "CardID \(card.id.queryCondition)").compactMap { $0 }
+
+			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
+			let filteredCards: [CardFieldValue] = card.id.filter(results: fieldValues, \.cardId)
+
+			return filteredCards
+		}
+		catch {
+			return []
+		}
+	}
+
 	/// The cryptography provider which can decrypt this wallet.
 	private var crypto: CryptoProvider?
+
+	private enum Tables: String, SQLiteTable {
+		case categories = "spbwlt_Category"
+		case cards = "spbwlt_Card"
+		case cardFieldValue = "spbwlt_CardFieldValue"
+
+		var name: String {
+			return rawValue
+		}
+	}
 }
