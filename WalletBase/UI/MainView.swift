@@ -14,18 +14,37 @@ struct MainView: View {
 		case unlocking(database: SwlDatabase)
 		case passwordPrompt(database: SwlDatabase, completion: (String) -> Void)
 		case browseContent(database: SwlDatabase)
+		case viewCard(database: SwlDatabase)
 		indirect case error(message: String, then: MyState)
 	}
 
 	@State private var state: MyState = .loadingDatabase
 	@State private var category: SwlDatabase.Item?
 	@State private var items: [SwlDatabase.Item] = []
+	@State private var card: CardValuesComposite?
 
-	fileprivate func navigate(toCategory item: SwlDatabase.Item?, database: SwlDatabase) {
-		category = item
+	fileprivate func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, card: SwlDatabase.Card? = nil) {
+		self.category = category
+
+		if let card = card {
+			items = []
+			let cardValues = database.fieldValues(in: card)
+			self.card = CardValuesComposite(name: database.decryptString(bytes: card.name) ?? "",
+			                                values: cardValues.map {
+			                                	CardValuesComposite.Value(name: "something",
+			                                	                          hidePlaintext: true,
+			                                	                          encryptedValue: $0.value) { encrypted in
+			                                		database.decryptString(bytes: encrypted)
+			                                	}
+			                                })
+			state = .viewCard(database: database)
+			return
+		}
+
+		// Load category view content.
 		var swlCategory: SwlDatabase.Category?
-		if let item = item,
-		   case .category(let category) = item.itemType
+		if let category = category,
+		   case .category(let category) = category.itemType
 		{
 			swlCategory = category
 		}
@@ -68,7 +87,7 @@ struct MainView: View {
 							return
 						}
 
-						navigate(toCategory: nil, database: database)
+						navigate(toDatabase: database)
 					}
 				}
 		case .passwordPrompt(let database, let completion):
@@ -84,16 +103,30 @@ struct MainView: View {
 			VStack {
 				ItemGrid(items: $items,
 				         container: $category) { item in
-					guard item.type == .category else {
-						return
+					switch item.itemType {
+					case .card(let card):
+						navigate(toDatabase: database, category: category, card: card)
+					case .category:
+						navigate(toDatabase: database, category: item)
 					}
-					navigate(toCategory: item, database: database)
 				} onBackTap: {
 					guard let category = category,
 					      case .category(let swlCategory) = category.itemType else { return }
 					let parentId = swlCategory.parent
 					let parent = database.categoryItem(forId: parentId)
-					navigate(toCategory: parent, database: database)
+					navigate(toDatabase: database, category: parent)
+				}
+				Button("Lock") {
+					items = []
+					category = nil
+					state = .buttonToUnlock(databaseFile: database.file)
+				}
+				.padding(.all, 20)
+			}
+		case .viewCard(let database):
+			VStack {
+				CardView(item: $card) {
+					navigate(toDatabase: database, category: category)
 				}
 				Button("Lock") {
 					items = []

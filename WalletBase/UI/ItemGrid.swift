@@ -44,25 +44,8 @@ struct ItemGrid<Item: ItemGridItem>: View {
 	let onItemTap: (Item) -> Void
 	let onBackTap: () -> Void
 	var body: some View {
-		VStack {
-			HStack {
-				if let container = container {
-					Button {
-						onBackTap()
-					} label: {
-						Image(systemName: "arrow.backward")
-							.foregroundColor(.black)
-					}
-					.frame(height: 50)
-					Spacer()
-					Text(container.name)
-						.foregroundColor(.white)
-				}
-			}
-			.padding([.leading, .trailing], 20)
-			.frame(height: 50)
-			.frame(maxWidth: .infinity)
-			.background(Color.secondary)
+		NavigationFrame(currentName: container?.name,
+		                onBackTap: onBackTap) {
 			ScrollView {
 				LazyVGrid(columns: columns, spacing: 20) {
 					ForEach(items, id: \.self) { item in

@@ -153,6 +153,11 @@ class SwlDatabase {
 		}
 	}
 
+	func decryptString(bytes: [UInt8]) -> String? {
+		let data = Data(bytes)
+		return crypto?.decryptString(data: data)
+	}
+
 	/// The cryptography provider which can decrypt this wallet.
 	private var crypto: CryptoProvider?
 
