@@ -57,6 +57,12 @@
 		8D5D616B2759B54700F95986 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61692759B4E100F95986 /* CardView.swift */; };
 		8D5D616D275A4E0B00F95986 /* CardValuesComposite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D616C275A4E0B00F95986 /* CardValuesComposite.swift */; };
 		8D5D616E275A4F0100F95986 /* CardValuesComposite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D616C275A4E0B00F95986 /* CardValuesComposite.swift */; };
+		8D5D6170275C70F200F95986 /* SwlTemplateField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D616F275C70F200F95986 /* SwlTemplateField.swift */; };
+		8D5D6171275C70F200F95986 /* SwlTemplateField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D616F275C70F200F95986 /* SwlTemplateField.swift */; };
+		8D5D6173275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6172275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift */; };
+		8D5D6174275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6172275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift */; };
+		8D5D6176275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6175275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift */; };
+		8D5D6177275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6175275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +115,9 @@
 		8D5D615A2759B01F00F95986 /* NavigationFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationFrame.swift; sourceTree = "<group>"; };
 		8D5D61692759B4E100F95986 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		8D5D616C275A4E0B00F95986 /* CardValuesComposite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardValuesComposite.swift; sourceTree = "<group>"; };
+		8D5D616F275C70F200F95986 /* SwlTemplateField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlTemplateField.swift; sourceTree = "<group>"; };
+		8D5D6172275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateField+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
+		8D5D6175275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int32+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,6 +245,7 @@
 				8D5D614E2751E89C00F95986 /* SwlCard.swift */,
 				8D5D615227550F8900F95986 /* SwlCardFieldValue.swift */,
 				8D5D613D2751942B00F95986 /* SwlCategory.swift */,
+				8D5D616F275C70F200F95986 /* SwlTemplateField.swift */,
 				8D5D614A2751963E00F95986 /* SQLiteDatabaseItem */,
 			);
 			path = Swl;
@@ -245,6 +255,7 @@
 			isa = PBXGroup;
 			children = (
 				8D5D61422751954600F95986 /* Array+SQLiteDatabaseItem.swift */,
+				8D5D6175275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift */,
 				8D5D61442751956700F95986 /* String+SQLiteDatabaseItem.swift */,
 			);
 			path = SQLiteItems;
@@ -257,6 +268,7 @@
 				8D5D61502751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift */,
 				8D5D61542755140600F95986 /* CardFieldValue+SQLiteDatabaseItem.swift */,
 				8D5D61482751960700F95986 /* SwlCategory+SQLiteDatabaseItem.swift */,
+				8D5D6172275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift */,
 			);
 			path = SQLiteDatabaseItem;
 			sourceTree = "<group>";
@@ -415,6 +427,9 @@
 				8D5D6140275194C500F95986 /* SwlItem.swift in Sources */,
 				8D5D613C275193EF00F95986 /* SwlID.swift in Sources */,
 				8D50F3AC273CBF1D00A754CB /* WalletBaseApp.swift in Sources */,
+				8D5D6176275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */,
+				8D5D6170275C70F200F95986 /* SwlTemplateField.swift in Sources */,
+				8D5D6173275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift in Sources */,
 				8D5D614F2751E89C00F95986 /* SwlCard.swift in Sources */,
 				8D5D61452751956700F95986 /* String+SQLiteDatabaseItem.swift in Sources */,
 				8D50F3D7273CC0AD00A754CB /* SwlDatabase.swift in Sources */,
@@ -445,6 +460,9 @@
 				8D5D61622759B35F00F95986 /* SwlCardFieldValue.swift in Sources */,
 				8D50F3E427419BF000A754CB /* PasswordPrompt.swift in Sources */,
 				8D50F3DE2741974B00A754CB /* CryptoProvider.swift in Sources */,
+				8D5D6177275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */,
+				8D5D6171275C70F200F95986 /* SwlTemplateField.swift in Sources */,
+				8D5D6174275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift in Sources */,
 				8D5D61372748AAD300F95986 /* SQLiteDatabase.swift in Sources */,
 				8D5D61392749AF4400F95986 /* ItemGrid.swift in Sources */,
 				8D5D61632759B36400F95986 /* SwlID+SQLiteDatabaseItem.swift in Sources */,

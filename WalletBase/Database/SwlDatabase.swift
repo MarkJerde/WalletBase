@@ -153,6 +153,28 @@ class SwlDatabase {
 		}
 	}
 
+	/// Obtains the encrypted template field of a given id.
+	/// - Parameter category: The category.
+	/// - Returns: The items.
+	func templateField(forId templateFieldId: SwlID) -> SwlTemplateField? {
+		do {
+			// Find everything that matches.
+			let templateFields: [SwlTemplateField] = try database.select(columns: ["ID", "Name", "TemplateID", "FieldTypeID", "Priority", "AdvInfo"], fromTable: Tables.templateField, where: "ID \(templateFieldId.queryCondition)").compactMap { $0 }
+
+			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
+			let filteredtemplateFields: [SwlTemplateField] = templateFieldId.filter(results: templateFields, \.id)
+
+			if filteredtemplateFields.count > 1 {
+				NSLog("multiple template fields \(filteredtemplateFields)")
+			}
+
+			return filteredtemplateFields.first
+		}
+		catch {
+			return nil
+		}
+	}
+
 	func decryptString(bytes: [UInt8]) -> String? {
 		let data = Data(bytes)
 		return crypto?.decryptString(data: data)
@@ -165,6 +187,7 @@ class SwlDatabase {
 		case categories = "spbwlt_Category"
 		case cards = "spbwlt_Card"
 		case cardFieldValue = "spbwlt_CardFieldValue"
+		case templateField = "spbwlt_TemplateField"
 
 		var name: String {
 			return rawValue

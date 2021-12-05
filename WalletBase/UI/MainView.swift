@@ -28,15 +28,7 @@ struct MainView: View {
 
 		if let card = card {
 			items = []
-			let cardValues = database.fieldValues(in: card)
-			self.card = CardValuesComposite(name: database.decryptString(bytes: card.name) ?? "",
-			                                values: cardValues.map {
-			                                	CardValuesComposite.Value(name: "something",
-			                                	                          hidePlaintext: true,
-			                                	                          encryptedValue: $0.value) { encrypted in
-			                                		database.decryptString(bytes: encrypted)
-			                                	}
-			                                })
+			self.card = CardValuesComposite.card(for: card, database: database)
 			state = .viewCard(database: database)
 			return
 		}
