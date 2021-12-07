@@ -28,8 +28,13 @@ struct CardValuesComposite: CardViewItem {
 			let field = fieldValue.field
 			let cardValue = fieldValue.value
 			enum FieldType: Int32 {
+				case plaintext = 1
+				case idNumber = 2
+				case name = 3
 				case password = 4
-				case plaintext = 12345
+				case url = 6
+				case email = 7
+				case phone = 8
 			}
 			let fieldType: FieldType
 			if let type = field?.fieldTypeId {
@@ -41,8 +46,10 @@ struct CardValuesComposite: CardViewItem {
 			} else {
 				fieldType = .password
 			}
-			return CardValuesComposite.Value(name: database.decryptString(bytes: field?.name ?? []) ?? "",
+			let name = database.decryptString(bytes: field?.name ?? []) ?? ""
+			return CardValuesComposite.Value(name: name,
 			                                 hidePlaintext: fieldType == .password,
+			                                 isURL: fieldType == .url,
 			                                 encryptedValue: cardValue.value) { encrypted in
 				database.decryptString(bytes: encrypted)
 			}
@@ -55,6 +62,7 @@ struct CardValuesComposite: CardViewItem {
 	struct CardValue: CardViewValue {
 		var name: String
 		var hidePlaintext: Bool
+		var isURL: Bool
 		var encryptedValue: [UInt8]
 		var decryptor: ([UInt8]) -> String?
 

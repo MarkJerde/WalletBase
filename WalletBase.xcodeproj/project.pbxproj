@@ -63,6 +63,8 @@
 		8D5D6174275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6172275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift */; };
 		8D5D6176275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6175275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift */; };
 		8D5D6177275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6175275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift */; };
+		8D5D617C275E381000F95986 /* CardValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D617B275E381000F95986 /* CardValue.swift */; };
+		8D5D617D275E381000F95986 /* CardValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D617B275E381000F95986 /* CardValue.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +120,7 @@
 		8D5D616F275C70F200F95986 /* SwlTemplateField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlTemplateField.swift; sourceTree = "<group>"; };
 		8D5D6172275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateField+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
 		8D5D6175275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int32+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
+		8D5D617B275E381000F95986 /* CardValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardValue.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -233,6 +236,7 @@
 				8D5D615A2759B01F00F95986 /* NavigationFrame.swift */,
 				8D5D61352748A62A00F95986 /* ItemGrid.swift */,
 				8D5D61692759B4E100F95986 /* CardView.swift */,
+				8D5D617B275E381000F95986 /* CardValue.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -429,6 +433,7 @@
 				8D50F3AC273CBF1D00A754CB /* WalletBaseApp.swift in Sources */,
 				8D5D6176275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */,
 				8D5D6170275C70F200F95986 /* SwlTemplateField.swift in Sources */,
+				8D5D617C275E381000F95986 /* CardValue.swift in Sources */,
 				8D5D6173275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift in Sources */,
 				8D5D614F2751E89C00F95986 /* SwlCard.swift in Sources */,
 				8D5D61452751956700F95986 /* String+SQLiteDatabaseItem.swift in Sources */,
@@ -462,6 +467,7 @@
 				8D50F3DE2741974B00A754CB /* CryptoProvider.swift in Sources */,
 				8D5D6177275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */,
 				8D5D6171275C70F200F95986 /* SwlTemplateField.swift in Sources */,
+				8D5D617D275E381000F95986 /* CardValue.swift in Sources */,
 				8D5D6174275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift in Sources */,
 				8D5D61372748AAD300F95986 /* SQLiteDatabase.swift in Sources */,
 				8D5D61392749AF4400F95986 /* ItemGrid.swift in Sources */,

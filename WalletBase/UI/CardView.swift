@@ -10,6 +10,7 @@ import SwiftUI
 protocol CardViewValue: Hashable {
 	var name: String { get }
 	var hidePlaintext: Bool { get }
+	var isURL: Bool { get }
 	var decryptedValue: String? { get }
 }
 
@@ -29,24 +30,7 @@ struct CardView<Item: CardViewItem>: View {
 			ScrollView {
 				VStack {
 					ForEach(item?.values ?? [], id: \.self) { item in
-						HStack {
-							Text(item.name)
-							Spacer()
-							Button {
-								// FIXME: Do something
-							} label: {
-								Text(item.hidePlaintext ? "********" : (item.decryptedValue ?? ""))
-							}
-							Button("Copy") {
-								if let value = item.decryptedValue {
-									let pasteboard = NSPasteboard.general
-									pasteboard.declareTypes([.string], owner: nil)
-									pasteboard.setString(value, forType: .string)
-									// FIXME: clear pasteboard after N seconds
-								}
-							}
-							.background(Color.gray)
-						}
+						CardValue(item: item)
 					}
 				}
 				.padding(20)
@@ -58,6 +42,7 @@ struct CardView<Item: CardViewItem>: View {
 struct CardView_Previews_Value: CardViewValue {
 	var name: String
 	var hidePlaintext: Bool
+	var isURL: Bool
 	var decryptedValue: String?
 }
 
@@ -69,10 +54,10 @@ struct CardView_Previews_Item: CardViewItem {
 struct CardView_Previews: PreviewProvider {
 	static var previews: some View {
 		CardView(item: .constant(CardView_Previews_Item(name: "Counting", values: [
-			.init(name: "One", hidePlaintext: false, decryptedValue: "Uno"),
-			.init(name: "Two", hidePlaintext: true, decryptedValue: "Dos"),
-			.init(name: "Three", hidePlaintext: false, decryptedValue: "Tres"),
-			.init(name: "Four", hidePlaintext: true, decryptedValue: "Cuatro"),
+			.init(name: "One", hidePlaintext: false, isURL: false, decryptedValue: "Uno"),
+			.init(name: "Two", hidePlaintext: true, isURL: false, decryptedValue: "Dos"),
+			.init(name: "Three", hidePlaintext: false, isURL: false, decryptedValue: "Tres"),
+			.init(name: "Four", hidePlaintext: true, isURL: false, decryptedValue: "Cuatro"),
 		]))) {
 			NSLog("Tapped back")
 		}
