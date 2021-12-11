@@ -141,7 +141,7 @@ class SwlDatabase {
 	func fieldValues(in card: Card) -> [CardFieldValue] {
 		do {
 			// Find everything that matches.
-			let fieldValues: [CardFieldValue] = try database.select(columns: ["ID", "CardID", "TemplateFieldID", "ValueString"], fromTable: Tables.cardFieldValue, where: "CardID \(card.id.queryCondition)").compactMap { $0 }
+			let fieldValues: [CardFieldValue] = try database.select(columns: ["ID", "CardID", "TemplateFieldID", "ValueString"], fromTable: Tables.cardFieldValues, where: "CardID \(card.id.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCards: [CardFieldValue] = card.id.filter(results: fieldValues, \.cardId)
@@ -159,7 +159,7 @@ class SwlDatabase {
 	func templateField(forId templateFieldId: SwlID) -> SwlTemplateField? {
 		do {
 			// Find everything that matches.
-			let templateFields: [SwlTemplateField] = try database.select(columns: ["ID", "Name", "TemplateID", "FieldTypeID", "Priority", "AdvInfo"], fromTable: Tables.templateField, where: "ID \(templateFieldId.queryCondition)").compactMap { $0 }
+			let templateFields: [SwlTemplateField] = try database.select(columns: ["ID", "Name", "TemplateID", "FieldTypeID", "Priority", "AdvInfo"], fromTable: Tables.templateFields, where: "ID \(templateFieldId.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredtemplateFields: [SwlTemplateField] = templateFieldId.filter(results: templateFields, \.id)
@@ -184,10 +184,19 @@ class SwlDatabase {
 	private var crypto: CryptoProvider?
 
 	private enum Tables: String, SQLiteTable {
+		case databaseVersion = "spb_DatabaseVersion" // TODO:
+		case wallet = "spbwlt_Wallet" // TODO:
 		case categories = "spbwlt_Category"
 		case cards = "spbwlt_Card"
-		case cardFieldValue = "spbwlt_CardFieldValue"
-		case templateField = "spbwlt_TemplateField"
+		case cardFieldValues = "spbwlt_CardFieldValue"
+		case cardAttachments = "spbwlt_CardAttachment" // TODO:
+		case cardViews = "spbwlt_CardView" // TODO:
+		case cardViewFields = "spbwlt_CardViewField" // TODO:
+		case templates = "spbwlt_Template" // TODO:
+		case templateFields = "spbwlt_TemplateField"
+		case templateFieldTypes = "spbwlt_TemplateFieldType" // TODO:
+		case icon = "spbwlt_Icon" // TODO:
+		case image = "spbwlt_Image" // TODO:
 
 		var name: String {
 			return rawValue
