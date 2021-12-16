@@ -1,14 +1,14 @@
 //
-//  CardFieldValue+SQLiteDatabaseItem.swift
+//  SwlCardAttachment+SQLiteDatabaseItem.swift
 //  WalletBase
 //
-//  Created by Mark Jerde on 11/29/21.
+//  Created by Mark Jerde on 12/10/21.
 //
 
 import Foundation
 import SQLite3
 
-extension SwlDatabase.CardFieldValue: SQLiteDatabaseItem {
+extension SwlDatabase.CardAttachment: SQLiteDatabaseItem {
 	/// Creates a new instance by decoding from the given statement.
 	/// - Parameters:
 	///   - statement: The statement to decode from.
@@ -18,10 +18,10 @@ extension SwlDatabase.CardFieldValue: SQLiteDatabaseItem {
 		// Decode the parts.
 		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column) else { return nil }
 		guard let cardId: SwlDatabase.SwlID = .decode(from: statement, column: column + 1) else { return nil }
-		guard let templateFieldId: SwlDatabase.SwlID = .decode(from: statement, column: column + 2) else { return nil }
-		guard let value: [UInt8] = .decode(from: statement, column: column + 3) else { return nil }
+		guard let name: [UInt8] = .decode(from: statement, column: column + 2) else { return nil }
+		guard let data: [UInt8] = .decode(from: statement, column: column + 3) else { return nil }
 
 		// Build and return the instance.
-		return .init(id: id, cardId: cardId, templateFieldId: templateFieldId, value: value)
+		return .init(id: id, cardId: cardId, name: name, data: data)
 	}
 }

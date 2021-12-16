@@ -135,6 +135,24 @@ class SwlDatabase {
 		}
 	}
 
+	/// Obtains the encrypted card attachments of a given card.
+	/// - Parameter category: The category.
+	/// - Returns: The items.
+	func attachments(in card: Card) -> [CardAttachment] {
+		do {
+			// Find everything that matches.
+			let fieldValues: [CardAttachment] = try database.select(columns: ["ID", "CardID", "Name", "Data"], fromTable: Tables.cardAttachments, where: "CardID \(card.id.queryCondition)").compactMap { $0 }
+
+			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
+			let filteredCards: [CardAttachment] = card.id.filter(results: fieldValues, \.cardId)
+
+			return filteredCards
+		}
+		catch {
+			return []
+		}
+	}
+
 	/// Obtains the encrypted card field values of a given card.
 	/// - Parameter category: The category.
 	/// - Returns: The items.
@@ -180,6 +198,11 @@ class SwlDatabase {
 		return crypto?.decryptString(data: data)
 	}
 
+	func decryptData(bytes: [UInt8]) -> Data? {
+		let data = Data(bytes)
+		return crypto?.decryptData(data: data)
+	}
+
 	/// The cryptography provider which can decrypt this wallet.
 	private var crypto: CryptoProvider?
 
@@ -189,7 +212,7 @@ class SwlDatabase {
 		case categories = "spbwlt_Category"
 		case cards = "spbwlt_Card"
 		case cardFieldValues = "spbwlt_CardFieldValue"
-		case cardAttachments = "spbwlt_CardAttachment" // TODO:
+		case cardAttachments = "spbwlt_CardAttachment"
 		case cardViews = "spbwlt_CardView" // TODO:
 		case cardViewFields = "spbwlt_CardViewField" // TODO:
 		case templates = "spbwlt_Template" // TODO:

@@ -54,6 +54,10 @@ class SwlCrypto: CryptoProvider {
 		return plaintext
 	}
 
+	func decryptData(data: Data) -> Data? {
+		decrypt(data: data)
+	}
+
 	func encrypt(_ string: String) -> Data? {
 		guard let utf16leData = string.data(using: .utf16LittleEndian) else {
 			return nil

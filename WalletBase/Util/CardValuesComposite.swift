@@ -8,8 +8,9 @@
 import Foundation
 
 struct CardValuesComposite: CardViewItem {
-	var name: String
-	var values: [CardValue]
+	let name: String
+	let values: [CardValue]
+	let attachments: [CardAttachment]
 
 	struct FieldValue {
 		let field: SwlDatabase.SwlTemplateField?
@@ -54,17 +55,28 @@ struct CardValuesComposite: CardViewItem {
 				database.decryptString(bytes: encrypted)
 			}
 		}
+
+		let cardAttachments = database.attachments(in: card)
+		let attachments = cardAttachments.map { CardAttachment(encryptedName: $0.name,
+		                                                       encryptedData: $0.data) { encrypted in
+				database.decryptString(bytes: encrypted)
+			} dataDecryptor: { encrypted in
+				database.decryptData(bytes: encrypted)
+			}
+		}
+
 		let result = CardValuesComposite(name: database.decryptString(bytes: card.name) ?? "",
-		                                 values: values)
+		                                 values: values,
+		                                 attachments: attachments)
 		return result
 	}
 
 	struct CardValue: CardViewValue {
-		var name: String
-		var hidePlaintext: Bool
-		var isURL: Bool
-		var encryptedValue: [UInt8]
-		var decryptor: ([UInt8]) -> String?
+		let name: String
+		let hidePlaintext: Bool
+		let isURL: Bool
+		let encryptedValue: [UInt8]
+		let decryptor: ([UInt8]) -> String?
 
 		var decryptedValue: String? {
 			decryptor(encryptedValue)
@@ -80,6 +92,31 @@ struct CardValuesComposite: CardViewItem {
 			name.hash(into: &hasher)
 			hidePlaintext.hash(into: &hasher)
 			encryptedValue.hash(into: &hasher)
+		}
+	}
+
+	struct CardAttachment: CardViewAttachment {
+		let encryptedName: [UInt8]
+		let encryptedData: [UInt8]
+		let decryptor: ([UInt8]) -> String?
+		let dataDecryptor: ([UInt8]) -> Data?
+
+		static func == (lhs: CardValuesComposite.CardAttachment, rhs: CardValuesComposite.CardAttachment) -> Bool {
+			lhs.encryptedName == rhs.encryptedName
+				&& lhs.encryptedData == rhs.encryptedData
+		}
+
+		func hash(into hasher: inout Hasher) {
+			encryptedName.hash(into: &hasher)
+			encryptedData.hash(into: &hasher)
+		}
+
+		var decryptedName: String? {
+			decryptor(encryptedName)
+		}
+
+		var decryptedData: Data? {
+			dataDecryptor(encryptedData)
 		}
 	}
 }
