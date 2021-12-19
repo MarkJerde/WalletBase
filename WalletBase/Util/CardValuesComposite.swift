@@ -14,7 +14,7 @@ struct CardValuesComposite: CardViewItem {
 	let attachments: [CardAttachment]
 
 	struct FieldValue {
-		let field: SwlDatabase.SwlTemplateField?
+		let field: SwlDatabase.TemplateField?
 		let value: SwlDatabase.CardFieldValue
 	}
 

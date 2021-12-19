@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension SwlDatabase.SwlTemplateField: SQLiteQueryDescribing {
+extension SwlDatabase.TemplateField: SQLiteQueryDescribing {
 	static let columns = ["ID", "Name", "TemplateID", "FieldTypeID", "Priority", "AdvInfo"]
 	static let table: SQLiteTable = SwlDatabase.Tables.templateFields
 }

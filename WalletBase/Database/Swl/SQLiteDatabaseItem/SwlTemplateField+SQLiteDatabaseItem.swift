@@ -8,7 +8,7 @@
 import Foundation
 import SQLite3
 
-extension SwlDatabase.SwlTemplateField: SQLiteDatabaseItem {
+extension SwlDatabase.TemplateField: SQLiteDatabaseItem {
 	/// Creates a new instance by decoding from the given statement.
 	/// - Parameters:
 	///   - statement: The statement to decode from.

@@ -9,7 +9,7 @@ import Foundation
 
 extension SwlDatabase {
 	/// An swl database card.
-	struct SwlTemplateField {
+	struct TemplateField {
 		/// The ID of this field.
 		let id: SwlID
 		/// The encrypted name of this field.
