@@ -45,7 +45,7 @@ class SwlDatabase {
 		      let crypto = crypto else { return nil }
 		do {
 			// Find everything that matches.
-			let categories: [Category] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: Tables.categories, where: "ID \(categoryId.queryCondition)").compactMap { $0 }
+			let categories: [Category] = try database.select(where: "ID \(categoryId.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCategories = categoryId.filter(results: categories, \.id)
@@ -86,7 +86,7 @@ class SwlDatabase {
 		guard let crypto = crypto else { return [] }
 		do {
 			// Find everything that matches.
-			let categories: [Category] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: Tables.categories, where: "ParentCategoryID \(category?.id.queryCondition ?? "like ''")").compactMap { $0 }
+			let categories: [Category] = try database.select(where: "ParentCategoryID \(category?.id.queryCondition ?? "like ''")").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCategories: [Category]
@@ -117,7 +117,7 @@ class SwlDatabase {
 		guard let crypto = crypto else { return [] }
 		do {
 			// Find everything that matches.
-			let cards: [Card] = try database.select(columns: ["ID", "Name", "ParentCategoryID"], fromTable: Tables.cards, where: "ParentCategoryID \(category.id.queryCondition)").compactMap { $0 }
+			let cards: [Card] = try database.select(where: "ParentCategoryID \(category.id.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCards: [Card] = category.id.filter(results: cards, \.parent)
@@ -141,7 +141,7 @@ class SwlDatabase {
 	func description(in card: Card) -> CardDescription? {
 		do {
 			// Find everything that matches.
-			let fieldValues: [CardDescription] = try database.select(columns: ["ID", "Description"], fromTable: Tables.cards, where: "ID \(card.id.queryCondition)").compactMap { $0 }
+			let fieldValues: [CardDescription] = try database.select(where: "ID \(card.id.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCards: [CardDescription] = card.id.filter(results: fieldValues, \.id)
@@ -159,7 +159,7 @@ class SwlDatabase {
 	func attachments(in card: Card) -> [CardAttachment] {
 		do {
 			// Find everything that matches.
-			let fieldValues: [CardAttachment] = try database.select(columns: ["ID", "CardID", "Name", "Data"], fromTable: Tables.cardAttachments, where: "CardID \(card.id.queryCondition)").compactMap { $0 }
+			let fieldValues: [CardAttachment] = try database.select(where: "CardID \(card.id.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCards: [CardAttachment] = card.id.filter(results: fieldValues, \.cardId)
@@ -177,7 +177,7 @@ class SwlDatabase {
 	func fieldValues(in card: Card) -> [CardFieldValue] {
 		do {
 			// Find everything that matches.
-			let fieldValues: [CardFieldValue] = try database.select(columns: ["ID", "CardID", "TemplateFieldID", "ValueString"], fromTable: Tables.cardFieldValues, where: "CardID \(card.id.queryCondition)").compactMap { $0 }
+			let fieldValues: [CardFieldValue] = try database.select(where: "CardID \(card.id.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredCards: [CardFieldValue] = card.id.filter(results: fieldValues, \.cardId)
@@ -195,7 +195,7 @@ class SwlDatabase {
 	func templateField(forId templateFieldId: SwlID) -> SwlTemplateField? {
 		do {
 			// Find everything that matches.
-			let templateFields: [SwlTemplateField] = try database.select(columns: ["ID", "Name", "TemplateID", "FieldTypeID", "Priority", "AdvInfo"], fromTable: Tables.templateFields, where: "ID \(templateFieldId.queryCondition)").compactMap { $0 }
+			let templateFields: [SwlTemplateField] = try database.select(where: "ID \(templateFieldId.queryCondition)").compactMap { $0 }
 
 			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
 			let filteredtemplateFields: [SwlTemplateField] = templateFieldId.filter(results: templateFields, \.id)
@@ -224,7 +224,7 @@ class SwlDatabase {
 	/// The cryptography provider which can decrypt this wallet.
 	private var crypto: CryptoProvider?
 
-	private enum Tables: String, SQLiteTable {
+	enum Tables: String, SQLiteTable {
 		case databaseVersion = "spb_DatabaseVersion" // TODO:
 		case wallet = "spbwlt_Wallet" // TODO:
 		case categories = "spbwlt_Category"

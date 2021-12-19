@@ -22,6 +22,11 @@ protocol SQLiteTable {
 	var name: String { get }
 }
 
+protocol SQLiteQueryDescribing {
+	static var columns: [String] { get }
+	static var table: SQLiteTable { get }
+}
+
 /// A wrapper around an SQLite database session.
 class SQLiteDatabase {
 	/// The database file.
@@ -75,6 +80,13 @@ class SQLiteDatabase {
 			case failedWithoutError
 			case error(String)
 		}
+	}
+
+	/// Performs a select operation on the database, selecting for the table and columns of the return type with the given where clause (if any).
+	///   - where: The where clause to filter by. (No filtering if nil.)
+	/// - Returns: An array containing the selected items from the database.
+	func select<T: SQLiteDatabaseItem>(where whereClause: String? = nil) throws -> [T?] where T: SQLiteQueryDescribing {
+		try select(columns: T.columns, fromTable: T.table, where: whereClause)
 	}
 
 	/// Performs a select operation on the database, selecting the named columns from the named table with the given where clause (if any).
