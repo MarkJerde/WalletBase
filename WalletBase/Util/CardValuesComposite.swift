@@ -10,6 +10,7 @@ import Foundation
 struct CardValuesComposite: CardViewItem {
 	let name: String
 	let values: [CardValue]
+	let description: CardDescription?
 	let attachments: [CardAttachment]
 
 	struct FieldValue {
@@ -56,6 +57,16 @@ struct CardValuesComposite: CardViewItem {
 			}
 		}
 
+		let cardDescription = database.description(in: card)
+		let description: CardDescription?
+		if let cardDescription = cardDescription?.description {
+			description = CardDescription(encryptedDescription: cardDescription) { encrypted in
+				database.decryptString(bytes: encrypted)
+			}
+		} else {
+			description = nil
+		}
+
 		let cardAttachments = database.attachments(in: card)
 		let attachments = cardAttachments.map { CardAttachment(encryptedName: $0.name,
 		                                                       encryptedData: $0.data) { encrypted in
@@ -67,6 +78,7 @@ struct CardValuesComposite: CardViewItem {
 
 		let result = CardValuesComposite(name: database.decryptString(bytes: card.name) ?? "",
 		                                 values: values,
+		                                 description: description,
 		                                 attachments: attachments)
 		return result
 	}
@@ -92,6 +104,23 @@ struct CardValuesComposite: CardViewItem {
 			name.hash(into: &hasher)
 			hidePlaintext.hash(into: &hasher)
 			encryptedValue.hash(into: &hasher)
+		}
+	}
+
+	struct CardDescription: CardViewDescription {
+		let encryptedDescription: [UInt8]
+		let decryptor: ([UInt8]) -> String?
+
+		static func == (lhs: CardValuesComposite.CardDescription, rhs: CardValuesComposite.CardDescription) -> Bool {
+			lhs.encryptedDescription == rhs.encryptedDescription
+		}
+
+		func hash(into hasher: inout Hasher) {
+			encryptedDescription.hash(into: &hasher)
+		}
+
+		var decryptedDescription: String? {
+			decryptor(encryptedDescription)
 		}
 	}
 

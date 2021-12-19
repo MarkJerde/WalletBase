@@ -135,6 +135,24 @@ class SwlDatabase {
 		}
 	}
 
+	/// Obtains the encrypted card description of a given card.
+	/// - Parameter category: The category.
+	/// - Returns: The description.
+	func description(in card: Card) -> CardDescription? {
+		do {
+			// Find everything that matches.
+			let fieldValues: [CardDescription] = try database.select(columns: ["ID", "Description"], fromTable: Tables.cards, where: "ID \(card.id.queryCondition)").compactMap { $0 }
+
+			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
+			let filteredCards: [CardDescription] = card.id.filter(results: fieldValues, \.id)
+
+			return filteredCards.first
+		}
+		catch {
+			return nil
+		}
+	}
+
 	/// Obtains the encrypted card attachments of a given card.
 	/// - Parameter category: The category.
 	/// - Returns: The items.

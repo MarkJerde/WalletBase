@@ -7,11 +7,23 @@
 
 import SwiftUI
 
+extension NSTextField {
+	// Inhibit the blue outline when selecting description text.
+	override open var focusRingType: NSFocusRingType {
+		get { .none }
+		set {}
+	}
+}
+
 protocol CardViewValue: Hashable {
 	var name: String { get }
 	var hidePlaintext: Bool { get }
 	var isURL: Bool { get }
 	var decryptedValue: String? { get }
+}
+
+protocol CardViewDescription: Hashable {
+	var decryptedDescription: String? { get }
 }
 
 protocol CardViewAttachment: Hashable {
@@ -21,9 +33,11 @@ protocol CardViewAttachment: Hashable {
 
 protocol CardViewItem: Hashable {
 	associatedtype Value: CardViewValue
+	associatedtype Description: CardViewDescription
 	associatedtype Attachment: CardViewAttachment
 	var name: String { get }
 	var values: [Value] { get }
+	var description: Description? { get }
 	var attachments: [Attachment] { get }
 }
 
@@ -40,7 +54,21 @@ struct CardView<Item: CardViewItem>: View {
 						CardValue(item: item)
 					}
 				}
-				.padding(20)
+				.padding([.top, .horizontal], 20)
+				if let description = item?.description?.decryptedDescription {
+					// TextField is used to provide the ability to copy & paste, but it has the downside of making the content editable and of adding a light shadow frame.
+					TextField("", text: .constant(description))
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.padding(EdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6))
+						.padding(20)
+						.background(Color.white)
+						.overlay(
+							RoundedRectangle(cornerRadius: 4)
+								.stroke(Color.gray, lineWidth: 2)
+						)
+						.padding(.top, 16)
+						.padding(.horizontal, 20)
+				}
 				LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 5), spacing: 20) {
 					ForEach(item?.attachments ?? [], id: \.self) { item in
 						VStack {
@@ -73,6 +101,7 @@ struct CardView<Item: CardViewItem>: View {
 						}
 					}
 				}
+				.padding(.top, 10)
 			}
 		}
 	}
@@ -85,6 +114,10 @@ struct CardView_Previews_Value: CardViewValue {
 	var decryptedValue: String?
 }
 
+struct CardView_Previews_Description: CardViewDescription {
+	var decryptedDescription: String?
+}
+
 struct CardView_Previews_Attachment: CardViewAttachment {
 	var decryptedName: String?
 	var decryptedData: Data?
@@ -93,20 +126,24 @@ struct CardView_Previews_Attachment: CardViewAttachment {
 struct CardView_Previews_Item: CardViewItem {
 	var name: String
 	var values: [CardView_Previews_Value]
+	var description: CardView_Previews_Description?
 	var attachments: [CardView_Previews_Attachment]
 }
 
 struct CardView_Previews: PreviewProvider {
 	static var previews: some View {
 		CardView(item: .constant(CardView_Previews_Item(name: "Counting", values: [
-			.init(name: "One", hidePlaintext: false, isURL: false, decryptedValue: "Uno"),
-			.init(name: "Two", hidePlaintext: true, isURL: false, decryptedValue: "Dos"),
-			.init(name: "Three", hidePlaintext: false, isURL: false, decryptedValue: "Tres"),
-			.init(name: "Four", hidePlaintext: true, isURL: false, decryptedValue: "Cuatro"),
-		], attachments: [
-			.init(decryptedName: "Able", decryptedData: "Baker Charlie".data(using: .utf8)),
-		]))) {
-			NSLog("Tapped back")
-		}
+				.init(name: "One", hidePlaintext: false, isURL: false, decryptedValue: "Uno"),
+				.init(name: "Two", hidePlaintext: true, isURL: false, decryptedValue: "Dos"),
+				.init(name: "Three", hidePlaintext: false, isURL: false, decryptedValue: "Tres"),
+				.init(name: "Four", hidePlaintext: true, isURL: false, decryptedValue: "Cuatro"),
+			],
+			description: CardView_Previews_Description(decryptedDescription: "This is the description text.\nIt has a second line.\nIt also has a really long line that mentions that the encrypted items above decrypt to Dos and Cuator.\n\nAfter a blank fourth line, it ends with a fifth line."),
+			attachments: [
+				.init(decryptedName: "Able", decryptedData: "Baker Charlie".data(using: .utf8)),
+			]))) {
+				NSLog("Tapped back")
+			}
+			.frame(height: 700.0)
 	}
 }
