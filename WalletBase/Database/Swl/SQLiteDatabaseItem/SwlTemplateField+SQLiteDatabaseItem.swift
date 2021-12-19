@@ -14,14 +14,17 @@ extension SwlDatabase.TemplateField: SQLiteDatabaseItem {
 	///   - statement: The statement to decode from.
 	///   - column: The column at which to start decoding. Multiple columns may be consumed if it is a composite type.
 	/// - Returns: The decoded instance.
-	static func decode(from statement: OpaquePointer, column: Int32 = 0) -> Self? {
+	static func decode(from statement: OpaquePointer, column: Int32 = 0, nextColumn: ((Int32) -> Void)?) -> Self? {
 		// Decode the parts.
-		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column) else { return nil }
-		guard let name: [UInt8] = .decode(from: statement, column: column + 1) else { return nil }
-		guard let templateId: SwlDatabase.SwlID = .decode(from: statement, column: column + 2) else { return nil }
-		guard let fieldTypeId: Int32 = .decode(from: statement, column: column + 3) else { return nil }
-		guard let priority: Int32 = .decode(from: statement, column: column + 4) else { return nil }
-		let advancedInfo: [UInt8]? = .decode(from: statement, column: column + 5)
+		var column = column
+		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		guard let name: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		guard let templateId: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		guard let fieldTypeId: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		guard let priority: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		let advancedInfo: [UInt8]? = .decode(from: statement, column: column, nextColumn: { column = $0 })
+
+		nextColumn?(column)
 
 		// Build and return the instance.
 		return .init(id: id,

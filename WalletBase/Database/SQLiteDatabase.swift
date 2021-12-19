@@ -14,8 +14,9 @@ protocol SQLiteDatabaseItem {
 	/// - Parameters:
 	///   - statement: The statement to decode from.
 	///   - column: The column at which to start decoding. Multiple columns may be consumed if it is a composite type.
+	///   - nextColumn: A closure to which is passed the next column number, to provide incrementing.
 	/// - Returns: The decoded instance.
-	static func decode(from statement: OpaquePointer, column: Int32) -> Self?
+	static func decode(from statement: OpaquePointer, column: Int32, nextColumn: ((Int32) -> Void)?) -> Self?
 }
 
 protocol SQLiteTable {
@@ -107,7 +108,7 @@ class SQLiteDatabase {
 
 		var response: [T?] = []
 		while sqlite3_step(statement) == SQLITE_ROW {
-			response.append(T.decode(from: statement, column: 0))
+			response.append(T.decode(from: statement, column: 0, nextColumn: nil))
 		}
 
 		guard sqlite3_finalize(statement) == SQLITE_OK else {
