@@ -44,10 +44,14 @@ protocol CardViewItem: Hashable {
 struct CardView<Item: CardViewItem>: View {
 	@Binding var item: Item?
 	let onBackTap: () -> Void
+	let onPreviousTap: (() -> Void)?
+	let onNextTap: (() -> Void)?
 
 	var body: some View {
 		NavigationFrame(currentName: item?.name ?? "",
-		                onBackTap: onBackTap) {
+		                onBackTap: onBackTap,
+		                onPreviousTap: onPreviousTap,
+		                onNextTap: onNextTap) {
 			ScrollView {
 				VStack {
 					ForEach(item?.values ?? [], id: \.self) { item in
@@ -144,6 +148,8 @@ struct CardView_Previews: PreviewProvider {
 			]))) {
 				NSLog("Tapped back")
 			}
+			onPreviousTap: {}
+			onNextTap: {}
 			.frame(height: 700.0)
 	}
 }

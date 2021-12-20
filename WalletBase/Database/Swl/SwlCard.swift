@@ -9,7 +9,7 @@ import Foundation
 
 extension SwlDatabase {
 	/// An swl database card.
-	struct Card {
+	struct Card: Equatable {
 		/// The ID of this card.
 		let id: SwlID
 		/// The encrypted name of this card.

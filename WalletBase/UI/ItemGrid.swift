@@ -45,7 +45,9 @@ struct ItemGrid<Item: ItemGridItem>: View {
 	let onBackTap: () -> Void
 	var body: some View {
 		NavigationFrame(currentName: container?.name,
-		                onBackTap: onBackTap) {
+		                onBackTap: onBackTap,
+		                onPreviousTap: nil,
+		                onNextTap: nil) {
 			ScrollView {
 				LazyVGrid(columns: columns, spacing: 20) {
 					ForEach(items, id: \.self) { item in

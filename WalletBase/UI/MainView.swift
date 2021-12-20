@@ -22,11 +22,31 @@ struct MainView: View {
 	@State private var category: SwlDatabase.Item?
 	@State private var items: [SwlDatabase.Item] = []
 	@State private var card: CardValuesComposite?
+	@State private var cardIndex: Int?
+	@State private var numCards: Int?
 
-	fileprivate func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, card: SwlDatabase.Card? = nil) {
+	private func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, card: SwlDatabase.Card? = nil) {
 		self.category = category
 
 		if let card = card {
+			let justCards = items.filter { item in
+				switch item.itemType {
+				case .card:
+					return true
+				default:
+					return false
+				}
+			}
+			let index = justCards.firstIndex { item in
+				switch item.itemType {
+				case .card(let aCard):
+					return card == aCard
+				default:
+					return false
+				}
+			}
+			numCards = justCards.count
+			cardIndex = index
 			items = []
 			self.card = CardValuesComposite.card(for: card, database: database)
 			state = .viewCard(database: database)
@@ -34,6 +54,39 @@ struct MainView: View {
 		}
 
 		// Load category view content.
+		items = items(of: category, in: database)
+		numCards = nil
+		cardIndex = nil
+		state = .browseContent(database: database)
+	}
+
+	private func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, index: Int) {
+		guard let numCards = numCards else {
+			return
+		}
+
+		let cards = items(of: category, in: database).filter { item in
+			switch item.itemType {
+			case .card:
+				return true
+			default:
+				return false
+			}
+		}
+		guard index < cards.count else { return }
+		let card = cards[index]
+		switch card.itemType {
+		case .card(let card):
+			navigate(toDatabase: database, category: category, card: card)
+			// Restore numCards which will have been cleared by navigate(:::) since the category items are not retained while viewing a card and set the new index.
+			self.numCards = numCards
+			cardIndex = index
+		default:
+			break
+		}
+	}
+
+	private func items(of category: SwlDatabase.Item?, in database: SwlDatabase) -> [SwlDatabase.Item] {
 		var swlCategory: SwlDatabase.Category?
 		if let category = category,
 		   case .category(let category) = category.itemType
@@ -47,8 +100,7 @@ struct MainView: View {
 		} else {
 			cards = []
 		}
-		items = categories + cards
-		state = .browseContent(database: database)
+		return categories + cards
 	}
 
 	var body: some View {
@@ -117,9 +169,21 @@ struct MainView: View {
 			}
 		case .viewCard(let database):
 			VStack {
-				CardView(item: $card) {
+				CardView(item: $card, onBackTap: {
 					navigate(toDatabase: database, category: category)
-				}
+				}, onPreviousTap: cardIndex == nil || cardIndex! <= 0 ? nil : {
+					guard let cardIndex = cardIndex else {
+						return
+					}
+
+					navigate(toDatabase: database, category: category, index: cardIndex - 1)
+				}, onNextTap: cardIndex == nil || numCards == nil || cardIndex! + 1 >= numCards! ? nil : {
+					guard let cardIndex = cardIndex else {
+						return
+					}
+
+					navigate(toDatabase: database, category: category, index: cardIndex + 1)
+				})
 				Button("Lock") {
 					items = []
 					category = nil

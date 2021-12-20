@@ -10,6 +10,8 @@ import SwiftUI
 struct NavigationFrame<Content>: View where Content: View {
 	/*@Binding */var currentName: String?
 	let onBackTap: () -> Void
+	let onPreviousTap: (() -> Void)?
+	let onNextTap: (() -> Void)?
 	@ViewBuilder var content: () -> Content
 
 	var body: some View {
@@ -24,8 +26,26 @@ struct NavigationFrame<Content>: View where Content: View {
 					}
 					.frame(height: 50)
 					Spacer()
+					if let onPreviousTap = onPreviousTap {
+						Button {
+							onPreviousTap()
+						} label: {
+							Image(systemName: "chevron.backward")
+								.foregroundColor(.black)
+						}
+						.frame(height: 50)
+					}
 					Text(currentName)
 						.foregroundColor(.white)
+					if let onNextTap = onNextTap {
+						Button {
+							onNextTap()
+						} label: {
+							Image(systemName: "chevron.forward")
+								.foregroundColor(.black)
+						}
+						.frame(height: 50)
+					}
 				}
 			}
 			.padding([.leading, .trailing], 20)
@@ -41,6 +61,10 @@ struct NavigationFrame_Previews: PreviewProvider {
 	static var previews: some View {
 		NavigationFrame(currentName: "Sample Title") {
 			NSLog("Tapped back")
+		} onPreviousTap: {
+			NSLog("Tapped previous")
+		} onNextTap: {
+			NSLog("Tapped next")
 		} content: {
 			Image(systemName: "creditcard")
 		}
