@@ -27,7 +27,31 @@ class SwlDatabase {
 	func open(password: (@escaping (String) -> Void) -> Void, completion: @escaping (Bool) -> Void) {
 		let crypto = SwlCrypto()
 		self.crypto = crypto
-		crypto.unlock(password: password, completion: completion)
+		crypto.unlock(password: password, completion: { success in
+			// Attempt to verify the password was correct before calling our caller's completion with success equals true.
+			guard success else {
+				completion(false)
+				return
+			}
+
+			do {
+				// There doesn't appear to be any mechanism for password validation in the database content. One workaround is to assume that the template fields must include one with the name "Password". This seems questionable in the cases of English not being the language of the content or the database being used to secure things that do not include passwords, but it's what we have so we will use it.
+				let templateFields: [TemplateField] = try self.database.select().compactMap { $0 }
+				let index = templateFields.firstIndex {
+					self.decryptString(bytes: $0.name) == "Password"
+				}
+				guard index != nil else {
+					completion(false)
+					return
+				}
+			}
+			catch {
+				completion(false)
+				return
+			}
+
+			completion(true)
+		})
 	}
 
 	/// Closes the wallet by discarding the decryption key.
