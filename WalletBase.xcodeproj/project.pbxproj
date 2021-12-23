@@ -85,6 +85,8 @@
 		8D5D6199276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryDescribing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6197276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryDescribing.swift */; };
 		8D5D619B276FC27100F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift */; };
 		8D5D619C276FC27100F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift */; };
+		8D5D619E2770B3F500F95986 /* URL+Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D619D2770B3F500F95986 /* URL+Crypto.swift */; };
+		8D5D619F2770B3F500F95986 /* URL+Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D619D2770B3F500F95986 /* URL+Crypto.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -151,6 +153,7 @@
 		8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryDescribing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCardAttachment+SQLiteQueryDescribing.swift"; sourceTree = "<group>"; };
 		8D5D6197276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryDescribing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCardFieldValue+SQLiteQueryDescribing.swift"; sourceTree = "<group>"; };
 		8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateField+SQLiteQueryDescribing.swift"; sourceTree = "<group>"; };
+		8D5D619D2770B3F500F95986 /* URL+Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Crypto.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -254,6 +257,7 @@
 			children = (
 				8D50F3DC2741974B00A754CB /* CryptoProvider.swift */,
 				8D50F3D9274196BB00A754CB /* SwlCrypto.swift */,
+				8D5D619D2770B3F500F95986 /* URL+Crypto.swift */,
 			);
 			path = Crypto;
 			sourceTree = "<group>";
@@ -470,6 +474,7 @@
 				8D50F3E327419BF000A754CB /* PasswordPrompt.swift in Sources */,
 				8D5D6195276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryDescribing.swift in Sources */,
 				8D5D615327550F8900F95986 /* SwlCardFieldValue.swift in Sources */,
+				8D5D619E2770B3F500F95986 /* URL+Crypto.swift in Sources */,
 				8D50F3DA274196BB00A754CB /* SwlCrypto.swift in Sources */,
 				8D5D614D2751E65B00F95986 /* Sequence+Sorted.swift in Sources */,
 				8D5D61512751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift in Sources */,
@@ -514,6 +519,7 @@
 				8D5D61612759B35B00F95986 /* SwlCard.swift in Sources */,
 				8D5D6196276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryDescribing.swift in Sources */,
 				8D5D61662759B36D00F95986 /* SwlCategory+SQLiteDatabaseItem.swift in Sources */,
+				8D5D619F2770B3F500F95986 /* URL+Crypto.swift in Sources */,
 				8D5D61672759B37200F95986 /* Sequence+Sorted.swift in Sources */,
 				8D50F3E527419BF700A754CB /* MainView.swift in Sources */,
 				8D5D615D2759B32100F95986 /* SwlCategory.swift in Sources */,

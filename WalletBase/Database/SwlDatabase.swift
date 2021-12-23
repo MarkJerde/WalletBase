@@ -5,6 +5,7 @@
 //  Created by Mark Jerde on 11/10/21.
 //
 
+import AppKit
 import Foundation
 
 /// An object providing access to an swl password wallet database.
@@ -25,6 +26,22 @@ class SwlDatabase {
 	///   - password: A closure to initiate acquisition of the password which takes a closure to call once the password has been acquired.
 	///   - completion: A closure to call after the decryption key is established or will not be established.
 	func open(password: (@escaping (String) -> Void) -> Void, completion: @escaping (Bool) -> Void) {
+		// Ensure the user is warned as to the safety of this software. This is a two-part mechanism. First we hash the file to create a UserDefaults key and if it failed to hash or the key was not true in UserDefaults, show the alert. If the user does not accept the alert, opening the wallet fails and the completion is called accordingly. Second, after the user has accepted the alert and provided a password capable of unlocking the file, then save true to that UserDefaults key. This provides a disclaimer before the user has provided any sensitive data (the encrypted file is not sensitive because they already have that readable by their account on the device) and does not persist acceptance until unlocking verifies that a person with access to the file contents provided that acceptance. This will continue showing the disclaimer for each file until all are accepted so that if multiple users shared a device they would each be independently warned.
+		let sha256 = database.file.contentSHA256
+		let disclaimerKey = "acceptedTerms_\(sha256?.compactMap { String(format: "%02x", $0) }.joined() ?? "noHash")"
+		if sha256 == nil || !UserDefaults.standard.bool(forKey: disclaimerKey) {
+			let alert = NSAlert()
+			alert.messageText = "Use at your own risk!"
+			alert.informativeText = "THE AUTHOR SUPPLIES THIS SOFTWARE \"AS IS\", AND MAKES NO EXPRESS OR IMPLIED WARRANTY OF ANY KIND. This software was written without expertise in data security and may have vulnerabilities which enable other software to capture your decrypted information, defects which result in a loss of data, or other ill effects. Users are encouraged to read the source code, made publicly available."
+			alert.addButton(withTitle: "Accept")
+			alert.addButton(withTitle: "Cancel")
+			let response = alert.runModal()
+			guard response == NSApplication.ModalResponse.alertFirstButtonReturn else {
+				completion(false)
+				return
+			}
+		}
+
 		let crypto = SwlCrypto()
 		self.crypto = crypto
 		crypto.unlock(password: password, completion: { success in
@@ -49,6 +66,9 @@ class SwlDatabase {
 				completion(false)
 				return
 			}
+
+			// Store that the user has seen the warning, now that we know the user is someone who can unlock the file.
+			UserDefaults.standard.set(true, forKey: disclaimerKey)
 
 			completion(true)
 		})
