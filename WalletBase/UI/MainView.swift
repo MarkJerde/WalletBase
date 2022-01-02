@@ -18,17 +18,89 @@ struct MainView: View {
 		indirect case error(message: String, then: MyState)
 	}
 
-	@State private var state: MyState = .loadingDatabase
+	@State private var state: MyState = .loadingDatabase {
+		didSet {
+			switch state {
+			case .loadingDatabase,
+			     .buttonToUnlock:
+				// Clear auto-lock.
+				ActivityMonitor.shared.onInactivity = nil
+			case .browseContent(let database),
+			     .viewCard(let database):
+				// Set auto-lock if not yet set.
+				guard ActivityMonitor.shared.onInactivity == nil else { return }
+
+				let file = database.file
+				ActivityMonitor.shared.onInactivity = {
+					self.items = []
+					self.category = nil
+					self.state = .buttonToUnlock(databaseFile: file)
+				}
+			case .unlocking,
+			     .passwordPrompt,
+			     .error:
+				break
+			}
+		}
+	}
+
 	@State private var category: SwlDatabase.Item?
 	@State private var items: [SwlDatabase.Item] = []
 	@State private var card: CardValuesComposite?
 	@State private var cardIndex: Int?
 	@State private var numCards: Int?
 
+	@State private var restoreCategoryId: SwlDatabase.SwlID?
+	@State private var restoreCardId: SwlDatabase.SwlID?
+
 	private func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, card: SwlDatabase.Card? = nil) {
+		if category == nil,
+		   card == nil,
+		   restoreCategoryId != nil,
+		   let category = database.categoryItem(forId: restoreCategoryId)
+		{
+			let cards: [SwlDatabase.Card] = items(of: category, in: database).compactMap { item in
+				switch item.itemType {
+				case .card(let card):
+					return card
+				default:
+					return nil
+				}
+			}
+			let card: SwlDatabase.Card?
+			if let restoreCardId = restoreCardId {
+				card = cards.first(where: { $0.id == restoreCardId })
+			} else {
+				card = nil
+			}
+			restoreCategoryId = nil
+			restoreCardId = nil
+
+			// Save numCards and cardIndex to restore later.
+			let numCards = self.numCards
+			let cardIndex = self.cardIndex
+
+			navigate(toDatabase: database, category: category, card: card)
+
+			// Restore `numCards` and `cardIndex` which will have been cleared by navigate(:::) since the category `items` are not retained while viewing a card and without that the count and index aren't determined by navigate(:::).
+			self.numCards = numCards
+			self.cardIndex = cardIndex
+
+			return
+		}
+
+		ActivityMonitor.shared.didActivity()
+		switch category?.itemType {
+		case .category(let category):
+			restoreCategoryId = category.id
+		default:
+			restoreCategoryId = nil
+		}
+
 		self.category = category
 
 		if let card = card {
+			restoreCardId = card.id
 			let justCards = items.filter { item in
 				switch item.itemType {
 				case .card:
@@ -52,6 +124,7 @@ struct MainView: View {
 			state = .viewCard(database: database)
 			return
 		}
+		restoreCardId = nil
 
 		// Load category view content.
 		items = items(of: category, in: database)
@@ -78,7 +151,7 @@ struct MainView: View {
 		switch card.itemType {
 		case .card(let card):
 			navigate(toDatabase: database, category: category, card: card)
-			// Restore numCards which will have been cleared by navigate(:::) since the category items are not retained while viewing a card and set the new index.
+			// Restore `numCards` which will have been cleared by navigate(:::) since the category `items` are not retained while viewing a card and without that the index isn't determined by navigate(:::), and set the new index.
 			self.numCards = numCards
 			cardIndex = index
 		default:
@@ -158,6 +231,8 @@ struct MainView: View {
 					      case .category(let swlCategory) = category.itemType else { return }
 					let parentId = swlCategory.parent
 					let parent = database.categoryItem(forId: parentId)
+					// Clear the restore category so it won't try to keep restoring if we navigate back to the root.
+					restoreCategoryId = nil
 					navigate(toDatabase: database, category: parent)
 				}
 				Button("Lock") {

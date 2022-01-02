@@ -53,7 +53,8 @@ struct CardValuesComposite: CardViewItem {
 			                                 hidePlaintext: fieldType == .password,
 			                                 isURL: fieldType == .url,
 			                                 encryptedValue: cardValue.value) { encrypted in
-				database.decryptString(bytes: encrypted)
+				ActivityMonitor.shared.didActivity()
+				return database.decryptString(bytes: encrypted)
 			}
 		}
 
@@ -61,7 +62,8 @@ struct CardValuesComposite: CardViewItem {
 		let description: CardDescription?
 		if let cardDescription = cardDescription?.description {
 			description = CardDescription(encryptedDescription: cardDescription) { encrypted in
-				database.decryptString(bytes: encrypted)
+				ActivityMonitor.shared.didActivity()
+				return database.decryptString(bytes: encrypted)
 			}
 		} else {
 			description = nil
@@ -70,9 +72,11 @@ struct CardValuesComposite: CardViewItem {
 		let cardAttachments = database.attachments(in: card)
 		let attachments = cardAttachments.map { CardAttachment(encryptedName: $0.name,
 		                                                       encryptedData: $0.data) { encrypted in
-				database.decryptString(bytes: encrypted)
+				ActivityMonitor.shared.didActivity()
+				return database.decryptString(bytes: encrypted)
 			} dataDecryptor: { encrypted in
-				database.decryptData(bytes: encrypted)
+				ActivityMonitor.shared.didActivity()
+				return database.decryptData(bytes: encrypted)
 			}
 		}
 

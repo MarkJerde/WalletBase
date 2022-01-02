@@ -87,6 +87,7 @@
 		8D5D619C276FC27100F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift */; };
 		8D5D619E2770B3F500F95986 /* URL+Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D619D2770B3F500F95986 /* URL+Crypto.swift */; };
 		8D5D619F2770B3F500F95986 /* URL+Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D619D2770B3F500F95986 /* URL+Crypto.swift */; };
+		8D5D61A1277ABBDB00F95986 /* ActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61A0277ABBDB00F95986 /* ActivityMonitor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -154,6 +155,7 @@
 		8D5D6197276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryDescribing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCardFieldValue+SQLiteQueryDescribing.swift"; sourceTree = "<group>"; };
 		8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateField+SQLiteQueryDescribing.swift"; sourceTree = "<group>"; };
 		8D5D619D2770B3F500F95986 /* URL+Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Crypto.swift"; sourceTree = "<group>"; };
+		8D5D61A0277ABBDB00F95986 /* ActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityMonitor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -321,6 +323,7 @@
 			children = (
 				8D5D616C275A4E0B00F95986 /* CardValuesComposite.swift */,
 				8D5D614C2751E65B00F95986 /* Sequence+Sorted.swift */,
+				8D5D61A0277ABBDB00F95986 /* ActivityMonitor.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -485,6 +488,7 @@
 				8D5D6188276EDBDD00F95986 /* SwlCardDescription+SQLiteDatabaseItem.swift in Sources */,
 				8D5D615B2759B01F00F95986 /* NavigationFrame.swift in Sources */,
 				8D5D61432751954600F95986 /* Array+SQLiteDatabaseItem.swift in Sources */,
+				8D5D61A1277ABBDB00F95986 /* ActivityMonitor.swift in Sources */,
 				8D5D6140275194C500F95986 /* SwlItem.swift in Sources */,
 				8D5D6185276EDB5E00F95986 /* SwlCardDescription.swift in Sources */,
 				8D5D619B276FC27100F95986 /* SwlTemplateField+SQLiteQueryDescribing.swift in Sources */,
