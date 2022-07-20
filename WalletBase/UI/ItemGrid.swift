@@ -10,6 +10,7 @@ import SwiftUI
 enum ItemGridItemType {
 	case card
 	case category
+	case file
 }
 
 extension ItemGridItemType {
@@ -19,12 +20,15 @@ extension ItemGridItemType {
 			return "creditcard"
 		case .category:
 			return "folder"
+		case .file:
+			return "doc"
 		}
 	}
 
 	var color: Color {
 		switch self {
-		case .card:
+		case .card,
+		     .file:
 			return .green
 		case .category:
 			return .blue

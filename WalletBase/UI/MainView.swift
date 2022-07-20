@@ -44,6 +44,8 @@ struct MainView: View {
 		}
 	}
 
+	@State private var folder: WalletFile?
+	@State private var files: [WalletFile] = []
 	@State private var category: SwlDatabase.Item?
 	@State private var items: [SwlDatabase.Item] = []
 	@State private var card: CardValuesComposite?
@@ -179,19 +181,20 @@ struct MainView: View {
 	var body: some View {
 		switch state {
 		case .loadingDatabase:
-			Text("Loading...")
-				.onAppear {
-					self.loadFile()
-				}
-		case .buttonToUnlock(let databaseFile):
-			VStack {
-				Text("Selected: \(databaseFile)")
-				Button("Unlock") {
-					let database = SwlDatabase(file: databaseFile)
-					state = .unlocking(database: database)
-				}
+			SandboxFileBrowser(folder: $folder,
+			                   files: $files) { item in
+				self.state = .buttonToUnlock(databaseFile: item.url)
+			} browse: {
+				self.loadFile()
 			}
-			.padding(.all, 20)
+		case .buttonToUnlock(let databaseFile):
+			UnlockView(file: "\(databaseFile)", unlock: {
+				let database = SwlDatabase(file: databaseFile)
+				state = .unlocking(database: database)
+			}, importFile: FileStorage.contains(databaseFile) ? nil : {
+				guard let importedFile = FileStorage.importFile(at: databaseFile) else { return }
+				state = .buttonToUnlock(databaseFile: importedFile)
+			})
 		case .unlocking(let database):
 			Text("Unlocking...")
 				.onAppear {
