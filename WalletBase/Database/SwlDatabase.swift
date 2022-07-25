@@ -91,13 +91,10 @@ class SwlDatabase {
 			// Find everything that matches.
 			let categories: [Category] = try database.select(where: "ID \(categoryId.queryCondition)").compactMap { $0 }
 
-			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
-			let filteredCategories = categoryId.filter(results: categories, \.id)
-
-			assert(filteredCategories.count < 2, "Unexpected to have 2+ matches after filtering.")
+			assert(categories.count < 2, "Unexpected to have 2+ matches after filtering.")
 
 			// Find the category, if there is one.
-			guard let category = filteredCategories.first else { return nil }
+			guard let category = categories.first else { return nil }
 
 			// Decrypt the category name.
 			let bytes: [UInt8] = category.name
@@ -132,17 +129,8 @@ class SwlDatabase {
 			// Find everything that matches.
 			let categories: [Category] = try database.select(where: "ParentCategoryID \(category?.id.queryCondition ?? "like ''")").compactMap { $0 }
 
-			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
-			let filteredCategories: [Category]
-			if let category = category {
-				filteredCategories = category.id.filter(results: categories, \.parent)
-			}
-			else {
-				filteredCategories = categories
-			}
-
 			// Decrypt the item names and return.
-			return filteredCategories.compactMap { category in
+			return categories.compactMap { category in
 				let bytes: [UInt8] = category.name
 				let data = Data(bytes)
 				guard let plaintext = crypto.decryptString(data: data) else { return nil }
@@ -163,11 +151,8 @@ class SwlDatabase {
 			// Find everything that matches.
 			let cards: [Card] = try database.select(where: "ParentCategoryID \(category.id.queryCondition)").compactMap { $0 }
 
-			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
-			let filteredCards: [Card] = category.id.filter(results: cards, \.parent)
-
 			// Decrypt the item names and return.
-			return filteredCards.compactMap { card in
+			return cards.compactMap { card in
 				let bytes: [UInt8] = card.name
 				let data = Data(bytes)
 				guard let plaintext = crypto.decryptString(data: data) else { return nil }
@@ -187,10 +172,7 @@ class SwlDatabase {
 			// Find everything that matches.
 			let fieldValues: [CardDescription] = try database.select(where: "ID \(card.id.queryCondition)").compactMap { $0 }
 
-			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
-			let filteredCards: [CardDescription] = card.id.filter(results: fieldValues, \.id)
-
-			return filteredCards.first
+			return fieldValues.first
 		}
 		catch {
 			return nil
@@ -205,10 +187,7 @@ class SwlDatabase {
 			// Find everything that matches.
 			let fieldValues: [CardAttachment] = try database.select(where: "CardID \(card.id.queryCondition)").compactMap { $0 }
 
-			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
-			let filteredCards: [CardAttachment] = card.id.filter(results: fieldValues, \.cardId)
-
-			return filteredCards
+			return fieldValues
 		}
 		catch {
 			return []
@@ -223,10 +202,7 @@ class SwlDatabase {
 			// Find everything that matches.
 			let fieldValues: [CardFieldValue] = try database.select(where: "CardID \(card.id.queryCondition)").compactMap { $0 }
 
-			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
-			let filteredCards: [CardFieldValue] = card.id.filter(results: fieldValues, \.cardId)
-
-			return filteredCards
+			return fieldValues
 		}
 		catch {
 			return []
@@ -241,14 +217,11 @@ class SwlDatabase {
 			// Find everything that matches.
 			let templateFields: [TemplateField] = try database.select(where: "ID \(templateFieldId.queryCondition)").compactMap { $0 }
 
-			// Filter matches since the swl category ID cannot be uniquely searched for in an SQL query.
-			let filteredtemplateFields: [TemplateField] = templateFieldId.filter(results: templateFields, \.id)
-
-			if filteredtemplateFields.count > 1 {
-				NSLog("multiple template fields \(filteredtemplateFields)")
+			if templateFields.count > 1 {
+				NSLog("multiple template fields \(templateFields)")
 			}
 
-			return filteredtemplateFields.first
+			return templateFields.first
 		}
 		catch {
 			return nil

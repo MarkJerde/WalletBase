@@ -26,6 +26,6 @@ extension SwlDatabase.SwlID: SQLiteDatabaseItem {
 
 		nextColumn?(column + 1)
 
-		return Self(value: array)
+		return Self(value: array, hexString: array.map { String(format: "%02X", $0) }.joined())
 	}
 }
