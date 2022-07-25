@@ -8,7 +8,7 @@
 import Foundation
 
 extension SwlDatabase {
-	/// An swl database card.
+	/// An swl database template field.
 	struct TemplateField {
 		/// The ID of this field.
 		let id: SwlID

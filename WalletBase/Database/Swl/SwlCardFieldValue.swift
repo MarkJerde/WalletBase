@@ -8,7 +8,7 @@
 import Foundation
 
 extension SwlDatabase {
-	/// An swl database card.
+	/// An swl database card field value.
 	struct CardFieldValue {
 		/// The ID of this field value.
 		let id: SwlID
