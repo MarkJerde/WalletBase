@@ -17,13 +17,31 @@ extension SwlDatabase.Card: SQLiteDatabaseItem {
 	static func decode(from statement: OpaquePointer, column: Int32 = 0, nextColumn: ((Int32) -> Void)?) -> Self? {
 		// Decode the parts.
 		var column = column
-		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
-		guard let name: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
-		guard let parent: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let name: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		let description: [UInt8]? = .decode(from: statement, column: column, nextColumn: { column = $0 })
+		guard let cardViewID: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let hasOwnCardView: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let templateID: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let parent: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let iconID: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let hitCount: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let syncID: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let createSyncID: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
 
 		nextColumn?(column)
 
 		// Build and return the instance.
-		return .init(id: id, name: name, parent: parent)
+		return .init(id: id,
+		             name: name,
+		             description: description,
+		             cardViewID: cardViewID,
+		             hasOwnCardView: hasOwnCardView,
+		             templateID: templateID,
+		             parent: parent,
+		             iconID: iconID,
+		             hitCount: hitCount,
+		             syncID: syncID,
+		             createSyncID: createSyncID)
 	}
 }
