@@ -8,6 +8,13 @@
 import Foundation
 
 extension SwlDatabase.CardAttachment: SQLiteQueryDescribing {
-	static let columns = ["ID", "CardID", "Name", "Data"]
-	static let table: SQLiteTable = SwlDatabase.Tables.cardAttachments
+	enum Column: String {
+		case id
+		case cardID
+		case name
+		case data
+	}
+
+	static let columns: [Column] = [.id, .cardID, .name, .data]
+	static let table = SwlDatabase.Tables.cardAttachments
 }

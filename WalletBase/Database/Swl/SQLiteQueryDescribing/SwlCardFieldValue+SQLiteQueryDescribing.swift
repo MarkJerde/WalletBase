@@ -8,6 +8,13 @@
 import Foundation
 
 extension SwlDatabase.CardFieldValue: SQLiteQueryDescribing {
-	static let columns = ["ID", "CardID", "TemplateFieldID", "ValueString"]
-	static let table: SQLiteTable = SwlDatabase.Tables.cardFieldValues
+	enum Column: String {
+		case id
+		case cardID
+		case templateFieldID
+		case valueString
+	}
+
+	static let columns: [Column] = [.id, .cardID, .templateFieldID, .valueString]
+	static let table = SwlDatabase.Tables.cardFieldValues
 }

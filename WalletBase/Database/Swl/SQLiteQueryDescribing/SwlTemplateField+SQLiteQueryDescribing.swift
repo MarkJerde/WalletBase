@@ -8,6 +8,15 @@
 import Foundation
 
 extension SwlDatabase.TemplateField: SQLiteQueryDescribing {
-	static let columns = ["ID", "Name", "TemplateID", "FieldTypeID", "Priority", "AdvInfo"]
-	static let table: SQLiteTable = SwlDatabase.Tables.templateFields
+	enum Column: String {
+		case id
+		case name
+		case templateID
+		case fieldTypeID
+		case priority
+		case advInfo
+	}
+
+	static let columns: [Column] = [.id, .name, .templateID, .fieldTypeID, .priority, .advInfo]
+	static let table = SwlDatabase.Tables.templateFields
 }

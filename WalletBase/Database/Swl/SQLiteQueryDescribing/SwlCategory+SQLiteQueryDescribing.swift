@@ -8,6 +8,12 @@
 import Foundation
 
 extension SwlDatabase.Category: SQLiteQueryDescribing {
-	static let columns = ["ID", "Name", "ParentCategoryID"]
-	static let table: SQLiteTable = SwlDatabase.Tables.categories
+	enum Column: String {
+		case id
+		case name
+		case parentCategoryID
+	}
+
+	static let columns: [Column] = [.id, .name, .parentCategoryID]
+	static let table = SwlDatabase.Tables.categories
 }

@@ -8,6 +8,11 @@
 import Foundation
 
 extension SwlDatabase.CardDescription: SQLiteQueryDescribing {
-	static let columns = ["ID", "Description"]
-	static let table: SQLiteTable = SwlDatabase.Tables.cards
+	enum Column: String {
+		case id
+		case description
+	}
+
+	static let columns: [Column] = [.id, .description]
+	static let table = SwlDatabase.Tables.cards
 }

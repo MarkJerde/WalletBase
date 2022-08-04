@@ -23,6 +23,8 @@ protocol SQLiteTable {
 }
 
 protocol SQLiteQueryDescribing {
-	static var columns: [String] { get }
-	static var table: SQLiteTable { get }
+	static var columns: [Column] { get }
+	static var table: Table { get }
+	associatedtype Table: SQLiteTable
+	associatedtype Column: Hashable & RawRepresentable where Column.RawValue == String
 }

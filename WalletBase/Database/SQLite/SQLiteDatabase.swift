@@ -67,7 +67,7 @@ class SQLiteDatabase {
 	///   - where: The where clause to filter by. (No filtering if nil.)
 	/// - Returns: An array containing the selected items from the database.
 	func select<T: SQLiteDatabaseItem>(where whereClause: String? = nil) throws -> [T?] where T: SQLiteQueryDescribing {
-		try select(columns: T.columns, fromTable: T.table, where: whereClause)
+		try select(columns: T.columns.map { $0.rawValue }, fromTable: T.table, where: whereClause)
 	}
 
 	/// Performs a select operation on the database, selecting the named columns from the named table with the given where clause (if any).
