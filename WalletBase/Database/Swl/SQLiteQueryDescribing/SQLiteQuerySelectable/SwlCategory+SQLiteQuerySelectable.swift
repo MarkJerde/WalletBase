@@ -16,4 +16,11 @@ extension SwlDatabase.Category: SQLiteQuerySelectable {
 
 	static let columns: [Column] = [.id, .name, .parentCategoryID]
 	static let table = SwlDatabase.Tables.categories
+	func encode() -> [Column: SQLiteDataType] {
+		[
+			.id: id.encoded,
+			.name: .blob(value: .init(arrayValue: name)),
+			.parentCategoryID: parent.encoded,
+		]
+	}
 }

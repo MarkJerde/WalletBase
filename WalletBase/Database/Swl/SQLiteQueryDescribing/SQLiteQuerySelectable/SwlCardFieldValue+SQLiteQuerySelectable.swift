@@ -17,4 +17,13 @@ extension SwlDatabase.CardFieldValue: SQLiteQuerySelectable {
 
 	static let columns: [Column] = [.id, .cardID, .templateFieldID, .valueString]
 	static let table = SwlDatabase.Tables.cardFieldValues
+	static let primary: Column = .id
+	func encode() -> [Column: SQLiteDataType] {
+		[
+			.id: id.encoded,
+			.cardID: cardId.encoded,
+			.templateFieldID: templateFieldId.encoded,
+			.valueString: .nullableBlob(value: .init(arrayValue: value)),
+		]
+	}
 }

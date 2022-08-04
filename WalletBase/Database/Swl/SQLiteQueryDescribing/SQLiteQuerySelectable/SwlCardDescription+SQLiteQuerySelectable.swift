@@ -15,4 +15,15 @@ extension SwlDatabase.CardDescription: SQLiteQuerySelectable {
 
 	static let columns: [Column] = [.id, .description]
 	static let table = SwlDatabase.Tables.cards
+	func encode() -> [Column: SQLiteDataType] {
+		[
+			.id: id.encoded,
+			.description: .nullableBlob(value: descriptionItem),
+		]
+	}
+
+	private var descriptionItem: SQLiteDataItem? {
+		guard let description = description else { return nil }
+		return SQLiteDataItem(arrayValue: description)
+	}
 }

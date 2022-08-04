@@ -17,4 +17,12 @@ extension SwlDatabase.CardAttachment: SQLiteQuerySelectable {
 
 	static let columns: [Column] = [.id, .cardID, .name, .data]
 	static let table = SwlDatabase.Tables.cardAttachments
+	func encode() -> [Column: SQLiteDataType] {
+		[
+			.id: id.encoded,
+			.cardID: cardId.encoded,
+			.name: .blob(value: .init(arrayValue: name)),
+			.data: .nullableBlob(value: .init(arrayValue: data)),
+		]
+	}
 }

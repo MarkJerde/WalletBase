@@ -19,4 +19,14 @@ extension SwlDatabase.TemplateField: SQLiteQuerySelectable {
 
 	static let columns: [Column] = [.id, .name, .templateID, .fieldTypeID, .priority, .advInfo]
 	static let table = SwlDatabase.Tables.templateFields
+	func encode() -> [Column: SQLiteDataType] {
+		[
+			.id: id.encoded,
+			.name: .blob(value: .init(arrayValue: name)),
+			.templateID: templateId.encoded,
+			.fieldTypeID: .integer(value: fieldTypeId),
+			.priority: .integer(value: priority),
+			.advInfo: .nullableBlob(value: nil),
+		]
+	}
 }
