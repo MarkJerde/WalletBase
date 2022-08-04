@@ -77,6 +77,45 @@ struct FileStorage {
 		}
 	}
 
+	/// Create a backup copy of a file.
+	/// - Parameter url: The file to backup
+	/// - Returns: The location of the backup copy.
+	@discardableResult
+	static func backupFile(at url: URL) -> URL? {
+		let modificationDate = fileModificationDate(url: url) ?? Date()
+
+		let pathExtension = "\(backupDateFormatter.string(from: modificationDate)).bak"
+
+		let destination = url.appendingPathExtension(pathExtension)
+
+		do {
+			try FileManager.default.copyItem(at: url, to: destination)
+			return destination
+		} catch {
+			if FileManager.default.fileExists(atPath: destination.path) {
+				// Already backed up today.
+				return destination
+			}
+			// Error.
+			return nil
+		}
+	}
+
+	private static let backupDateFormatter: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.dateFormat = "yyyyMMdd"
+		return formatter
+	}()
+
+	private static func fileModificationDate(url: URL) -> Date? {
+		do {
+			let attr = try FileManager.default.attributesOfItem(atPath: url.path)
+			return attr[FileAttributeKey.modificationDate] as? Date
+		} catch {
+			return nil
+		}
+	}
+
 	/// Determine if a file URL is in storage.
 	/// - Parameter url: The URL to check.
 	/// - Returns: True if the file exists and is in storage. False otherwise.
