@@ -262,7 +262,7 @@
 		8D50F3DF27419B5A00A754CB /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				8D5D6133274757C900F95986 /* SQLiteDatabase.swift */,
+				8D97CE49289A232500373192 /* SQLite */,
 				8D50F3D6273CC0AD00A754CB /* SwlDatabase.swift */,
 				8D5D61412751952400F95986 /* SQLiteItems */,
 				8D5D613A275193D100F95986 /* Swl */,
@@ -368,6 +368,14 @@
 				8D97CE33288791DE00373192 /* UnlockView.swift */,
 			);
 			path = MainViewStates;
+			sourceTree = "<group>";
+		};
+		8D97CE49289A232500373192 /* SQLite */ = {
+			isa = PBXGroup;
+			children = (
+				8D5D6133274757C900F95986 /* SQLiteDatabase.swift */,
+			);
+			path = SQLite;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
