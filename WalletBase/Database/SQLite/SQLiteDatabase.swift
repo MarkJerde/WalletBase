@@ -27,6 +27,14 @@ class SQLiteDatabase {
 		return _database
 	}
 
+	private func close() -> Bool {
+		guard let database = _database else {
+			return true
+		}
+		_database = nil
+		return sqlite3_close(database) == SQLITE_OK
+	}
+
 	private var _database: OpaquePointer?
 
 	/// Creates and returns an SQLite database session wrapper for the specified database file.
@@ -96,5 +104,14 @@ class SQLiteDatabase {
 		}
 
 		return response
+	}
+
+	var canBackupDatabaseFile: Bool {
+		FileStorage.contains(file)
+	}
+
+	func backupDatabaseFile() -> Bool {
+		guard close() else { return false }
+		return FileStorage.backupFile(at: file) != nil
 	}
 }
