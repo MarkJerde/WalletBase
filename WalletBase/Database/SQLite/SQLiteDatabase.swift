@@ -62,12 +62,32 @@ class SQLiteDatabase {
 
 		enum Site {
 			case prepare
+			case step
 			case finalize
 		}
 
 		enum Problem {
 			case failedWithoutError
 			case error(String)
+		}
+	}
+
+	/// An error that occurs in this layer between a call site and the database.
+	struct LayerError: Error {
+		/// The site of the problem.
+		let site: Site
+		/// The problem that occurred.
+		let problem: Problem
+
+		enum Site {
+			case insert
+			case update
+			case backup
+		}
+
+		enum Problem {
+			case generalError
+			case requirements
 		}
 	}
 
@@ -104,6 +124,76 @@ class SQLiteDatabase {
 		}
 
 		return response
+	}
+
+	func insert<T: SQLiteDatabaseItem>(record: T) throws where T: SQLiteQueryWritable {
+		try insert(into: T.table, values: record.insertionValues())
+	}
+
+	func insert<Table>(into table: Table, values: [SQLiteDataType]) throws where Table: SQLiteTable {
+		guard canBackupDatabaseFile,
+		      backupDatabaseFile()
+		else {
+			throw LayerError(site: .backup, problem: .generalError)
+		}
+
+		var statement: OpaquePointer?
+
+		let statementText = "insert into \(table.name) values (\(values.map { $0.queryValue }.joined(separator: ", ")))"
+		guard sqlite3_prepare_v2(database, statementText, -1, &statement, nil) == SQLITE_OK,
+		      let statement = statement
+		else {
+			throw DatabaseError(site: .prepare, database: database)
+		}
+
+		guard sqlite3_finalize(statement) == SQLITE_OK else {
+			throw DatabaseError(site: .finalize, database: database)
+		}
+	}
+
+	func update<T: SQLiteDatabaseItem>(record: T, from previousRecord: T? = nil) throws where T: SQLiteQueryWritable {
+		var recordValues = record.encode()
+		if let previousRecord = previousRecord {
+			let previousValues = previousRecord.encode()
+			for key in previousValues.keys {
+				guard key != T.primary,
+				      recordValues[key] == previousValues[key] else { continue }
+				recordValues.removeValue(forKey: key)
+			}
+		}
+		try update(from: T.table, values: recordValues, primary: T.primary)
+	}
+
+	func update<Table, Column>(from table: Table, values: [Column: SQLiteDataType], primary: Column) throws where Table: SQLiteTable, Column: Hashable & RawRepresentable, Column.RawValue == String {
+		guard canBackupDatabaseFile,
+		      backupDatabaseFile()
+		else {
+			throw LayerError(site: .backup, problem: .generalError)
+		}
+
+		guard let primaryValue = values[primary] else {
+			throw LayerError(site: .update, problem: .requirements)
+		}
+
+		var values = values
+		values.removeValue(forKey: primary)
+
+		var statement: OpaquePointer?
+
+		let statementText = "update \(table.name) set \(values.map { "\($0.key.rawValue) = \($0.value.queryValue)" }.joined(separator: ", ")) where \(primary) == \(primaryValue.queryValue)"
+		guard sqlite3_prepare_v2(database, statementText, -1, &statement, nil) == SQLITE_OK,
+		      let statement = statement
+		else {
+			throw DatabaseError(site: .prepare, database: database)
+		}
+
+		guard sqlite3_step(statement) == SQLITE_DONE else {
+			throw DatabaseError(site: .step, database: database)
+		}
+
+		guard sqlite3_finalize(statement) == SQLITE_OK else {
+			throw DatabaseError(site: .finalize, database: database)
+		}
 	}
 
 	var canBackupDatabaseFile: Bool {
