@@ -99,6 +99,8 @@
 		8D97CE3F2887B97B00373192 /* WalletFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE3D2887B97B00373192 /* WalletFile.swift */; };
 		8D97CE412887BB6000373192 /* SandboxFileBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE402887BB6000373192 /* SandboxFileBrowser.swift */; };
 		8D97CE422887BB6000373192 /* SandboxFileBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE402887BB6000373192 /* SandboxFileBrowser.swift */; };
+		8D97CE57289A27D000373192 /* SQLiteProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE56289A27D000373192 /* SQLiteProtocols.swift */; };
+		8D97CE58289A27D000373192 /* SQLiteProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE56289A27D000373192 /* SQLiteProtocols.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -172,6 +174,7 @@
 		8D97CE3A2887AD6900373192 /* String+splitOnLastOccurenceOf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+splitOnLastOccurenceOf.swift"; sourceTree = "<group>"; };
 		8D97CE3D2887B97B00373192 /* WalletFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletFile.swift; sourceTree = "<group>"; };
 		8D97CE402887BB6000373192 /* SandboxFileBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SandboxFileBrowser.swift; sourceTree = "<group>"; };
+		8D97CE56289A27D000373192 /* SQLiteProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteProtocols.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -373,6 +376,7 @@
 			isa = PBXGroup;
 			children = (
 				8D5D6133274757C900F95986 /* SQLiteDatabase.swift */,
+				8D97CE56289A27D000373192 /* SQLiteProtocols.swift */,
 				8D5D61412751952400F95986 /* SQLiteItems */,
 			);
 			path = SQLite;
@@ -548,6 +552,7 @@
 				8D97CE34288791DE00373192 /* UnlockView.swift in Sources */,
 				8D97CE412887BB6000373192 /* SandboxFileBrowser.swift in Sources */,
 				8D5D61362748A62A00F95986 /* ItemGrid.swift in Sources */,
+				8D97CE57289A27D000373192 /* SQLiteProtocols.swift in Sources */,
 				8D5D6192276FC15300F95986 /* SwlCardDescription+SQLiteQueryDescribing.swift in Sources */,
 				8D5D61552755140600F95986 /* SwlCardFieldValue+SQLiteDatabaseItem.swift in Sources */,
 				8D5D616A2759B4E100F95986 /* CardView.swift in Sources */,
@@ -599,6 +604,7 @@
 				8D97CE362887930B00373192 /* UnlockView.swift in Sources */,
 				8D97CE422887BB6000373192 /* SandboxFileBrowser.swift in Sources */,
 				8D5D615F2759B34E00F95986 /* String+SQLiteDatabaseItem.swift in Sources */,
+				8D97CE58289A27D000373192 /* SQLiteProtocols.swift in Sources */,
 				8D5D6193276FC15300F95986 /* SwlCardDescription+SQLiteQueryDescribing.swift in Sources */,
 				8D5D61382749AF3900F95986 /* SwlDatabase.swift in Sources */,
 				8D5D616B2759B54700F95986 /* CardView.swift in Sources */,
