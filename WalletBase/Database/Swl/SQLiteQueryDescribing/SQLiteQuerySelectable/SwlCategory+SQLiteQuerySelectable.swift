@@ -1,5 +1,5 @@
 //
-//  SwlCard+SQLiteQueryDescribing.swift
+//  SwlCategory+SQLiteQuerySelectable.swift
 //  WalletBase
 //
 //  Created by Mark Jerde on 12/19/21.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension SwlDatabase.Card: SQLiteQueryDescribing {
+extension SwlDatabase.Category: SQLiteQuerySelectable {
 	enum Column: String {
 		case id
 		case name
@@ -15,5 +15,5 @@ extension SwlDatabase.Card: SQLiteQueryDescribing {
 	}
 
 	static let columns: [Column] = [.id, .name, .parentCategoryID]
-	static let table = SwlDatabase.Tables.cards
+	static let table = SwlDatabase.Tables.categories
 }

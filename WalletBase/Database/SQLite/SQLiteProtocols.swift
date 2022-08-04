@@ -23,8 +23,24 @@ protocol SQLiteTable {
 }
 
 protocol SQLiteQueryDescribing {
-	static var columns: [Column] { get }
 	static var table: Table { get }
 	associatedtype Table: SQLiteTable
 	associatedtype Column: Hashable & RawRepresentable where Column.RawValue == String
 }
+
+protocol SQLiteQuerySelectable: SQLiteQueryDescribing {
+	static var columns: [Column] { get }
+}
+
+protocol SQLiteQueryWritable: SQLiteQueryDescribing {
+	static var primary: Column { get }
+	func encode() -> [Column: SQLiteDataType]
+}
+
+extension SQLiteQueryWritable {
+	func insertionValues() -> [SQLiteDataType] {
+		Array(encode().values)
+	}
+}
+
+protocol SQLiteQueryReadWritable: SQLiteQuerySelectable, SQLiteQueryWritable {}

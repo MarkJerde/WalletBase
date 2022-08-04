@@ -1,5 +1,5 @@
 //
-//  SwlTemplateField+SQLiteQueryDescribing.swift
+//  SwlTemplateField+SQLiteQuerySelectable.swift
 //  WalletBase
 //
 //  Created by Mark Jerde on 12/19/21.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension SwlDatabase.TemplateField: SQLiteQueryDescribing {
+extension SwlDatabase.TemplateField: SQLiteQuerySelectable {
 	enum Column: String {
 		case id
 		case name

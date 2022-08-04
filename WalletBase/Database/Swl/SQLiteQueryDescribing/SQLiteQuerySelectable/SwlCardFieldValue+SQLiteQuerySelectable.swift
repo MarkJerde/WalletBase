@@ -1,5 +1,5 @@
 //
-//  SwlCardFieldValue+SQLiteQueryDescribing.swift
+//  SwlCardFieldValue+SQLiteQuerySelectable.swift
 //  WalletBase
 //
 //  Created by Mark Jerde on 12/19/21.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension SwlDatabase.CardFieldValue: SQLiteQueryDescribing {
+extension SwlDatabase.CardFieldValue: SQLiteQuerySelectable {
 	enum Column: String {
 		case id
 		case cardID
