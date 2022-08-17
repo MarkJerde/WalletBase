@@ -17,6 +17,7 @@ struct CardValue<Item: CardViewValue>: View {
 	let item: Item
 	@State var value: String
 	@State var isEncrypted: Bool
+	@State var isActive: Bool = false
 	var body: some View {
 		HStack {
 			Text(item.name)
@@ -24,20 +25,6 @@ struct CardValue<Item: CardViewValue>: View {
 			Spacer()
 			Text(value)
 				.padding()
-				.onTapGesture {
-					if item.hidePlaintext {
-						if isEncrypted {
-							value = item.decryptedValue ?? ""
-						} else {
-							value = "********"
-						}
-						isEncrypted = !isEncrypted
-					} else if item.isURL,
-					          let url = URL(string: value)
-					{
-						NSWorkspace.shared.open(url)
-					}
-				}
 			Button {
 				if let value = item.decryptedValue {
 					let pasteboard = NSPasteboard.general
@@ -50,9 +37,27 @@ struct CardValue<Item: CardViewValue>: View {
 			}
 			.buttonStyle(CopyButtonStyle())
 		}
+		.background(Color.white.opacity(0.02)) // Minimum non-hidden opacity because hidden and clear items are not tappable in SwiftUI, or at least not as tappable.
+		.onTapGesture {
+			if item.hidePlaintext {
+				if isEncrypted {
+					value = item.decryptedValue ?? ""
+				} else {
+					value = "********"
+				}
+				isEncrypted = !isEncrypted
+			} else if item.isURL,
+			          let url = URL(string: value)
+			{
+				isActive = true
+				NSWorkspace.shared.open(url, configuration: .init()) { _, _ in
+					isActive = false
+				}
+			}
+		}
 		.overlay(
 			RoundedRectangle(cornerRadius: 4)
-				.stroke(Color.gray, lineWidth: 2)
+				.stroke(isActive ? Color.blue : Color.gray, lineWidth: 2)
 		)
 	}
 
