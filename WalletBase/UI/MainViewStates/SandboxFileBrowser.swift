@@ -12,22 +12,43 @@ struct SandboxFileBrowser: View {
 	@Binding var files: [WalletFile]
 	let onItemTap: (WalletFile) -> Void
 	let browse: () -> Void
+	@State private var filtered: Bool = false
+
+	fileprivate func loadFiles(searchString: String? = nil) {
+		// Look for already-imported files.
+		// Only map swl files (no folders) for now.
+		let found = FileStorage.items
+			.filter { $0.lastPathComponent.hasSuffix(".swl")
+			}
+			.map { WalletFile(url: $0, type: .file) }
+
+		guard let searchString = searchString,
+		      !searchString.isEmpty
+		else {
+			files = found
+
+			// Open the file dialog if there are no already-imported files.
+			if files.isEmpty {
+				browse()
+			}
+
+			filtered = false
+			return
+		}
+
+		files = found.filter { file in
+			file.url.lastPathComponent.lowercased().contains(searchString.lowercased())
+		}
+		filtered = true
+	}
 
 	var body: some View {
-		if files.isEmpty {
+		if files.isEmpty,
+		   !filtered
+		{
 			Text("Loading...")
 				.onAppear {
-					// Look for already-imported files.
-					// Only map swl files (no folders) for now.
-					files = FileStorage.items
-						.filter { $0.lastPathComponent.hasSuffix(".swl")
-						}
-						.map { WalletFile(url: $0, type: .file) }
-
-					// Open the file dialog if there are no already-imported files.
-					if files.isEmpty {
-						browse()
-					}
+					loadFiles()
 				}
 		} else {
 			VStack {
@@ -35,6 +56,8 @@ struct SandboxFileBrowser: View {
 					onItemTap(item)
 				} onBackTap: {
 					// Folders not supported yet.
+				} onSearch: { searchString in
+					loadFiles(searchString: searchString)
 				}
 				Button("Browse") {
 					browse()

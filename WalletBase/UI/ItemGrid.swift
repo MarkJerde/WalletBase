@@ -42,16 +42,31 @@ protocol ItemGridItem: Hashable {
 }
 
 struct ItemGrid<Item: ItemGridItem>: View {
+	internal init(items: Binding<[Item]>,
+	              container: Binding<Item?>,
+	              onItemTap: @escaping (Item) -> Void,
+	              onBackTap: @escaping () -> Void,
+	              onSearch: ((String) -> Void)? = nil)
+	{
+		self._items = items
+		self._container = container
+		self.onItemTap = onItemTap
+		self.onBackTap = onBackTap
+		self.onSearch = onSearch
+	}
+
 	let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 5)
 	@Binding var items: [Item]
 	@Binding var container: Item?
 	let onItemTap: (Item) -> Void
 	let onBackTap: () -> Void
+	let onSearch: ((String) -> Void)?
 	var body: some View {
 		NavigationFrame(currentName: container?.name,
 		                onBackTap: onBackTap,
 		                onPreviousTap: nil,
-		                onNextTap: nil) {
+		                onNextTap: nil,
+		                onSearch: onSearch) {
 			ScrollView {
 				LazyVGrid(columns: columns, spacing: 20) {
 					ForEach(items, id: \.self) { item in
@@ -94,6 +109,8 @@ struct ItemGrid_Previews: PreviewProvider {
 			NSLog("tapped \($0)")
 		} onBackTap: {
 			NSLog("tapBack")
+		} onSearch: { searchString in
+			NSLog("searching \(searchString)")
 		}
 	}
 }

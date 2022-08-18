@@ -12,12 +12,15 @@ struct NavigationFrame<Content>: View where Content: View {
 	let onBackTap: () -> Void
 	let onPreviousTap: (() -> Void)?
 	let onNextTap: (() -> Void)?
+	let onSearch: ((String) -> Void)?
 	@ViewBuilder var content: () -> Content
+
+	@State private var searchTerm = ""
 
 	var body: some View {
 		VStack {
 			HStack {
-				if let currentName = currentName {
+				if currentName != nil {
 					Button {
 						onBackTap()
 					} label: {
@@ -25,7 +28,20 @@ struct NavigationFrame<Content>: View where Content: View {
 							.foregroundColor(.black)
 					}
 					.frame(height: 50)
-					Spacer()
+				}
+				Spacer(minLength: 50)
+				if let onSearch = onSearch {
+					TextField("Search...", text: $searchTerm)
+						.overlay(
+							RoundedRectangle(cornerRadius: 4)
+								.stroke(Color.white, lineWidth: 2)
+						)
+						.onChange(of: searchTerm) { _ in
+							onSearch(searchTerm)
+						}
+				}
+				Spacer(minLength: 50)
+				if let currentName = currentName {
 					if let onPreviousTap = onPreviousTap {
 						Button {
 							onPreviousTap()
@@ -65,6 +81,8 @@ struct NavigationFrame_Previews: PreviewProvider {
 			NSLog("Tapped previous")
 		} onNextTap: {
 			NSLog("Tapped next")
+		} onSearch: { string in
+			NSLog("Searching for \(string)")
 		} content: {
 			Image(systemName: "creditcard")
 		}

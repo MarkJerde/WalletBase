@@ -51,7 +51,8 @@ struct CardView<Item: CardViewItem>: View {
 		NavigationFrame(currentName: item?.name ?? "",
 		                onBackTap: onBackTap,
 		                onPreviousTap: onPreviousTap,
-		                onNextTap: onNextTap) {
+		                onNextTap: onNextTap,
+		                onSearch: nil) {
 			ScrollView {
 				VStack {
 					ForEach(item?.values ?? [], id: \.self) { item in
