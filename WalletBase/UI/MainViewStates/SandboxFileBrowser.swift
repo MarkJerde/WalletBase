@@ -52,7 +52,9 @@ struct SandboxFileBrowser: View {
 				}
 		} else {
 			VStack {
-				ItemGrid(items: $files, container: $folder) { item in
+				ItemGrid(items: $files,
+				         container: $folder,
+				         emptyMessage: "No filenames match search.") { item in
 					onItemTap(item)
 				} onBackTap: {
 					// Folders not supported yet.

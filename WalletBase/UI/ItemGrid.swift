@@ -44,12 +44,14 @@ protocol ItemGridItem: Hashable {
 struct ItemGrid<Item: ItemGridItem>: View {
 	internal init(items: Binding<[Item]>,
 	              container: Binding<Item?>,
+	              emptyMessage: String? = "Empty",
 	              onItemTap: @escaping (Item) -> Void,
 	              onBackTap: @escaping () -> Void,
 	              onSearch: ((String) -> Void)? = nil)
 	{
 		self._items = items
 		self._container = container
+		self.emptyMessage = emptyMessage
 		self.onItemTap = onItemTap
 		self.onBackTap = onBackTap
 		self.onSearch = onSearch
@@ -58,6 +60,7 @@ struct ItemGrid<Item: ItemGridItem>: View {
 	let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 5)
 	@Binding var items: [Item]
 	@Binding var container: Item?
+	let emptyMessage: String?
 	let onItemTap: (Item) -> Void
 	let onBackTap: () -> Void
 	let onSearch: ((String) -> Void)?
@@ -67,18 +70,25 @@ struct ItemGrid<Item: ItemGridItem>: View {
 		                onPreviousTap: nil,
 		                onNextTap: nil,
 		                onSearch: onSearch) {
-			ScrollView {
-				LazyVGrid(columns: columns, spacing: 20) {
-					ForEach(items, id: \.self) { item in
-						VStack {
-							Image(systemName: item.type.icon)
-								.font(.system(size: 30))
-								.foregroundColor(item.type.color)
-								.frame(width: 50, height: 50)
-							Text(item.name)
-						}
-						.onTapGesture {
-							onItemTap(item)
+			if items.isEmpty,
+			   let emptyMessage = emptyMessage
+			{
+				Text(emptyMessage)
+					.frame(maxHeight: .infinity)
+			} else {
+				ScrollView {
+					LazyVGrid(columns: columns, spacing: 20) {
+						ForEach(items, id: \.self) { item in
+							VStack {
+								Image(systemName: item.type.icon)
+									.font(.system(size: 30))
+									.foregroundColor(item.type.color)
+									.frame(width: 50, height: 50)
+								Text(item.name)
+							}
+							.onTapGesture {
+								onItemTap(item)
+							}
 						}
 					}
 				}
