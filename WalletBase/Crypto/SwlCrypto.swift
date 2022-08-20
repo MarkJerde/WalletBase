@@ -143,7 +143,6 @@ class SwlCrypto: CryptoProvider {
 		}
 
 		guard successBytes > 0 else { return nil }
-		dataOut.count = successBytes + 4
 
 		var response = Data(count: 0)
 		response.append(contentsOf: [paddingSize, 0, 0, 0])
