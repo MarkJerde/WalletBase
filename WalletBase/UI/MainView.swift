@@ -178,6 +178,10 @@ struct MainView: View {
 		return categories + cards
 	}
 
+	private func items(of searchString: String, in database: SwlDatabase) -> [SwlDatabase.Item] {
+		database.cards(in: searchString).sorted(by: \.name)
+	}
+
 	var body: some View {
 		switch state {
 		case .loadingDatabase:
@@ -222,22 +226,34 @@ struct MainView: View {
 		case .browseContent(let database):
 			VStack {
 				ItemGrid(items: $items,
-				         container: $category) { item in
-					switch item.itemType {
-					case .card(let card):
-						navigate(toDatabase: database, category: category, card: card)
-					case .category:
-						navigate(toDatabase: database, category: item)
-					}
-				} onBackTap: {
-					guard let category = category,
-					      case .category(let swlCategory) = category.itemType else { return }
-					let parentId = swlCategory.parent
-					let parent = database.categoryItem(forId: parentId)
-					// Clear the restore category so it won't try to keep restoring if we navigate back to the root.
-					restoreCategoryId = nil
-					navigate(toDatabase: database, category: parent)
-				}
+				         container: $category,
+				         onItemTap: { item in
+				         	switch item.itemType {
+				         	case .card(let card):
+				         		navigate(toDatabase: database, category: category, card: card)
+				         	case .category:
+				         		navigate(toDatabase: database, category: item)
+				         	}
+				         },
+				         onBackTap: {
+				         	guard let category = category,
+				         	      case .category(let swlCategory) = category.itemType else { return }
+				         	let parentId = swlCategory.parent
+				         	let parent = database.categoryItem(forId: parentId)
+				         	// Clear the restore category so it won't try to keep restoring if we navigate back to the root.
+				         	restoreCategoryId = nil
+				         	navigate(toDatabase: database, category: parent)
+				         },
+				         onSearch: (self.category == nil ? { searchString in
+				         	guard !searchString.isEmpty else {
+				         		items = items(of: category, in: database)
+				         		return
+				         	}
+				         	items = items(of: searchString, in: database)
+				         	numCards = nil
+				         	cardIndex = nil
+				         	state = .browseContent(database: database)
+				         } : nil))
 				Button("Lock") {
 					items = []
 					category = nil

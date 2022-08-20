@@ -164,6 +164,32 @@ class SwlDatabase {
 		}
 	}
 
+	/// Obtains the decrypted card items in a given category.
+	/// - Parameter category: The category.
+	/// - Returns: The items.
+	func cards(in searchString: String) -> [Item] {
+		guard let crypto = crypto,
+		      let encryptedSearchStringData = crypto.encrypt(searchString) else { return [] }
+
+		let encryptedSearchString = SQLiteDataItem(dataValue: encryptedSearchStringData)
+
+		do {
+			// Find everything that matches.
+			let cards: [Card] = try database.select(where: "Name is \(encryptedSearchString.asBlob)").compactMap { $0 }
+
+			// Decrypt the item names and return.
+			return cards.compactMap { card in
+				let bytes: [UInt8] = card.name
+				let data = Data(bytes)
+				guard let plaintext = crypto.decryptString(data: data) else { return nil }
+				return .init(name: plaintext, type: .card(card: card))
+			}
+		}
+		catch {
+			return []
+		}
+	}
+
 	/// Obtains the encrypted card description of a given card.
 	/// - Parameter category: The category.
 	/// - Returns: The description.
