@@ -45,7 +45,7 @@ struct MainView: View {
 	@State private var files: [WalletFile] = []
 	@State private var category: SwlDatabase.Item?
 	@State private var items: [SwlDatabase.Item] = []
-	@State private var card: CardValuesComposite?
+	@State private var card: CardValuesComposite<SwlDatabase.SwlID>?
 	@State private var cardIndex: Int?
 	@State private var numCards: Int?
 
@@ -119,7 +119,7 @@ struct MainView: View {
 			numCards = justCards.count
 			cardIndex = index
 			items = []
-			self.card = CardValuesComposite.card(for: card, database: database)
+			self.card = CardValuesComposite<SwlDatabase.SwlID>.card(for: card, database: database)
 			state = .viewCard(database: database)
 			return
 		}
@@ -179,9 +179,19 @@ struct MainView: View {
 		database.cards(in: searchString).sorted(by: \.name)
 	}
 
+	private func showFailedToSaveAlert() {
+		let alert = NSAlert()
+		alert.messageText = "Save Failed"
+		alert.informativeText = "Something went wrong while trying to save. Please try again."
+		alert.alertStyle = .warning
+		alert.addButton(withTitle: "OK")
+		_ = alert.runModal()
+	}
+
 	private func lock(database: SwlDatabase) {
 		items = []
 		category = nil
+		database.close()
 		state = .buttonToUnlock(databaseFile: database.file)
 	}
 
@@ -278,6 +288,43 @@ struct MainView: View {
 					}
 
 					navigate(toDatabase: database, category: category, index: cardIndex + 1)
+				}, onSave: { edits in
+					guard let card = card else {
+						showFailedToSaveAlert()
+						return false
+					}
+					do {
+						try database.update(fieldValues: Dictionary(uniqueKeysWithValues: edits.map { (key: CardValuesComposite<SwlDatabase.SwlID>.CardValue, value: String) in
+							(key.id, value)
+						}), in: card.id)
+					} catch {
+						if let error = error as? SwlDatabase.Error {
+							switch error {
+							case .writeFailureIndeterminite:
+								let alert = NSAlert()
+								alert.messageText = "Save Failed"
+								alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
+								alert.alertStyle = .critical
+								alert.addButton(withTitle: "Close Wallet")
+								alert.addButton(withTitle: "Take More Risks")
+								guard alert.runModal() == .alertFirstButtonReturn else { return false }
+								folder = nil
+								lock(database: database)
+								return true
+							default:
+								break
+							}
+						}
+						showFailedToSaveAlert()
+						return false
+					}
+					// Navigate to updated card.
+					guard let cardIndex = cardIndex else {
+						navigate(toDatabase: database, category: category)
+						return true
+					}
+					navigate(toDatabase: database, category: category, index: cardIndex)
+					return true
 				})
 				Button("Lock") {
 					lock(database: database)

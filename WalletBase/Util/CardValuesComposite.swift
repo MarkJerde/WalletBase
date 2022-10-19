@@ -7,18 +7,19 @@
 
 import Foundation
 
-struct CardValuesComposite: CardViewItem {
+struct CardValuesComposite<IDType>: CardViewItem where IDType: Hashable {
 	let name: String
 	let values: [CardValue]
 	let description: CardDescription?
 	let attachments: [CardAttachment]
+	let id: IDType
 
 	struct FieldValue {
 		let field: SwlDatabase.TemplateField?
 		let value: SwlDatabase.CardFieldValue
 	}
 
-	static func card(for card: SwlDatabase.Card, database: SwlDatabase) -> Self? {
+	static func card(for card: SwlDatabase.Card, database: SwlDatabase) -> CardValuesComposite<SwlDatabase.SwlID>? {
 		let cardValues = database.fieldValues(in: card)
 		let fieldValues: [FieldValue] = cardValues.map { cardValue in
 			let field = database.templateField(forId: cardValue.templateFieldId)
@@ -26,7 +27,7 @@ struct CardValuesComposite: CardViewItem {
 		}.sorted {
 			($0.field?.priority ?? 9999) < ($1.field?.priority ?? 9999)
 		}
-		let values: [CardValuesComposite.Value] = fieldValues.map { fieldValue in
+		let values: [CardValuesComposite<SwlDatabase.SwlID>.Value] = fieldValues.map { fieldValue in
 			let field = fieldValue.field
 			let cardValue = fieldValue.value
 			let fieldType: SwlDatabase.TemplateField.FieldType
@@ -36,19 +37,20 @@ struct CardValuesComposite: CardViewItem {
 				fieldType = .password
 			}
 			let name = database.decryptString(bytes: field?.name ?? []) ?? ""
-			return CardValuesComposite.Value(name: name,
-			                                 hidePlaintext: fieldType == .password,
-			                                 isURL: fieldType == .url,
-			                                 encryptedValue: cardValue.value) { encrypted in
+			return CardValuesComposite<SwlDatabase.SwlID>.Value(id: cardValue.id,
+			                                                    name: name,
+			                                                    hidePlaintext: fieldType == .password,
+			                                                    isURL: fieldType == .url,
+			                                                    encryptedValue: cardValue.value) { encrypted in
 				ActivityMonitor.shared.didActivity()
 				return database.decryptString(bytes: encrypted)
 			}
 		}
 
 		let cardDescription = database.description(in: card)
-		let description: CardDescription?
+		let description: CardValuesComposite<SwlDatabase.SwlID>.CardDescription?
 		if let cardDescription = cardDescription?.description {
-			description = CardDescription(encryptedDescription: cardDescription) { encrypted in
+			description = CardValuesComposite<SwlDatabase.SwlID>.CardDescription(encryptedDescription: cardDescription) { encrypted in
 				ActivityMonitor.shared.didActivity()
 				return database.decryptString(bytes: encrypted)
 			}
@@ -57,8 +59,8 @@ struct CardValuesComposite: CardViewItem {
 		}
 
 		let cardAttachments = database.attachments(in: card)
-		let attachments = cardAttachments.map { CardAttachment(encryptedName: $0.name,
-		                                                       encryptedData: $0.data) { encrypted in
+		let attachments = cardAttachments.map { CardValuesComposite<SwlDatabase.SwlID>.CardAttachment(encryptedName: $0.name,
+		                                                                                              encryptedData: $0.data) { encrypted in
 				ActivityMonitor.shared.didActivity()
 				return database.decryptString(bytes: encrypted)
 			} dataDecryptor: { encrypted in
@@ -67,14 +69,16 @@ struct CardValuesComposite: CardViewItem {
 			}
 		}
 
-		let result = CardValuesComposite(name: database.decryptString(bytes: card.name) ?? "",
-		                                 values: values,
-		                                 description: description,
-		                                 attachments: attachments)
+		let result = CardValuesComposite<SwlDatabase.SwlID>(name: database.decryptString(bytes: card.name) ?? "",
+		                                                    values: values,
+		                                                    description: description,
+		                                                    attachments: attachments,
+		                                                    id: card.id)
 		return result
 	}
 
 	struct CardValue: CardViewValue {
+		let id: IDType
 		let name: String
 		let hidePlaintext: Bool
 		let isURL: Bool
