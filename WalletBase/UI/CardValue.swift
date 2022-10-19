@@ -28,6 +28,36 @@ struct CardValue<Item: CardViewValue>: View {
 	private var onSet: (String) -> Void
 	@State private var isShowingPopover: Bool = false
 
+	func makePopoverInputFirstResponder(attempt: Int = 1) {
+		let subviews = String(describing: NSApplication.shared.mainWindow?.contentViewController?.view.subviews.last?.subviews.last?.subviews)
+		print(subviews)
+		// SwiftUI doesn't yet, as of macOS 11, have a way to make our SecureField a first responder. So use an ugly hack that is pretty well protected to avoid any ill effects because having the password field not auto-focus is pretty bad.
+
+		// An interesting thing, is that when .onAppear{} was executed, the prior screen content was still what we would find in mainWindow. Testing shows that an async without delay is enough to get what we want, but try for up to 400 ms to find the view we want.
+		DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds((attempt == 1) ? 0 : 100)) {
+			if let view = NSApplication.shared.mainWindow?.contentViewController?.view {
+				self.printSubviews(of: view, prefix: "\(attempt): ")
+			}
+			guard let view = NSApplication.shared.mainWindow?.contentViewController?.view.subviews[1].subviews[0].subviews[0],
+			      view is NSSecureTextField
+			else {
+				if attempt < 5 {
+					self.makePopoverInputFirstResponder(attempt: attempt + 1)
+				}
+				return
+			}
+
+			view.becomeFirstResponder()
+		}
+	}
+
+	private func printSubviews(of view: NSView, prefix: String = "") {
+		print("\(prefix) \(view)")
+		for subview in view.subviews {
+			printSubviews(of: subview, prefix: "\(prefix)  ")
+		}
+	}
+
 	var body: some View {
 		HStack {
 			Text(item.name)
@@ -94,6 +124,10 @@ struct CardValue<Item: CardViewValue>: View {
 			// Reset the value, since if it weren't a cancel the card would have been reloaded.
 			value = item.hidePlaintext ? "********" : (item.decryptedValue ?? "")
 		}
+		.onChange(of: isShowingPopover, perform: { isShowingPopover in
+			guard isShowingPopover else { return }
+			makePopoverInputFirstResponder()
+		})
 	}
 
 	private struct CopyButtonStyle: ButtonStyle {
