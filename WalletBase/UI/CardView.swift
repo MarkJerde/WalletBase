@@ -46,6 +46,10 @@ struct CardView<Item: CardViewItem>: View {
 	let onBackTap: () -> Void
 	let onPreviousTap: (() -> Void)?
 	let onNextTap: (() -> Void)?
+	let onSave: (([Item.Value: String]) -> Bool)?
+
+	@State private var isEditing = false
+	@State private var edits: [Item.Value: String] = [:]
 
 	var body: some View {
 		NavigationFrame(currentName: item?.name ?? "",
@@ -54,12 +58,35 @@ struct CardView<Item: CardViewItem>: View {
 		                onNextTap: onNextTap,
 		                onSearch: nil) {
 			ScrollView {
-				VStack {
-					ForEach(item?.values ?? [], id: \.self) { item in
-						CardValue(item: item)
+				if let onSave = onSave {
+					if !isEditing {
+						Button("Edit") {
+							isEditing = true
+						}
+					} else {
+						HStack {
+							Button("Cancel") {
+								isEditing = false
+								edits = [:]
+							}
+							Button("Save") {
+								guard onSave(edits) else { return }
+								isEditing = false
+								edits = [:]
+							}
+						}
 					}
 				}
-				.padding([.top, .horizontal], 20)
+				VStack {
+					ForEach(item?.values ?? [], id: \.self) { item in
+						CardValue(item: item,
+						          isEditing: isEditing,
+						          onSet: { value in
+						          	edits[item] = value
+						          })
+					}
+				}
+				.padding([.horizontal], 20)
 				if let description = item?.description?.decryptedDescription {
 					// TextField is used to provide the ability to copy & paste, but it has the downside of making the content editable and of adding a light shadow frame.
 					TextField("", text: .constant(description))
@@ -151,6 +178,10 @@ struct CardView_Previews: PreviewProvider {
 			}
 			onPreviousTap: {}
 			onNextTap: {}
+			onSave: { _ in
+				NSLog("Tapped Save")
+				return true
+			}
 			.frame(height: 700.0)
 	}
 }
