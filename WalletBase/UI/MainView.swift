@@ -30,11 +30,8 @@ struct MainView: View {
 				// Set auto-lock if not yet set.
 				guard ActivityMonitor.shared.onInactivity == nil else { return }
 
-				let file = database.file
 				ActivityMonitor.shared.onInactivity = {
-					self.items = []
-					self.category = nil
-					self.state = .buttonToUnlock(databaseFile: file)
+					self.lock(database: database)
 				}
 			case .unlocking,
 			     .passwordPrompt,
@@ -182,6 +179,12 @@ struct MainView: View {
 		database.cards(in: searchString).sorted(by: \.name)
 	}
 
+	private func lock(database: SwlDatabase) {
+		items = []
+		category = nil
+		state = .buttonToUnlock(databaseFile: database.file)
+	}
+
 	var body: some View {
 		switch state {
 		case .loadingDatabase:
@@ -255,9 +258,7 @@ struct MainView: View {
 				         	state = .browseContent(database: database)
 				         } : nil))
 				Button("Lock") {
-					items = []
-					category = nil
-					state = .buttonToUnlock(databaseFile: database.file)
+					lock(database: database)
 				}
 				.padding(.all, 20)
 			}
@@ -279,9 +280,7 @@ struct MainView: View {
 					navigate(toDatabase: database, category: category, index: cardIndex + 1)
 				})
 				Button("Lock") {
-					items = []
-					category = nil
-					state = .buttonToUnlock(databaseFile: database.file)
+					lock(database: database)
 				}
 				.padding(.all, 20)
 			}
