@@ -22,5 +22,15 @@ extension SwlDatabase {
 		let priority: Int32
 		/// The encrypted advanced info of this field.
 		let advancedInfo: [UInt8]?
+
+		enum FieldType: Int32 {
+			case plaintext = 1
+			case idNumber = 2
+			case name = 3
+			case password = 4
+			case url = 6
+			case email = 7
+			case phone = 8
+		}
 	}
 }

@@ -29,22 +29,9 @@ struct CardValuesComposite: CardViewItem {
 		let values: [CardValuesComposite.Value] = fieldValues.map { fieldValue in
 			let field = fieldValue.field
 			let cardValue = fieldValue.value
-			enum FieldType: Int32 {
-				case plaintext = 1
-				case idNumber = 2
-				case name = 3
-				case password = 4
-				case url = 6
-				case email = 7
-				case phone = 8
-			}
-			let fieldType: FieldType
+			let fieldType: SwlDatabase.TemplateField.FieldType
 			if let type = field?.fieldTypeId {
-				if let type = FieldType(rawValue: type) {
-					fieldType = type
-				} else {
-					fieldType = .plaintext
-				}
+				fieldType = SwlDatabase.TemplateField.FieldType(rawValue: type) ?? .plaintext
 			} else {
 				fieldType = .password
 			}
