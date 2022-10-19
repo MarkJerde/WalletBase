@@ -64,6 +64,7 @@ class SQLiteDatabase {
 			case prepare
 			case step
 			case finalize
+			case exec
 		}
 
 		enum Problem {
@@ -83,11 +84,55 @@ class SQLiteDatabase {
 			case insert
 			case update
 			case backup
+			case beginTransaction
+			case commitTransaction
+			case rollbackTransaction
 		}
 
 		enum Problem {
 			case generalError
 			case requirements
+		}
+	}
+
+	private var transactionInProgress = false
+
+	func beginTransaction() throws {
+		guard !transactionInProgress else {
+			throw LayerError(site: .beginTransaction, problem: .requirements)
+		}
+
+		guard sqlite3_exec(database, "BEGIN TRANSACTION;", nil, nil, nil) == SQLITE_OK
+		else {
+			throw DatabaseError(site: .exec, database: database)
+		}
+
+		transactionInProgress = true
+	}
+
+	func commitTransaction() throws {
+		guard transactionInProgress else {
+			throw LayerError(site: .commitTransaction, problem: .requirements)
+		}
+
+		guard sqlite3_exec(database, "COMMIT TRANSACTION;", nil, nil, nil) == SQLITE_OK
+		else {
+			throw DatabaseError(site: .exec, database: database)
+		}
+
+		transactionInProgress = false
+	}
+
+	func rollbackTransaction() throws {
+		guard transactionInProgress else {
+			throw LayerError(site: .rollbackTransaction, problem: .requirements)
+		}
+
+		transactionInProgress = false
+
+		guard sqlite3_exec(database, "ROLLBACK TRANSACTION;", nil, nil, nil) == SQLITE_OK
+		else {
+			throw DatabaseError(site: .exec, database: database)
 		}
 	}
 
