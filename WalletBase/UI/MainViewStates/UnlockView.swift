@@ -19,6 +19,9 @@ struct UnlockView: View {
 			Button("Unlock") {
 				unlock()
 			}
+			.onAppear {
+				makeUnlockButtonFirstResponder()
+			}
 			Spacer()
 			if let importFile = importFile {
 				HStack {
@@ -33,6 +36,17 @@ struct UnlockView: View {
 		}
 		.padding(.all, 20)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
+	}
+
+	func makeUnlockButtonFirstResponder() {
+		makeViewFirstResponder {
+			guard let button = NSApplication.shared.mainWindow?.contentViewController?.view.subviews[1].subviews[0] as? NSButton else { return nil }
+			// Adapted from https://stackoverflow.com/a/31730015
+			let key = String(utf16CodeUnits: [unichar(NSCarriageReturnCharacter)], count: 1) as String
+			button.keyEquivalent = key
+			// Return the button even though it should be sufficiently setup, since that stops us from coming through here again.
+			return button
+		}
 	}
 }
 

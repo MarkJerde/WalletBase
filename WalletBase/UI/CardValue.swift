@@ -28,33 +28,32 @@ struct CardValue<Item: CardViewValue>: View {
 	private var onSet: (String) -> Void
 	@State private var isShowingPopover: Bool = false
 
-	func makePopoverInputFirstResponder(attempt: Int = 1) {
-		let subviews = String(describing: NSApplication.shared.mainWindow?.contentViewController?.view.subviews.last?.subviews.last?.subviews)
-		print(subviews)
-		// SwiftUI doesn't yet, as of macOS 11, have a way to make our SecureField a first responder. So use an ugly hack that is pretty well protected to avoid any ill effects because having the password field not auto-focus is pretty bad.
-
-		// An interesting thing, is that when .onAppear{} was executed, the prior screen content was still what we would find in mainWindow. Testing shows that an async without delay is enough to get what we want, but try for up to 400 ms to find the view we want.
-		DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds((attempt == 1) ? 0 : 100)) {
-			if let view = NSApplication.shared.mainWindow?.contentViewController?.view {
-				self.printSubviews(of: view, prefix: "\(attempt): ")
-			}
-			guard let view = NSApplication.shared.mainWindow?.contentViewController?.view.subviews[1].subviews[0].subviews[0],
-			      view is NSSecureTextField
-			else {
-				if attempt < 5 {
-					self.makePopoverInputFirstResponder(attempt: attempt + 1)
-				}
-				return
-			}
-
-			view.becomeFirstResponder()
+	func makePopoverInputFirstResponder() {
+		makeViewFirstResponder {
+			guard let view = NSApplication.shared.windows.last?.contentViewController?.view.subviews.first?.subviews.first?.subviews.first,
+			      "\(view)".contains("TextField") else { return nil }
+			return view
 		}
 	}
 
-	private func printSubviews(of view: NSView, prefix: String = "") {
-		print("\(prefix) \(view)")
-		for subview in view.subviews {
-			printSubviews(of: subview, prefix: "\(prefix)  ")
+	private func saveEdit() {
+		onSet(newValue)
+		value = newValue
+		isShowingPopover = false
+	}
+
+	struct DefaultButtonStyle: ButtonStyle {
+		func makeBody(configuration: Self.Configuration) -> some View {
+			// This color is ever so slightly off, but it's pretty good.
+			// FIXME: Can we read this color from system preferences?
+			let blue = Color(red: 46.0 / 255, green: 125.0 / 255, blue: 246.0 / 255)
+			configuration.label
+				.font(.body) // Without this the text would be slightly low and the button a pixel to wide.
+				.padding(.horizontal, 8)
+				.padding(.vertical, 2)
+				.foregroundColor(configuration.isPressed ? blue : Color.white)
+				.background(configuration.isPressed ? Color.white : blue)
+				.cornerRadius(5.0)
 		}
 	}
 
@@ -67,18 +66,19 @@ struct CardValue<Item: CardViewValue>: View {
 				.padding()
 				.popover(isPresented: $isShowingPopover, arrowEdge: .bottom) {
 					VStack {
-						TextField(item.name, text: $newValue)
-							.frame(minWidth: 300)
+						TextField(item.name, text: $newValue, onCommit: {
+							saveEdit()
+						})
+						.frame(minWidth: 300)
 						HStack {
 							Spacer()
 							Button("Cancel") {
 								isShowingPopover = false
 							}
 							Button("Save") {
-								onSet(newValue)
-								value = newValue
-								isShowingPopover = false
+								saveEdit()
 							}
+							.buttonStyle(DefaultButtonStyle())
 						}
 					}
 					.padding()
