@@ -30,6 +30,32 @@ extension View {
 		}
 	}
 
+	/// Takes a few attempts at making a button the default.
+	///
+	/// SwiftUI doesn't yet, as of macOS 11, have a way to make our Button the default. So this is an ugly hack that can be pretty well protected, depending on the quality of the closure, to avoid any ill effects because having the button not be default is pretty bad.
+	/// - Parameter getButtonInWindow: A closure to provide, if found, the NSButton to make default.
+	func makeButtonDefault(_ getButtonInWindow: @escaping (NSWindow) -> NSButton?) {
+		let availableWindows: [NSWindow] = {
+			var response: [NSWindow] = []
+			let mainWindow = NSApplication.shared.mainWindow
+			if let mainWindow = mainWindow {
+				response.append(mainWindow)
+			}
+			let otherWindows = NSApplication.shared.windows.filter { $0 != mainWindow }
+			response.append(contentsOf: otherWindows)
+			return response
+		}()
+
+		makeViewFirstResponder {
+			guard let button = availableWindows.compactMap({ getButtonInWindow($0) }).first else { return nil }
+			// Adapted from https://stackoverflow.com/a/31730015
+			let key = String(utf16CodeUnits: [unichar(NSCarriageReturnCharacter)], count: 1) as String
+			button.keyEquivalent = key
+			// Return the button even though it should be sufficiently setup, since that stops us from coming through here again.
+			return button
+		}
+	}
+
 #if DEBUG
 	/// Prints all of the subviews of all windows as a debug aid in identifying the path to a window which should be made first responder.
 	/// - Parameter prefix: A prefix, if desired, to place on the lines printed for identification sake.
