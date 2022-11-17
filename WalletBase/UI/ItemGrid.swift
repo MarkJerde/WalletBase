@@ -85,6 +85,7 @@ struct ItemGrid<Item: ItemGridItem>: View {
 									.foregroundColor(item.type.color)
 									.frame(width: 50, height: 50)
 								Text(item.name)
+								Spacer(minLength: 0)
 							}
 							.onTapGesture {
 								onItemTap(item)
