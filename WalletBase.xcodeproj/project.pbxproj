@@ -109,6 +109,8 @@
 		8D97CE57289A27D000373192 /* SQLiteProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE56289A27D000373192 /* SQLiteProtocols.swift */; };
 		8D97CE58289A27D000373192 /* SQLiteProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE56289A27D000373192 /* SQLiteProtocols.swift */; };
 		8D97CE5A28B0507400373192 /* SwlCryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE5928B0507400373192 /* SwlCryptoTests.swift */; };
+		8D9DC80F296508D900D392CE /* Image+OldOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC80E296508D900D392CE /* Image+OldOS.swift */; };
+		8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */; };
 		8DB2029029022D1D00736057 /* View+MakeFirstResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */; };
 /* End PBXBuildFile section */
 
@@ -188,6 +190,8 @@
 		8D97CE53289A23CA00373192 /* SQLiteDataItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteDataItem.swift; sourceTree = "<group>"; };
 		8D97CE56289A27D000373192 /* SQLiteProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteProtocols.swift; sourceTree = "<group>"; };
 		8D97CE5928B0507400373192 /* SwlCryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlCryptoTests.swift; sourceTree = "<group>"; };
+		8D9DC80E296508D900D392CE /* Image+OldOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+OldOS.swift"; sourceTree = "<group>"; };
+		8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityVGrid.swift; sourceTree = "<group>"; };
 		8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+MakeFirstResponder.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -362,6 +366,8 @@
 				8D97CE3D2887B97B00373192 /* WalletFile.swift */,
 				8D97CE46289A22E200373192 /* String+SplitByLength.swift */,
 				8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */,
+				8D9DC80E296508D900D392CE /* Image+OldOS.swift */,
+				8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -568,12 +574,14 @@
 				8D97CE47289A22E200373192 /* String+SplitByLength.swift in Sources */,
 				8D5D614D2751E65B00F95986 /* Sequence+Sorted.swift in Sources */,
 				8D5D61512751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift in Sources */,
+				8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */,
 				8D5D61472751959900F95986 /* SwlID+SQLiteDatabaseItem.swift in Sources */,
 				8DB2029029022D1D00736057 /* View+MakeFirstResponder.swift in Sources */,
 				8D5D6198276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift in Sources */,
 				8D5D61492751960800F95986 /* SwlCategory+SQLiteDatabaseItem.swift in Sources */,
 				8D97CE51289A23AD00373192 /* SQLiteVarcharItem.swift in Sources */,
 				8D5D618F276FC0D200F95986 /* SwlCategory+SQLiteQuerySelectable.swift in Sources */,
+				8D9DC80F296508D900D392CE /* Image+OldOS.swift in Sources */,
 				8D5D6188276EDBDD00F95986 /* SwlCardDescription+SQLiteDatabaseItem.swift in Sources */,
 				8D5D615B2759B01F00F95986 /* NavigationFrame.swift in Sources */,
 				8D5D61432751954600F95986 /* Array+SQLiteDatabaseItem.swift in Sources */,
@@ -740,13 +748,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.3;
 			};
 			name = Debug;
 		};
@@ -795,12 +804,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.3;
 			};
 			name = Release;
 		};
@@ -823,12 +833,12 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jerdeapps.WalletBase;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.3;
 			};
 			name = Debug;
 		};
@@ -851,12 +861,12 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jerdeapps.WalletBase;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.3;
 			};
 			name = Release;
 		};
@@ -880,7 +890,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jerdeapps.WalletBaseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WalletBase.app/Contents/MacOS/WalletBase";
 			};
 			name = Debug;
@@ -905,7 +915,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jerdeapps.WalletBaseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WalletBase.app/Contents/MacOS/WalletBase";
 			};
 			name = Release;
@@ -928,7 +938,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jerdeapps.WalletBaseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.3;
 				TEST_TARGET_NAME = WalletBase;
 			};
 			name = Debug;
@@ -951,7 +961,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jerdeapps.WalletBaseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.3;
 				TEST_TARGET_NAME = WalletBase;
 			};
 			name = Release;

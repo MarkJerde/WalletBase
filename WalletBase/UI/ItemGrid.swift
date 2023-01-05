@@ -57,7 +57,6 @@ struct ItemGrid<Item: ItemGridItem>: View {
 		self.onSearch = onSearch
 	}
 
-	let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 5)
 	@Binding var items: [Item]
 	@Binding var container: Item?
 	let emptyMessage: String?
@@ -77,22 +76,29 @@ struct ItemGrid<Item: ItemGridItem>: View {
 					.frame(maxHeight: .infinity)
 			} else {
 				ScrollView {
-					LazyVGrid(columns: columns, spacing: 20) {
-						ForEach(items, id: \.self) { item in
-							VStack {
-								Image(systemName: item.type.icon)
-									.font(.system(size: 30))
-									.foregroundColor(item.type.color)
-									.frame(width: 50, height: 50)
-								Text(item.name)
-								Spacer(minLength: 0)
-							}
-							.onTapGesture {
-								onItemTap(item)
-							}
-						}
+					CompatibilityVGrid(data: items, id: \.self) { item in
+						ItemGridItem(item: item, onItemTap: onItemTap)
 					}
 				}
+			}
+		}
+	}
+
+	private struct ItemGridItem: View {
+		let item: Item
+		let onItemTap: (Item) -> Void
+
+		var body: some View {
+			VStack {
+				Image.image(systemName: item.type.icon,
+				            color: item.type.color,
+				            size: 30)
+					.frame(width: 50, height: 50)
+				Text(item.name)
+				Spacer(minLength: 0)
+			}
+			.onTapGesture {
+				onItemTap(item)
 			}
 		}
 	}

@@ -21,7 +21,7 @@ struct UnlockView: View {
 			}
 			.onAppear {
 				makeButtonDefault { window in
-					guard let firstSubviews = window.contentViewController?.view.subviews,
+					guard let firstSubviews = (window.contentViewController?.view ?? window.contentView)?.subviews,
 					      let secondSubviews = firstSubviews.prefix(2).last?.subviews,
 					      let button = secondSubviews.first as? NSButton else { return nil }
 					return button

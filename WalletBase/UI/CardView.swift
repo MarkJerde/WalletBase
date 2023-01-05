@@ -101,39 +101,45 @@ struct CardView<Item: CardViewItem>: View {
 						.padding(.top, 16)
 						.padding(.horizontal, 20)
 				}
-				LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 5), spacing: 20) {
-					ForEach(item?.attachments ?? [], id: \.self) { item in
-						VStack {
-							Image(systemName: "doc.text")
-								.font(.system(size: 30))
-								.foregroundColor(.gray)
-								.frame(width: 50, height: 50)
-							Text(item.decryptedName ?? "???")
-						}
-						.onTapGesture {
-							let alert = NSAlert()
-							alert.messageText = "Save compressed attachment?"
-							alert.informativeText = "Attachments are compressed, though it's not clear what compression was used. But at least it's decrypted. Do you still want to save?"
-							alert.alertStyle = .warning
-							alert.addButton(withTitle: "OK")
-							alert.addButton(withTitle: "Cancel")
-							guard alert.runModal() == .alertFirstButtonReturn else { return }
-
-							let dialog = NSSavePanel()
-
-							dialog.title = "Save attachment"
-							dialog.nameFieldStringValue = item.decryptedName ?? "Unknown"
-							dialog.canCreateDirectories = true
-							dialog.showsResizeIndicator = true
-
-							guard dialog.runModal() == .OK,
-							      let url = dialog.url else { return }
-
-							try? item.decryptedData?.write(to: url)
-						}
-					}
+				CompatibilityVGrid(data: item?.attachments ?? [], id: \.self) { item in
+					AttachmentsGridItem(item: item)
 				}
 				.padding(.top, 10)
+			}
+		}
+	}
+
+	private struct AttachmentsGridItem: View {
+		let item: Item.Attachment
+
+		var body: some View {
+			VStack {
+				Image.image(systemName: "doc.text",
+				            color: .gray,
+				            size: 30)
+					.frame(width: 50, height: 50)
+				Text(item.decryptedName ?? "???")
+			}
+			.onTapGesture {
+				let alert = NSAlert()
+				alert.messageText = "Save compressed attachment?"
+				alert.informativeText = "Attachments are compressed, though it's not clear what compression was used. But at least it's decrypted. Do you still want to save?"
+				alert.alertStyle = .warning
+				alert.addButton(withTitle: "OK")
+				alert.addButton(withTitle: "Cancel")
+				guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+				let dialog = NSSavePanel()
+
+				dialog.title = "Save attachment"
+				dialog.nameFieldStringValue = item.decryptedName ?? "Unknown"
+				dialog.canCreateDirectories = true
+				dialog.showsResizeIndicator = true
+
+				guard dialog.runModal() == .OK,
+				      let url = dialog.url else { return }
+
+				try? item.decryptedData?.write(to: url)
 			}
 		}
 	}

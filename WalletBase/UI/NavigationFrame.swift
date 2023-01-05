@@ -5,6 +5,7 @@
 //  Created by Mark Jerde on 12/2/21.
 //
 
+import Combine
 import SwiftUI
 
 struct NavigationFrame<Content>: View where Content: View {
@@ -24,8 +25,9 @@ struct NavigationFrame<Content>: View where Content: View {
 					Button {
 						onBackTap()
 					} label: {
-						Image(systemName: "arrow.backward")
-							.foregroundColor(.black)
+						Image.image(systemName: "arrow.backward",
+						            color: .black,
+						            size: 12)
 					}
 					.frame(height: 50)
 				}
@@ -36,7 +38,7 @@ struct NavigationFrame<Content>: View where Content: View {
 							RoundedRectangle(cornerRadius: 4)
 								.stroke(Color.white, lineWidth: 2)
 						)
-						.onChange(of: searchTerm) { _ in
+						.onReceive(Just(searchTerm)) { _ in
 							onSearch(searchTerm)
 						}
 				}
@@ -46,8 +48,9 @@ struct NavigationFrame<Content>: View where Content: View {
 						Button {
 							onPreviousTap()
 						} label: {
-							Image(systemName: "chevron.backward")
-								.foregroundColor(.black)
+							Image.image(systemName: "chevron.backward",
+							            color: .black,
+							            size: 12)
 						}
 						.frame(height: 50)
 					}
@@ -57,8 +60,9 @@ struct NavigationFrame<Content>: View where Content: View {
 						Button {
 							onNextTap()
 						} label: {
-							Image(systemName: "chevron.forward")
-								.foregroundColor(.black)
+							Image.image(systemName: "chevron.forward",
+							            color: .black,
+							            size: 12)
 						}
 						.frame(height: 50)
 					}
@@ -84,7 +88,9 @@ struct NavigationFrame_Previews: PreviewProvider {
 		} onSearch: { string in
 			NSLog("Searching for \(string)")
 		} content: {
-			Image(systemName: "creditcard")
+			Image.image(systemName: "creditcard",
+			            color: .black,
+			            size: 30)
 		}
 	}
 }

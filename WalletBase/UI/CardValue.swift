@@ -5,6 +5,7 @@
 //  Created by Mark Jerde on 12/6/21.
 //
 
+import Combine
 import SwiftUI
 
 struct CardValue<Item: CardViewValue>: View {
@@ -30,7 +31,7 @@ struct CardValue<Item: CardViewValue>: View {
 
 	func makePopoverInputFirstResponder() {
 		makeViewFirstResponder {
-			guard let view = NSApplication.shared.windows.last?.contentViewController?.view.subviews.first?.subviews.first?.subviews.first,
+			guard let view = (NSApplication.shared.windows.last?.contentViewController?.view ?? NSApplication.shared.windows.last?.contentView)?.subviews.first?.subviews.first?.subviews.first,
 			      "\(view)".contains("TextField") else { return nil }
 			return view
 		}
@@ -119,15 +120,15 @@ struct CardValue<Item: CardViewValue>: View {
 			RoundedRectangle(cornerRadius: 4)
 				.stroke(isActive ? Color.blue : Color.gray, lineWidth: 2)
 		)
-		.onChange(of: isEditing) { isEditing in
+		.onReceive(Just(isEditing)) { isEditing in
 			guard !isEditing else { return }
 			// Reset the value, since if it weren't a cancel the card would have been reloaded.
 			value = item.hidePlaintext ? "********" : (item.decryptedValue ?? "")
 		}
-		.onChange(of: isShowingPopover, perform: { isShowingPopover in
+		.onReceive(Just(isShowingPopover)) { isShowingPopover in
 			guard isShowingPopover else { return }
 			makePopoverInputFirstResponder()
-		})
+		}
 	}
 
 	private struct CopyButtonStyle: ButtonStyle {
