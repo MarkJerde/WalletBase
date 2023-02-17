@@ -339,13 +339,11 @@ struct MainView: View {
 					state = then
 				}
 			}
-			.onAppear {
-				makeButtonDefault { window in
-					guard let firstSubviews = (window.contentViewController?.view ?? window.contentView)?.subviews,
-					      let secondSubviews = firstSubviews.prefix(3).last?.subviews,
-					      let button = secondSubviews.first as? NSButton else { return nil }
-					return button
-				}
+			.compatibilityKeyboardShortcut(.defaultAction) { window in
+				guard let firstSubviews = (window.contentViewController?.view ?? window.contentView)?.subviews,
+				      let secondSubviews = firstSubviews.prefix(3).last?.subviews,
+				      let button = secondSubviews.first as? NSButton else { return nil }
+				return button
 			}
 		}
 	}

@@ -36,7 +36,8 @@ struct PasswordPrompt: View {
 
 	func makePasswordInputFirstResponder() {
 		makeViewFirstResponder {
-			(NSApplication.shared.mainWindow?.contentViewController?.view ?? NSApplication.shared.windows.first?.contentView)?.subviews[1].subviews[0].subviews[0] as? NSSecureTextField
+			(NSApplication.shared.mainWindow?.contentViewController?.view ?? NSApplication.shared.windows.first?.contentView)?.subviews.flatMap { $0.subviews }.flatMap { $0.subviews }.compactMap { $0 as? NSSecureTextField }.first
+				?? (NSApplication.shared.mainWindow?.contentViewController?.view ?? NSApplication.shared.windows.first?.contentView)?.subviews.flatMap { $0.subviews }.filter { "\($0)".contains("SecureTextField") }.first
 		}
 	}
 }

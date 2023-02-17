@@ -112,6 +112,7 @@
 		8D9DC80F296508D900D392CE /* Image+OldOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC80E296508D900D392CE /* Image+OldOS.swift */; };
 		8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */; };
 		8DA75A9D299F1C6200E83E9C /* MultilineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */; };
+		8DA75A9F299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA75A9E299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift */; };
 		8DB2029029022D1D00736057 /* View+MakeFirstResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */; };
 /* End PBXBuildFile section */
 
@@ -194,6 +195,7 @@
 		8D9DC80E296508D900D392CE /* Image+OldOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+OldOS.swift"; sourceTree = "<group>"; };
 		8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityVGrid.swift; sourceTree = "<group>"; };
 		8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineTextField.swift; sourceTree = "<group>"; };
+		8DA75A9E299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+compatibilityKeyboardShortcut.swift"; sourceTree = "<group>"; };
 		8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+MakeFirstResponder.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -371,6 +373,7 @@
 				8D9DC80E296508D900D392CE /* Image+OldOS.swift */,
 				8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */,
 				8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */,
+				8DA75A9E299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -580,6 +583,7 @@
 				8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */,
 				8D5D61472751959900F95986 /* SwlID+SQLiteDatabaseItem.swift in Sources */,
 				8DB2029029022D1D00736057 /* View+MakeFirstResponder.swift in Sources */,
+				8DA75A9F299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift in Sources */,
 				8D5D6198276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift in Sources */,
 				8D5D61492751960800F95986 /* SwlCategory+SQLiteDatabaseItem.swift in Sources */,
 				8D97CE51289A23AD00373192 /* SQLiteVarcharItem.swift in Sources */,
