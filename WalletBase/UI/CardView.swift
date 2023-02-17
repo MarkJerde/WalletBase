@@ -93,7 +93,7 @@ struct CardView<Item: CardViewItem>: View {
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(EdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6))
 						.padding(20)
-						.background(Color.white)
+						.background(Color(NSColor.textBackgroundColor))
 						.overlay(
 							RoundedRectangle(cornerRadius: 4)
 								.stroke(Color.gray, lineWidth: 2)

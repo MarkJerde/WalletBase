@@ -135,7 +135,7 @@ struct CardValue<Item: CardViewValue>: View {
 		func makeBody(configuration: Self.Configuration) -> some View {
 			configuration.label
 				.padding()
-				.background(configuration.isPressed ? Color.gray : Color.white)
+				.background(configuration.isPressed ? Color.gray : Color(NSColor.textBackgroundColor))
 		}
 	}
 }
