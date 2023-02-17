@@ -89,7 +89,7 @@ struct CardView<Item: CardViewItem>: View {
 				.padding([.horizontal], 20)
 				if let description = item?.description?.decryptedDescription {
 					// TextField is used to provide the ability to copy & paste, but it has the downside of making the content editable and of adding a light shadow frame.
-					TextField("", text: .constant(description))
+					MultilineTextField("", text: .constant(description))
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(EdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6))
 						.padding(20)

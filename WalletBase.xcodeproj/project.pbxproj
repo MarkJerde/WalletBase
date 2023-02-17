@@ -111,6 +111,7 @@
 		8D97CE5A28B0507400373192 /* SwlCryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE5928B0507400373192 /* SwlCryptoTests.swift */; };
 		8D9DC80F296508D900D392CE /* Image+OldOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC80E296508D900D392CE /* Image+OldOS.swift */; };
 		8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */; };
+		8DA75A9D299F1C6200E83E9C /* MultilineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */; };
 		8DB2029029022D1D00736057 /* View+MakeFirstResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */; };
 /* End PBXBuildFile section */
 
@@ -192,6 +193,7 @@
 		8D97CE5928B0507400373192 /* SwlCryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlCryptoTests.swift; sourceTree = "<group>"; };
 		8D9DC80E296508D900D392CE /* Image+OldOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+OldOS.swift"; sourceTree = "<group>"; };
 		8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityVGrid.swift; sourceTree = "<group>"; };
+		8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineTextField.swift; sourceTree = "<group>"; };
 		8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+MakeFirstResponder.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -368,6 +370,7 @@
 				8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */,
 				8D9DC80E296508D900D392CE /* Image+OldOS.swift */,
 				8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */,
+				8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -602,6 +605,7 @@
 				8D5D61822764495900F95986 /* SwlCardAttachment+SQLiteDatabaseItem.swift in Sources */,
 				8D5D614F2751E89C00F95986 /* SwlCard.swift in Sources */,
 				8D5D61452751956700F95986 /* String+SQLiteDatabaseItem.swift in Sources */,
+				8DA75A9D299F1C6200E83E9C /* MultilineTextField.swift in Sources */,
 				8D50F3D7273CC0AD00A754CB /* SwlDatabase.swift in Sources */,
 				8D97CE4D289A237200373192 /* SQLiteDataType.swift in Sources */,
 				8D5D616D275A4E0B00F95986 /* CardValuesComposite.swift in Sources */,
