@@ -447,6 +447,7 @@
 				8D50F3A4273CBF1D00A754CB /* Sources */,
 				8D50F3A5273CBF1D00A754CB /* Frameworks */,
 				8D50F3A6273CBF1D00A754CB /* Resources */,
+				8DA75AA0299F20B300E83E9C /* Set Build Number */,
 			);
 			buildRules = (
 			);
@@ -561,6 +562,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8DA75AA0299F20B300E83E9C /* Set Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Set Build Number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\nbuildNumber=$(LC_TIME=C TZ=America/Chicago date +%y.%m%d.%H)\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D50F3A4273CBF1D00A754CB /* Sources */ = {
