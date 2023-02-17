@@ -88,14 +88,15 @@ struct FileStorage {
 
 		let destination = url.appendingPathExtension(pathExtension)
 
+		if FileManager.default.fileExists(atPath: destination.path) {
+			// Already backed up today.
+			return destination
+		}
+
 		do {
 			try FileManager.default.copyItem(at: url, to: destination)
 			return destination
 		} catch {
-			if FileManager.default.fileExists(atPath: destination.path) {
-				// Already backed up today.
-				return destination
-			}
 			// Error.
 			return nil
 		}
