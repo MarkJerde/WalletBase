@@ -46,7 +46,7 @@ extension SwlDatabase.Card: SQLiteQueryReadWritable {
 		[
 			.id: id.encoded,
 			.name: .blob(value: .init(arrayValue: name)),
-			.description: .nullableBlob(value: nil),
+			.description: .nullableBlob(value: (description == nil) ? nil : .init(arrayValue: description!)),
 			.cardViewID: cardViewID.encoded,
 			.hasOwnCardView: .integer(value: 0), // (default: 0)
 			.templateID: templateID.encoded,
