@@ -274,27 +274,46 @@ class SwlDatabase {
 		}
 
 		for (id, value) in fieldValues {
-			try update(id: id, encrypting: value) { current, encryptedValue in
-				CardFieldValue(id: current.id,
-				               cardId: current.cardId,
-				               templateFieldId: current.templateFieldId,
-				               value: [UInt8](encryptedValue))
+			guard !value.isEmpty else {
+				// FIXME: Delete field.
+				continue
+			}
+			try update(id: id) { current -> CardFieldValue? in
+				guard let encryptedValue = crypto?.encrypt(value) else {
+					return nil
+				}
+				return CardFieldValue(id: current.id,
+				                      cardId: current.cardId,
+				                      templateFieldId: current.templateFieldId,
+				                      value: [UInt8](encryptedValue))
 			}
 		}
 
 		if let editedDescription {
-			try update(id: cardId, encrypting: editedDescription) { current, encryptedValue in
-				Card(id: current.id,
-				     name: current.name,
-				     description: [UInt8](encryptedValue),
-				     cardViewID: current.cardViewID,
-				     hasOwnCardView: current.hasOwnCardView,
-				     templateID: current.templateID,
-				     parent: current.parent,
-				     iconID: current.iconID,
-				     hitCount: current.hitCount,
-				     syncID: current.syncID,
-				     createSyncID: current.createSyncID)
+			try update(id: cardId) { current -> Card? in
+				let encryptedValue: Data?
+				if editedDescription.isEmpty {
+					// Description is documented as nullable, but in practice a X'00000000' value is used rather than NULL.
+					encryptedValue = Data(count: 4)
+				}
+				else {
+					guard let encrypted = crypto?.encrypt(editedDescription) else {
+						return nil
+					}
+					encryptedValue = encrypted
+				}
+
+				return Card(id: current.id,
+				            name: current.name,
+				            description: (encryptedValue == nil) ? nil : [UInt8](encryptedValue!),
+				            cardViewID: current.cardViewID,
+				            hasOwnCardView: current.hasOwnCardView,
+				            templateID: current.templateID,
+				            parent: current.parent,
+				            iconID: current.iconID,
+				            hitCount: current.hitCount,
+				            syncID: current.syncID,
+				            createSyncID: current.createSyncID)
 			}
 		}
 
@@ -308,15 +327,14 @@ class SwlDatabase {
 
 	private func update<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(
 		id: SwlID,
-		encrypting decryptedValue: String,
-		transform: (T, Data) -> T) throws
+		transform: (T) -> T?) throws
 	{
 		let current: [T]? = try? database.select(where: "id \(id.queryCondition)").compactMap { $0 }
 		guard let current = current,
 		      current.count == 1,
 		      let current = current.first,
 		      current.id == id,
-		      let encryptedValue = crypto?.encrypt(decryptedValue)
+		      let updated = transform(current)
 		else {
 			do {
 				try database.rollbackTransaction()
@@ -326,8 +344,6 @@ class SwlDatabase {
 			}
 			throw Error.writeFailure
 		}
-
-		let updated = transform(current, encryptedValue)
 
 		do {
 			try database.update(record: updated, from: current)
