@@ -381,8 +381,8 @@
 		8D5D618A276FBF1F00F95986 /* SQLiteQuerySelectable */ = {
 			isa = PBXGroup;
 			children = (
-				8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift */,
 				8D5D6191276FC15300F95986 /* SwlCardDescription+SQLiteQuerySelectable.swift */,
+				8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift */,
 				8D5D618E276FC0D200F95986 /* SwlCategory+SQLiteQuerySelectable.swift */,
 			);
 			path = SQLiteQuerySelectable;
