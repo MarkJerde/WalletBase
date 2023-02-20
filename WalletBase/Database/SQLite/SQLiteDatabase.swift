@@ -246,6 +246,31 @@ class SQLiteDatabase {
 		}
 	}
 
+	func delete<Table>(from table: Table, where whereClause: String) throws where Table: SQLiteTable {
+		guard canBackupDatabaseFile,
+		      backupDatabaseFile()
+		else {
+			throw LayerError(site: .backup, problem: .generalError)
+		}
+
+		var statement: OpaquePointer?
+
+		let statementText = "delete from \(table.name) where \(whereClause)"
+		guard sqlite3_prepare_v2(database, statementText, -1, &statement, nil) == SQLITE_OK,
+		      let statement = statement
+		else {
+			throw DatabaseError(site: .prepare, database: database)
+		}
+
+		guard sqlite3_step(statement) == SQLITE_DONE else {
+			throw DatabaseError(site: .step, database: database)
+		}
+
+		guard sqlite3_finalize(statement) == SQLITE_OK else {
+			throw DatabaseError(site: .finalize, database: database)
+		}
+	}
+
 	var canBackupDatabaseFile: Bool {
 		FileStorage.contains(file)
 	}
