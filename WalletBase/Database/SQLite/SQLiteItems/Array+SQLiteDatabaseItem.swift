@@ -18,14 +18,16 @@ extension Array: SQLiteDatabaseItem where Element == UInt8 {
 		let length = sqlite3_column_bytes(statement, column)
 		let pointer = sqlite3_column_blob(statement, column)
 
+		defer {
+			nextColumn?(column + 1)
+		}
+
 		guard pointer != nil else {
 			return nil
 		}
 
 		let data = NSData(bytes: pointer, length: Int(length))
 		let array = [UInt8](data)
-
-		nextColumn?(column + 1)
 
 		return array
 	}

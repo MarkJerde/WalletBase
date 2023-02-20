@@ -16,12 +16,14 @@ extension SwlDatabase.Category: SQLiteDatabaseItem {
 	/// - Returns: The decoded instance.
 	static func decode(from statement: OpaquePointer, column: Int32 = 0, nextColumn: ((Int32) -> Void)?) -> Self? {
 		// Decode the parts.
+		defer {
+			nextColumn?(column)
+		}
+
 		var column = column
 		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
 		guard let name: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
 		guard let parent: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
-
-		nextColumn?(column)
 
 		// Build and return the instance.
 		return .init(id: id, name: name, parent: parent)

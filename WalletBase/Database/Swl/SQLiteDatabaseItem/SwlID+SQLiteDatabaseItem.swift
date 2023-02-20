@@ -15,6 +15,9 @@ extension SwlDatabase.SwlID: SQLiteDatabaseItem {
 	///   - column: The column at which to start decoding. Multiple columns may be consumed if it is a composite type.
 	/// - Returns: The decoded instance.
 	static func decode(from statement: OpaquePointer, column: Int32 = 0, nextColumn: ((Int32) -> Void)?) -> Self? {
+		defer {
+			nextColumn?(column + 1)
+		}
 		guard let cString = sqlite3_column_text(statement, column) else {
 			return nil
 		}
@@ -23,8 +26,6 @@ extension SwlDatabase.SwlID: SQLiteDatabaseItem {
 		let buffer = UnsafeBufferPointer(start: cString, count: Int(length))
 
 		let array = Array(buffer)
-
-		nextColumn?(column + 1)
 
 		return Self(value: array, hexString: array.map { String(format: "%02X", $0) }.joined())
 	}
