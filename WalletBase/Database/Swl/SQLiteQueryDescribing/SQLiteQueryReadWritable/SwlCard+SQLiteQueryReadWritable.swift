@@ -8,9 +8,26 @@
 import Foundation
 
 extension SwlDatabase.Card: SQLiteQueryReadWritable {
-	enum Column: String {
+	/*
+	 CREATE TABLE IF NOT EXISTS "spbwlt_Card" (^M
+	 "ID" VARCHAR(22)  UNIQUE NOT NULL PRIMARY KEY,^M
+	 "Name" BLOB  NOT NULL,^M
+	 "Description" BLOB NULL,^M
+	 "CardViewID" VARCHAR(22)  NOT NULL,^M
+	 "HasOwnCardView" INTEGER NOT NULL DEFAULT 0,^M
+	 "TemplateID" VARCHAR(22)  NOT NULL,^M
+	 "ParentCategoryID" VARCHAR(22)  NOT NULL,^M
+	 "IconID" VARCHAR(22)  NOT NULL,^M
+	 "HitCount" INTEGER DEFAULT 0  NOT NULL,^M
+	 "SyncID" INTEGER NOT NULL DEFAULT -1, ^M
+	 "CreateSyncID" INTEGER NOT NULL DEFAULT -1^M
+	 );
+	 */
+
+	enum Column: String, CaseIterable {
 		case id
 		case name
+		/// The free-text which the original client rendered below the fields. Seeming to be better described as a bucket for free-form encrypted content rather than as a subtitle.
 		case description
 		case cardViewID
 		case hasOwnCardView
@@ -22,7 +39,7 @@ extension SwlDatabase.Card: SQLiteQueryReadWritable {
 		case createSyncID
 	}
 
-	static let columns: [Column] = [.id, .name, .description, .cardViewID, .hasOwnCardView, .templateID, .parentCategoryID, .iconID, .hitCount, .syncID, .createSyncID]
+	static let columns: [Column] = Column.allCases
 	static let table = SwlDatabase.Tables.cards
 	static let primary: Column = .id
 	func encode() -> [Column: SQLiteDataType] {
