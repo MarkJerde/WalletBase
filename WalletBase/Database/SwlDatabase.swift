@@ -275,7 +275,8 @@ class SwlDatabase {
 
 		for (id, value) in fieldValues {
 			guard !value.isEmpty else {
-				// FIXME: Delete field.
+				// Delete field.
+				try database.delete(from: CardFieldValue.table, where: "id \(id.queryCondition)")
 				continue
 			}
 			try update(id: id) { current -> CardFieldValue? in
