@@ -82,7 +82,7 @@ struct CardView<Item: CardViewItem>: View {
 							Button("Save") {
 								// A nil description indicates no description changes.
 								var description: String?
-								if editableDescription != item?.description?.decryptedDescription {
+								if editableDescription != (item?.description?.decryptedDescription ?? "") {
 									// Set description to communicate changes.
 									description = editableDescription
 								}
