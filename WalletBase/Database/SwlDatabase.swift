@@ -8,6 +8,10 @@
 import AppKit
 import Foundation
 
+protocol SwlIdentifiable {
+	var id: SwlDatabase.SwlID { get }
+}
+
 /// An object providing access to an swl password wallet database.
 class SwlDatabase {
 	/// The SQLite database representing the encrypted wallet.
@@ -261,7 +265,7 @@ class SwlDatabase {
 		case writeFailureIndeterminite
 	}
 
-	func update(fieldValues: [SwlID: String], in cardId: SwlID) throws {
+	func update(fieldValues: [SwlID: String], editedDescription: String?, in cardId: SwlID) throws {
 		do {
 			try database.beginTransaction()
 		}
@@ -270,40 +274,27 @@ class SwlDatabase {
 		}
 
 		for (id, value) in fieldValues {
-			let current: [CardFieldValue]? = try? database.select(where: "id \(id.queryCondition)").compactMap { $0 }
-			guard let current = current,
-			      current.count == 1,
-			      let current = current.first,
-			      current.cardId == cardId,
-			      let encryptedValue = crypto?.encrypt(value)
-			else {
-				do {
-					try database.rollbackTransaction()
-				}
-				catch {
-					throw Error.writeFailureIndeterminite // This should be indeterminite, since it did not fail in SQLite.
-				}
-				throw Error.writeFailure
+			try update(id: id, encrypting: value) { current, encryptedValue in
+				CardFieldValue(id: current.id,
+				               cardId: current.cardId,
+				               templateFieldId: current.templateFieldId,
+				               value: [UInt8](encryptedValue))
 			}
+		}
 
-			let updated = CardFieldValue(id: current.id,
-			                             cardId: current.cardId,
-			                             templateFieldId: current.templateFieldId,
-			                             value: [UInt8](encryptedValue))
-			do {
-				try database.update(record: updated, from: current)
-			}
-			catch {
-				do {
-					try database.rollbackTransaction()
-				}
-				catch {
-					if error is SQLiteDatabase.DatabaseError {
-						throw Error.writeFailure // We can't be sure it is indeterminite, since SQLite returns an error in some rollback cases which occur after an automatically rollbacked error.
-					}
-					throw Error.writeFailureIndeterminite // This should be indeterminite, since it did not fail in SQLite.
-				}
-				throw Error.writeFailure
+		if let editedDescription {
+			try update(id: cardId, encrypting: editedDescription) { current, encryptedValue in
+				Card(id: current.id,
+				     name: current.name,
+				     description: [UInt8](encryptedValue),
+				     cardViewID: current.cardViewID,
+				     hasOwnCardView: current.hasOwnCardView,
+				     templateID: current.templateID,
+				     parent: current.parent,
+				     iconID: current.iconID,
+				     hitCount: current.hitCount,
+				     syncID: current.syncID,
+				     createSyncID: current.createSyncID)
 			}
 		}
 
@@ -312,6 +303,46 @@ class SwlDatabase {
 		}
 		catch {
 			throw Error.writeFailureIndeterminite
+		}
+	}
+
+	private func update<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(
+		id: SwlID,
+		encrypting decryptedValue: String,
+		transform: (T, Data) -> T) throws
+	{
+		let current: [T]? = try? database.select(where: "id \(id.queryCondition)").compactMap { $0 }
+		guard let current = current,
+		      current.count == 1,
+		      let current = current.first,
+		      current.id == id,
+		      let encryptedValue = crypto?.encrypt(decryptedValue)
+		else {
+			do {
+				try database.rollbackTransaction()
+			}
+			catch {
+				throw Error.writeFailureIndeterminite // This should be indeterminite, since it did not fail in SQLite.
+			}
+			throw Error.writeFailure
+		}
+
+		let updated = transform(current, encryptedValue)
+
+		do {
+			try database.update(record: updated, from: current)
+		}
+		catch {
+			do {
+				try database.rollbackTransaction()
+			}
+			catch {
+				if error is SQLiteDatabase.DatabaseError {
+					throw Error.writeFailure // We can't be sure it is indeterminite, since SQLite returns an error in some rollback cases which occur after an automatically rollbacked error.
+				}
+				throw Error.writeFailureIndeterminite // This should be indeterminite, since it did not fail in SQLite.
+			}
+			throw Error.writeFailure
 		}
 	}
 

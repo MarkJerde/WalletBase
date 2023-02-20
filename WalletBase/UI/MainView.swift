@@ -288,15 +288,18 @@ struct MainView: View {
 					}
 
 					navigate(toDatabase: database, category: category, index: cardIndex + 1)
-				}, onSave: { edits in
+				}, onSave: { edits, editedDescription in
 					guard let card = card else {
 						showFailedToSaveAlert()
 						return false
 					}
 					do {
-						try database.update(fieldValues: Dictionary(uniqueKeysWithValues: edits.map { (key: CardValuesComposite<SwlDatabase.SwlID>.CardValue, value: String) in
-							(key.id, value)
-						}), in: card.id)
+						try database.update(
+							fieldValues: Dictionary(uniqueKeysWithValues: edits.map { (key: CardValuesComposite<SwlDatabase.SwlID>.CardValue, value: String) in
+								(key.id, value)
+							}),
+							editedDescription: editedDescription,
+							in: card.id)
 					} catch {
 						if let error = error as? SwlDatabase.Error {
 							switch error {

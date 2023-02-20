@@ -46,10 +46,21 @@ struct CardView<Item: CardViewItem>: View {
 	let onBackTap: () -> Void
 	let onPreviousTap: (() -> Void)?
 	let onNextTap: (() -> Void)?
-	let onSave: (([Item.Value: String]) -> Bool)?
+	let onSave: (([Item.Value: String], String?) -> Bool)?
 
-	@State private var isEditing = false
+	@State private var isEditing = false {
+		didSet {
+			if isEditing {
+				editableDescription = item?.description?.decryptedDescription ?? ""
+			} else {
+				edits = [:]
+				editableDescription = ""
+			}
+		}
+	}
+
 	@State private var edits: [Item.Value: String] = [:]
+	@State private var editableDescription: String = ""
 
 	var body: some View {
 		NavigationFrame(currentName: item?.name ?? "",
@@ -67,12 +78,16 @@ struct CardView<Item: CardViewItem>: View {
 						HStack {
 							Button("Cancel") {
 								isEditing = false
-								edits = [:]
 							}
 							Button("Save") {
-								guard onSave(edits) else { return }
+								// A nil description indicates no description changes.
+								var description: String?
+								if editableDescription != item?.description?.decryptedDescription {
+									// Set description to communicate changes.
+									description = editableDescription
+								}
+								guard onSave(edits, description) else { return }
 								isEditing = false
-								edits = [:]
 							}
 						}
 					}
@@ -87,9 +102,12 @@ struct CardView<Item: CardViewItem>: View {
 					}
 				}
 				.padding([.horizontal], 20)
-				if let description = item?.description?.decryptedDescription {
+				if isEditing ||
+					(item?.description?.decryptedDescription != nil
+						&& !(item?.description?.decryptedDescription)!.isEmpty)
+				{
 					// TextField is used to provide the ability to copy & paste, but it has the downside of making the content editable and of adding a light shadow frame.
-					MultilineTextField("", text: .constant(description))
+					MultilineTextField("", text: isEditing ? $editableDescription : .constant((item?.description?.decryptedDescription)!))
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(EdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6))
 						.padding(20)
@@ -184,7 +202,7 @@ struct CardView_Previews: PreviewProvider {
 			}
 			onPreviousTap: {}
 			onNextTap: {}
-			onSave: { _ in
+			onSave: { _, _ in
 				NSLog("Tapped Save")
 				return true
 			}
