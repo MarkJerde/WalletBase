@@ -191,6 +191,11 @@ class SQLiteDatabase {
 			throw DatabaseError(site: .prepare, database: database)
 		}
 
+		// FIXME: The following is probably missing.
+		/* guard sqlite3_step(statement) == SQLITE_DONE else {
+		 	throw DatabaseError(site: .step, database: database)
+		 } */
+
 		guard sqlite3_finalize(statement) == SQLITE_OK else {
 			throw DatabaseError(site: .finalize, database: database)
 		}
