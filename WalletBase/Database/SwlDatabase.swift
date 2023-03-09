@@ -265,7 +265,10 @@ class SwlDatabase {
 		case writeFailureIndeterminite
 	}
 
-	func update(fieldValues: [SwlID: String], editedDescription: String?, in cardId: SwlID) throws {
+	func update(fieldValues: [SwlID: (String, SwlID)],
+	            editedDescription: String?,
+	            in cardId: SwlID) throws
+	{
 		do {
 			try database.beginTransaction()
 		}
@@ -274,15 +277,39 @@ class SwlDatabase {
 		}
 
 		for (id, value) in fieldValues {
+			let templateFieldId = value.1
+			let value = value.0
+			guard !id.value.isEmpty || !value.isEmpty else {
+				// Creating a new empty field. We will just ignore this.
+				continue
+			}
+
 			guard !value.isEmpty else {
 				// Delete field.
 				try database.delete(from: CardFieldValue.table, where: "id \(id.queryCondition)")
 				continue
 			}
+
+			guard !id.value.isEmpty else {
+				// Create new field.
+				guard let newId = SwlID.new,
+				      let encryptedValue = crypto?.encrypt(value)
+				else {
+					throw Error.writeFailure
+				}
+
+				try insert(value: CardFieldValue(id: newId,
+				                                 cardId: cardId,
+				                                 templateFieldId: templateFieldId,
+				                                 value: [UInt8](encryptedValue)))
+				continue
+			}
+
 			try update(id: id) { current -> CardFieldValue? in
 				guard let encryptedValue = crypto?.encrypt(value) else {
 					return nil
 				}
+
 				return CardFieldValue(id: current.id,
 				                      cardId: current.cardId,
 				                      templateFieldId: current.templateFieldId,
@@ -326,9 +353,28 @@ class SwlDatabase {
 		}
 	}
 
-	private func update<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(
-		id: SwlID,
-		transform: (T) -> T?) throws
+	private func insert<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(
+		value: T) throws
+	{
+		do {
+			try database.insert(record: value)
+		}
+		catch {
+			do {
+				try database.rollbackTransaction()
+			}
+			catch {
+				if error is SQLiteDatabase.DatabaseError {
+					throw Error.writeFailure // We can't be sure it is indeterminite, since SQLite returns an error in some rollback cases which occur after an automatically rollbacked error.
+				}
+				throw Error.writeFailureIndeterminite // This should be indeterminite, since it did not fail in SQLite.
+			}
+			throw Error.writeFailure
+		}
+	}
+
+	private func update<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(id: SwlID,
+	                                                                                       transform: (T) -> T?) throws
 	{
 		let current: [T]? = try? database.select(where: "id \(id.queryCondition)").compactMap { $0 }
 		guard let current = current,
@@ -379,6 +425,21 @@ class SwlDatabase {
 		}
 		catch {
 			return nil
+		}
+	}
+
+	/// Obtains the encrypted template fields of a given template ID.
+	/// - Parameter templateId: The template ID.
+	/// - Returns: The template fields.
+	func templateFields(forTemplateId templateId: SwlID) -> [TemplateField] {
+		do {
+			// Find everything that matches.
+			let templateFields: [TemplateField] = try database.select(where: "\(TemplateField.Column.templateID) \(templateId.queryCondition)").compactMap { $0 }
+
+			return templateFields
+		}
+		catch {
+			return []
 		}
 	}
 

@@ -296,7 +296,7 @@ struct MainView: View {
 					do {
 						try database.update(
 							fieldValues: Dictionary(uniqueKeysWithValues: edits.map { (key: CardValuesComposite<SwlDatabase.SwlID>.CardValue, value: String) in
-								(key.id, value)
+								(key.id, (value, key.templateFieldId))
 							}),
 							editedDescription: editedDescription,
 							in: card.id)

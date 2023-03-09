@@ -37,12 +37,14 @@ protocol CardViewItem: Hashable {
 	associatedtype Attachment: CardViewAttachment
 	var name: String { get }
 	var values: [Value] { get }
+	var getTemplateValues: () -> [Value] { get }
 	var description: Description? { get }
 	var attachments: [Attachment] { get }
 }
 
 struct CardView<Item: CardViewItem>: View {
 	@Binding var item: Item?
+	@State var templateValues: [Item.Value] = []
 	let onBackTap: () -> Void
 	let onPreviousTap: (() -> Void)?
 	let onNextTap: (() -> Void)?
@@ -51,8 +53,11 @@ struct CardView<Item: CardViewItem>: View {
 	@State private var isEditing = false {
 		didSet {
 			if isEditing {
+				// Get templateValues
+				templateValues = item?.getTemplateValues() ?? []
 				editableDescription = item?.description?.decryptedDescription ?? ""
 			} else {
+				templateValues = []
 				edits = [:]
 				editableDescription = ""
 			}
@@ -93,7 +98,7 @@ struct CardView<Item: CardViewItem>: View {
 					}
 				}
 				VStack {
-					ForEach(item?.values ?? [], id: \.self) { item in
+					ForEach((isEditing ? templateValues : item?.values) ?? [], id: \.self) { item in
 						CardValue(item: item,
 						          isEditing: isEditing,
 						          onSet: { value in
@@ -182,18 +187,24 @@ struct CardView_Previews_Attachment: CardViewAttachment {
 struct CardView_Previews_Item: CardViewItem {
 	var name: String
 	var values: [CardView_Previews_Value]
+	let getTemplateValues: () -> [CardView_Previews_Value]
 	var description: CardView_Previews_Description?
 	var attachments: [CardView_Previews_Attachment]
+	var id = UUID()
 }
 
 struct CardView_Previews: PreviewProvider {
+	static let values: [CardView_Previews_Value] = [
+		.init(name: "One", hidePlaintext: false, isURL: false, decryptedValue: "Uno"),
+		.init(name: "Two", hidePlaintext: true, isURL: false, decryptedValue: "Dos"),
+		.init(name: "Three", hidePlaintext: false, isURL: false, decryptedValue: "Tres"),
+		.init(name: "Four", hidePlaintext: true, isURL: false, decryptedValue: "Cuatro"),
+	]
+
 	static var previews: some View {
-		CardView(item: .constant(CardView_Previews_Item(name: "Counting", values: [
-				.init(name: "One", hidePlaintext: false, isURL: false, decryptedValue: "Uno"),
-				.init(name: "Two", hidePlaintext: true, isURL: false, decryptedValue: "Dos"),
-				.init(name: "Three", hidePlaintext: false, isURL: false, decryptedValue: "Tres"),
-				.init(name: "Four", hidePlaintext: true, isURL: false, decryptedValue: "Cuatro"),
-			],
+		CardView(item: .constant(CardView_Previews_Item(name: "Counting", values: values, getTemplateValues: {
+				values
+			},
 			description: CardView_Previews_Description(decryptedDescription: "This is the description text.\nIt has a second line.\nIt also has a really long line that mentions that the encrypted items above decrypt to Dos and Cuator.\n\nAfter a blank fourth line, it ends with a fifth line."),
 			attachments: [
 				.init(decryptedName: "Able", decryptedData: "Baker Charlie".data(using: .utf8)),

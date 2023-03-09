@@ -23,6 +23,12 @@ extension SwlDatabase {
 		var encoded: SQLiteDataType {
 			.varchar(value: .init(arrayValue: value))
 		}
+
+		static var new: Self? {
+			guard let value = [UInt8].cryptographicRandomBytes(count: 8) else { return nil }
+
+			return Self(value: value, hexString: value.map { String(format: "%02X", $0) }.joined())
+		}
 	}
 }
 

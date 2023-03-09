@@ -10,6 +10,7 @@ import Foundation
 struct CardValuesComposite<IDType>: CardViewItem where IDType: Hashable {
 	let name: String
 	let values: [CardValue]
+	let getTemplateValues: () -> [CardValue]
 	let description: CardDescription?
 	let attachments: [CardAttachment]
 	let id: IDType
@@ -38,6 +39,7 @@ struct CardValuesComposite<IDType>: CardViewItem where IDType: Hashable {
 			}
 			let name = database.decryptString(bytes: field?.name ?? []) ?? ""
 			return CardValuesComposite<SwlDatabase.SwlID>.Value(id: cardValue.id,
+			                                                    templateFieldId: fieldValue.value.templateFieldId,
 			                                                    name: name,
 			                                                    hidePlaintext: fieldType == .password,
 			                                                    isURL: fieldType == .url,
@@ -71,6 +73,45 @@ struct CardValuesComposite<IDType>: CardViewItem where IDType: Hashable {
 
 		let result = CardValuesComposite<SwlDatabase.SwlID>(name: database.decryptString(bytes: card.name) ?? "",
 		                                                    values: values,
+		                                                    getTemplateValues: {
+		                                                    	let fields = database.templateFields(forTemplateId: card.templateID)
+		                                                    		.sorted(by: \.priority)
+		                                                    	guard !fields.isEmpty else { return values }
+		                                                    	return fields
+		                                                    		.sorted { $0.priority < $1.priority }
+		                                                    		.map { (field: SwlDatabase.TemplateField) -> FieldValue in
+		                                                    			guard let fieldValue = fieldValues.first(where: { fieldValue in
+		                                                    				fieldValue.field?.id == field.id
+		                                                    			}) else {
+		                                                    				return FieldValue(field: field,
+		                                                    				                  value: .init(id: .init(value: [], hexString: "0x0"),
+		                                                    				                               cardId: card.id,
+		                                                    				                               templateFieldId: field.id,
+		                                                    				                               value: []))
+		                                                    			}
+		                                                    			return fieldValue
+		                                                    		}
+		                                                    		.map { fieldValue in
+		                                                    			let field = fieldValue.field
+		                                                    			let cardValue = fieldValue.value
+		                                                    			let fieldType: SwlDatabase.TemplateField.FieldType
+		                                                    			if let type = field?.fieldTypeId {
+		                                                    				fieldType = SwlDatabase.TemplateField.FieldType(rawValue: type) ?? .plaintext
+		                                                    			} else {
+		                                                    				fieldType = .password
+		                                                    			}
+		                                                    			let name = database.decryptString(bytes: field?.name ?? []) ?? ""
+		                                                    			return CardValuesComposite<SwlDatabase.SwlID>.Value(id: cardValue.id,
+		                                                    			                                                    templateFieldId: fieldValue.value.templateFieldId,
+		                                                    			                                                    name: name,
+		                                                    			                                                    hidePlaintext: fieldType == .password,
+		                                                    			                                                    isURL: fieldType == .url,
+		                                                    			                                                    encryptedValue: cardValue.value) { encrypted in
+		                                                    				ActivityMonitor.shared.didActivity()
+		                                                    				return database.decryptString(bytes: encrypted)
+		                                                    			}
+		                                                    		}
+		                                                    },
 		                                                    description: description,
 		                                                    attachments: attachments,
 		                                                    id: card.id)
@@ -79,6 +120,7 @@ struct CardValuesComposite<IDType>: CardViewItem where IDType: Hashable {
 
 	struct CardValue: CardViewValue {
 		let id: IDType
+		let templateFieldId: IDType
 		let name: String
 		let hidePlaintext: Bool
 		let isURL: Bool
