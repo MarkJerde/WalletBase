@@ -8,7 +8,7 @@
 import Foundation
 
 extension SwlDatabase.CardDescription: SQLiteQuerySelectable {
-	enum Column: String {
+	enum Column: String, CaseIterable {
 		case id
 		case description
 	}

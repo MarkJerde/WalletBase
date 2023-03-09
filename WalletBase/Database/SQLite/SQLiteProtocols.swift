@@ -25,7 +25,7 @@ protocol SQLiteTable {
 protocol SQLiteQueryDescribing {
 	static var table: Table { get }
 	associatedtype Table: SQLiteTable
-	associatedtype Column: Hashable & RawRepresentable where Column.RawValue == String
+	associatedtype Column: Hashable & RawRepresentable & CaseIterable where Column.RawValue == String
 }
 
 protocol SQLiteQuerySelectable: SQLiteQueryDescribing {
@@ -39,7 +39,10 @@ protocol SQLiteQueryWritable: SQLiteQueryDescribing {
 
 extension SQLiteQueryWritable {
 	func insertionValues() -> [SQLiteDataType] {
-		Array(encode().values)
+		let encoding = encode()
+		return Column.allCases.map { key in
+			encoding[key] ?? .nullableBlob(value: nil)
+		}
 	}
 }
 

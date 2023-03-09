@@ -8,7 +8,7 @@
 import Foundation
 
 extension SwlDatabase.CardAttachment: SQLiteQuerySelectable {
-	enum Column: String {
+	enum Column: String, CaseIterable {
 		case id
 		case cardID
 		case name

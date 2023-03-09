@@ -8,7 +8,7 @@
 import Foundation
 
 extension SwlDatabase.Category: SQLiteQuerySelectable {
-	enum Column: String {
+	enum Column: String, CaseIterable {
 		case id
 		case name
 		case parentCategoryID
