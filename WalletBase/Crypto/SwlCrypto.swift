@@ -76,7 +76,8 @@ class SwlCrypto: CryptoProvider {
 	private var key: Data?
 
 	private func decrypt(data: Data) -> Data? {
-		guard let key = key else { return nil }
+		guard !data.isEmpty,
+		      let key = key else { return nil }
 		let paddingSize = data[0]
 		let dataIn = data[4...]
 		var dataOut = Data(count: dataIn.count)
