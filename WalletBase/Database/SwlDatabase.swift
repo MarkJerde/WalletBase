@@ -433,6 +433,25 @@ class SwlDatabase {
 		}
 	}
 
+	/// Obtains the encrypted template of a given id.
+	/// - Parameter templateId: The template ID.
+	/// - Returns: The template.
+	func template(forId templateId: SwlID) -> Template? {
+		do {
+			// Find everything that matches.
+			let templates: [Template] = try database.select(where: "ID \(templateId.queryCondition)").compactMap { $0 }
+
+			if templates.count > 1 {
+				NSLog("multiple templates \(templates)")
+			}
+
+			return templates.first
+		}
+		catch {
+			return nil
+		}
+	}
+
 	/// Obtains the encrypted template field of a given id.
 	/// - Parameter templateFieldId: The template field ID.
 	/// - Returns: The template field.
@@ -490,7 +509,7 @@ class SwlDatabase {
 		case cardAttachments = "spbwlt_CardAttachment"
 		case cardViews = "spbwlt_CardView" // TODO:
 		case cardViewFields = "spbwlt_CardViewField" // TODO:
-		case templates = "spbwlt_Template" // TODO:
+		case templates = "spbwlt_Template"
 		case templateFields = "spbwlt_TemplateField"
 		case templateFieldTypes = "spbwlt_TemplateFieldType" // TODO:
 		case icon = "spbwlt_Icon" // TODO:
