@@ -54,6 +54,30 @@ class SwlDatabase {
 			}
 
 			do {
+				/* Harvest SwlIds for analysis:
+				 let templateFieldsToPrint: [TemplateField] = try self.database.select()
+				 	.compactMap { $0 }
+				 templateFieldsToPrint.forEach { NSLog("swlid: \($0.id.hexString) TemplateField(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+				 let cardsToPrint: [Card] = try self.database.select()
+				 	.compactMap { $0 }
+				 cardsToPrint.forEach { NSLog("swlid: \($0.id.hexString) Card(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+				 let cardAttachmentsToPrint: [CardAttachment] = try self.database.select()
+				 	.compactMap { $0 }
+				 cardAttachmentsToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardAttachment(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+				 let cardDescriptionsToPrint: [CardDescription] = try self.database.select()
+				 	.compactMap { $0 }
+				 cardDescriptionsToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardDescription(\(self.decryptString(bytes: $0.description ?? []) ?? "nil"))") }
+				 let cardFieldValuesToPrint: [CardFieldValue] = try self.database.select()
+				 	.compactMap { $0 }
+				 cardFieldValuesToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardFieldValue(\($0.templateFieldId.hexString) \($0.cardId.hexString))") }
+				 let categorysToPrint: [Category] = try self.database.select()
+				 	.compactMap { $0 }
+				 categorysToPrint.forEach { NSLog("swlid: \($0.id.hexString) Category(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+				 let templatesToPrint: [Template] = try self.database.select()
+				 	.compactMap { $0 }
+				 templatesToPrint.forEach { NSLog("swlid: \($0.id.hexString) Template(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+				  */
+
 				// There doesn't appear to be any mechanism for password validation in the database content. One workaround is to assume that the template fields must include one with the name "Password". This seems questionable in the cases of English not being the language of the content or the database being used to secure things that do not include passwords, but it's what we have so we will use it.
 				let templateFields: [TemplateField] = try self.database.select().compactMap { $0 }
 				let index = templateFields.firstIndex {
