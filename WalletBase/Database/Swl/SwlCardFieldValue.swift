@@ -16,7 +16,7 @@ extension SwlDatabase {
 		let cardId: SwlID
 		/// The template field ID of this field value.
 		let templateFieldId: SwlID
-		/// The encrypted name of this card.
+		/// The encrypted value of this field value.
 		let value: [UInt8]
 	}
 }

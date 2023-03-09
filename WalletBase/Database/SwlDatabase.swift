@@ -364,8 +364,8 @@ class SwlDatabase {
 	}
 
 	/// Obtains the encrypted template field of a given id.
-	/// - Parameter category: The category.
-	/// - Returns: The items.
+	/// - Parameter templateFieldId: The template field ID.
+	/// - Returns: The template field.
 	func templateField(forId templateFieldId: SwlID) -> TemplateField? {
 		do {
 			// Find everything that matches.
