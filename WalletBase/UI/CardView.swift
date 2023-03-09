@@ -35,11 +35,31 @@ protocol CardViewItem: Hashable {
 	associatedtype Value: CardViewValue
 	associatedtype Description: CardViewDescription
 	associatedtype Attachment: CardViewAttachment
+	associatedtype IDType: Hashable
 	var name: String { get }
 	var values: [Value] { get }
 	var getTemplateValues: () -> [Value] { get }
 	var description: Description? { get }
 	var attachments: [Attachment] { get }
+	var id: IDType { get }
+}
+
+extension CardViewItem {
+	static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.name == rhs.name
+			&& lhs.values == rhs.values
+			&& lhs.description == rhs.description
+			&& lhs.attachments == rhs.attachments
+			&& lhs.id == rhs.id
+	}
+
+	func hash(into hasher: inout Hasher) {
+		name.hash(into: &hasher)
+		values.hash(into: &hasher)
+		description.hash(into: &hasher)
+		attachments.hash(into: &hasher)
+		id.hash(into: &hasher)
+	}
 }
 
 struct CardView<Item: CardViewItem>: View {
