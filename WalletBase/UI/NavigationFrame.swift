@@ -11,6 +11,7 @@ import SwiftUI
 struct NavigationFrame<Content>: View where Content: View {
 	/*@Binding */var currentName: String?
 	let onBackTap: () -> Void
+	let onNewTap: (() -> Void)?
 	let onPreviousTap: (() -> Void)?
 	let onNextTap: (() -> Void)?
 	let onSearch: ((String) -> Void)?
@@ -31,7 +32,17 @@ struct NavigationFrame<Content>: View where Content: View {
 					}
 					.frame(height: 50)
 				}
-				Spacer(minLength: 50)
+				if let onNewTap {
+					Button {
+						onNewTap()
+					} label: {
+						Image.image(systemName: "plus",
+						            color: .black,
+						            size: 12)
+					}
+					.frame(height: 50)
+				}
+				Spacer(minLength: 30)
 				if let onSearch = onSearch {
 					TextField("Search...", text: $searchTerm)
 						.foregroundColor(Color.black)
@@ -87,6 +98,8 @@ struct NavigationFrame_Previews: PreviewProvider {
 	static var previews: some View {
 		NavigationFrame(currentName: "Sample Title") {
 			NSLog("Tapped back")
+		} onNewTap: {
+			NSLog("Tapped new")
 		} onPreviousTap: {
 			NSLog("Tapped previous")
 		} onNextTap: {

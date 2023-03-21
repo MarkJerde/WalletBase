@@ -47,6 +47,7 @@ struct ItemGrid<Item: ItemGridItem>: View {
 	              emptyMessage: String? = "Empty",
 	              onItemTap: @escaping (Item) -> Void,
 	              onBackTap: @escaping () -> Void,
+	              onNewTap: (() -> Void)? = nil,
 	              onSearch: ((String) -> Void)? = nil)
 	{
 		self._items = items
@@ -54,6 +55,7 @@ struct ItemGrid<Item: ItemGridItem>: View {
 		self.emptyMessage = emptyMessage
 		self.onItemTap = onItemTap
 		self.onBackTap = onBackTap
+		self.onNewTap = onNewTap
 		self.onSearch = onSearch
 	}
 
@@ -62,10 +64,12 @@ struct ItemGrid<Item: ItemGridItem>: View {
 	let emptyMessage: String?
 	let onItemTap: (Item) -> Void
 	let onBackTap: () -> Void
+	let onNewTap: (() -> Void)?
 	let onSearch: ((String) -> Void)?
 	var body: some View {
 		NavigationFrame(currentName: container?.name,
 		                onBackTap: onBackTap,
+		                onNewTap: onNewTap,
 		                onPreviousTap: nil,
 		                onNextTap: nil,
 		                onSearch: onSearch) {
@@ -126,6 +130,8 @@ struct ItemGrid_Previews: PreviewProvider {
 			NSLog("tapped \($0)")
 		} onBackTap: {
 			NSLog("tapBack")
+		} onNewTap: {
+			NSLog("tapNew")
 		} onSearch: { searchString in
 			NSLog("searching \(searchString)")
 		}

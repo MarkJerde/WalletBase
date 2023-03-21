@@ -54,13 +54,17 @@ struct SandboxFileBrowser: View {
 			VStack {
 				ItemGrid(items: $files,
 				         container: $folder,
-				         emptyMessage: "No filenames match search.") { item in
-					onItemTap(item)
-				} onBackTap: {
-					// Folders not supported yet.
-				} onSearch: { searchString in
-					loadFiles(searchString: searchString)
-				}
+				         emptyMessage: "No filenames match search.",
+				         onItemTap: { item in
+				         	onItemTap(item)
+				         },
+				         onBackTap: {
+				         	// Folders not supported yet.
+				         },
+				         onNewTap: nil,
+				         onSearch: { searchString in
+				         	loadFiles(searchString: searchString)
+				         })
 				Button("Browse") {
 					browse()
 				}

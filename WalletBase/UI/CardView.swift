@@ -90,6 +90,7 @@ struct CardView<Item: CardViewItem>: View {
 	var body: some View {
 		NavigationFrame(currentName: item?.name ?? "",
 		                onBackTap: onBackTap,
+		                onNewTap: nil,
 		                onPreviousTap: onPreviousTap,
 		                onNextTap: onNextTap,
 		                onSearch: nil) {
