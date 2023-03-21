@@ -10,7 +10,7 @@ import SwiftUI
 struct MenuView: View {
 	internal init(title: String? = nil,
 	              message: String? = nil,
-	              options: [String],
+	              options: [Option],
 	              handler: @escaping (String) -> Void)
 	{
 		self.title = title
@@ -22,11 +22,12 @@ struct MenuView: View {
 
 	let title: String?
 	let message: String?
-	let options: [String]
+	let options: [Option]
 	let handler: (String) -> Void
 
-	enum Option {
+	enum Option: Hashable {
 		case button(text: String)
+		case field(id: String)
 	}
 
 	@State private var backgroundColor: Color
@@ -51,12 +52,19 @@ struct MenuView: View {
 				Divider()
 			}
 			ForEach(Array(options.enumerated()), id: \.element) { item in
-				Button {
-					handler(item.element)
-				} label: {
-					Text(item.element)
+				switch item.element {
+				case .button(let text):
+					Button {
+						handler(text)
+					} label: {
+						Text(text)
+					}
+					.buttonStyle(OptionButtonStyle(backgroundColor: backgroundColor))
+					.eraseToAnyView
+				case .field:
+					Text("---")
+						.eraseToAnyView
 				}
-				.buttonStyle(OptionButtonStyle(backgroundColor: backgroundColor))
 				if item.offset < (options.count - 1) {
 					Divider()
 				}
