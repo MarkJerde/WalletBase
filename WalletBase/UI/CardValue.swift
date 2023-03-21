@@ -96,7 +96,7 @@ struct CardValue<Item: CardViewValue>: View {
 			}
 			.buttonStyle(CopyButtonStyle())
 		}
-		.background(Color.white.opacity(0.02)) // Minimum non-hidden opacity because hidden and clear items are not tappable in SwiftUI, or at least not as tappable.
+		.background(Color.tappableClear)
 		.onTapGesture {
 			if isEditing {
 				isShowingPopover = !isShowingPopover
