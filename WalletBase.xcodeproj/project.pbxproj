@@ -119,6 +119,7 @@
 		8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */; };
 		8DA75A9D299F1C6200E83E9C /* MultilineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */; };
 		8DA75A9F299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA75A9E299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift */; };
+		8DAA721D29C95EDC00C5D4D2 /* View+EraseToAnyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DAA721C29C95EDC00C5D4D2 /* View+EraseToAnyView.swift */; };
 		8DB2029029022D1D00736057 /* View+MakeFirstResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */; };
 /* End PBXBuildFile section */
 
@@ -208,6 +209,7 @@
 		8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityVGrid.swift; sourceTree = "<group>"; };
 		8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineTextField.swift; sourceTree = "<group>"; };
 		8DA75A9E299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+compatibilityKeyboardShortcut.swift"; sourceTree = "<group>"; };
+		8DAA721C29C95EDC00C5D4D2 /* View+EraseToAnyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+EraseToAnyView.swift"; sourceTree = "<group>"; };
 		8DB2028F29022D1D00736057 /* View+MakeFirstResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+MakeFirstResponder.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -391,6 +393,7 @@
 				8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */,
 				8DA75A9E299F1F5D00E83E9C /* View+compatibilityKeyboardShortcut.swift */,
 				8D6A211A29C009A2003A4941 /* Color+tappableClear.swift */,
+				8DAA721C29C95EDC00C5D4D2 /* View+EraseToAnyView.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -657,6 +660,7 @@
 				8D50F3D7273CC0AD00A754CB /* SwlDatabase.swift in Sources */,
 				8D97CE4D289A237200373192 /* SQLiteDataType.swift in Sources */,
 				8D5D616D275A4E0B00F95986 /* CardValuesComposite.swift in Sources */,
+				8DAA721D29C95EDC00C5D4D2 /* View+EraseToAnyView.swift in Sources */,
 				8D97CE34288791DE00373192 /* UnlockView.swift in Sources */,
 				8D97CE412887BB6000373192 /* SandboxFileBrowser.swift in Sources */,
 				8D6A211329A867C2003A4941 /* SwlTemplate+SQLiteDatabaseItem.swift in Sources */,
