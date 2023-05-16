@@ -22,6 +22,7 @@ struct CardValue<Item: CardViewValue>: View {
 
 	private let item: Item
 	@State private var value: String
+	// FIXME: newValue is displayed on subsequent edit. Might be a SwiftUI bug.
 	@State private var newValue: String = ""
 	@State private var isEncrypted: Bool
 	@State private var isActive: Bool = false
@@ -39,8 +40,9 @@ struct CardValue<Item: CardViewValue>: View {
 
 	private func saveEdit() {
 		onSet(newValue)
-		value = newValue
+		value = isEncrypted ? "********" : newValue
 		isShowingPopover = false
+		newValue = "alphabet"
 	}
 
 	struct DefaultButtonStyle: ButtonStyle {
@@ -100,6 +102,8 @@ struct CardValue<Item: CardViewValue>: View {
 		.onTapGesture {
 			if isEditing {
 				isShowingPopover = !isShowingPopover
+				guard isShowingPopover else { return }
+				makePopoverInputFirstResponder()
 			} else if item.hidePlaintext {
 				if isEncrypted {
 					value = item.decryptedValue ?? ""
@@ -120,15 +124,6 @@ struct CardValue<Item: CardViewValue>: View {
 			RoundedRectangle(cornerRadius: 4)
 				.stroke(isActive ? Color.blue : Color.gray, lineWidth: 2)
 		)
-		.onReceive(Just(isEditing)) { isEditing in
-			guard !isEditing else { return }
-			// Reset the value, since if it weren't a cancel the card would have been reloaded.
-			value = item.hidePlaintext ? "********" : (item.decryptedValue ?? "")
-		}
-		.onReceive(Just(isShowingPopover)) { isShowingPopover in
-			guard isShowingPopover else { return }
-			makePopoverInputFirstResponder()
-		}
 	}
 
 	private struct CopyButtonStyle: ButtonStyle {
