@@ -236,6 +236,16 @@ struct MainView: View {
 				}
 				completion(password)
 			}
+#if DEBUG
+						.onAppear {
+							guard database.file.lastPathComponent == "Sample.swl",
+							      !Self.didAutoUnlockSampleWallet else { return }
+							Self.didAutoUnlockSampleWallet = true
+							DispatchQueue.main.async {
+								completion("WalletBase")
+							}
+						}
+#endif
 		case .browseContent(let database):
 			VStack {
 				ItemGrid(items: $items,
@@ -359,6 +369,10 @@ struct MainView: View {
 			}
 		}
 	}
+
+#if DEBUG
+	static var didAutoUnlockSampleWallet = false
+#endif
 
 	private func loadFile() {
 		DispatchQueue.main.async {

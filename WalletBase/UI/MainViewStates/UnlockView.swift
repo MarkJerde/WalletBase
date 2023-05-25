@@ -19,6 +19,16 @@ struct UnlockView: View {
 			Button("Unlock") {
 				unlock()
 			}
+#if DEBUG
+				.onAppear {
+					guard file.hasSuffix("Sample.swl"),
+					      !Self.didAutoTapUnlockForSampleWallet else { return }
+					Self.didAutoTapUnlockForSampleWallet = true
+					DispatchQueue.main.async {
+						self.unlock()
+					}
+				}
+#endif
 			.compatibilityKeyboardShortcut(.defaultAction) { window in
 				guard let firstSubviews = (window.contentViewController?.view ?? window.contentView)?.subviews,
 				      let secondSubviews = firstSubviews.prefix(2).last?.subviews,
@@ -40,6 +50,10 @@ struct UnlockView: View {
 		.padding(.all, 20)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 	}
+
+#if DEBUG
+	static var didAutoTapUnlockForSampleWallet = false
+#endif
 }
 
 struct UnlockView_Previews: PreviewProvider {

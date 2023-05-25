@@ -65,6 +65,16 @@ struct SandboxFileBrowser: View {
 				         onSearch: { searchString in
 				         	loadFiles(searchString: searchString)
 				         })
+				#if DEBUG
+					.onAppear {
+						guard let sample = files.first(where: { $0.name == "Sample.swl" }),
+						      !Self.didAutoSelectSampleWallet else { return }
+						Self.didAutoSelectSampleWallet = true
+						DispatchQueue.main.async {
+							self.onItemTap(sample)
+						}
+					}
+				#endif
 				Button("Browse") {
 					browse()
 				}
@@ -72,6 +82,10 @@ struct SandboxFileBrowser: View {
 			}
 		}
 	}
+
+	#if DEBUG
+		static var didAutoSelectSampleWallet = false
+	#endif
 }
 
 struct SandboxFileBrowser_Previews: PreviewProvider {
