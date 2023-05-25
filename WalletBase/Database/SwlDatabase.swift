@@ -289,7 +289,21 @@ class SwlDatabase {
 		case writeFailureIndeterminite
 	}
 
-	func update(fieldValues: [SwlID: (String, SwlID)],
+
+	enum IDType: Hashable {
+		case new(SwlID)
+		case existing(SwlID)
+
+		var id: SwlID {
+			switch self {
+			case .new(let id),
+			     .existing(let id):
+				return id
+			}
+		}
+	}
+
+	func update(fieldValues: [IDType: (String, SwlID)],
 	            editedDescription: String?,
 	            in cardId: SwlID) throws
 	{
@@ -303,20 +317,27 @@ class SwlDatabase {
 		for (id, value) in fieldValues {
 			let templateFieldId = value.1
 			let value = value.0
-			guard !id.value.isEmpty || !value.isEmpty else {
+			let isNewRow: Bool
+			switch id {
+			case .new:
+				isNewRow = true
+			default:
+				isNewRow = false
+			}
+			guard isNewRow || !id.id.value.isEmpty || !value.isEmpty else {
 				// Creating a new empty field. We will just ignore this.
 				continue
 			}
 
 			guard !value.isEmpty else {
 				// Delete field.
-				try database.delete(from: CardFieldValue.table, where: "id \(id.queryCondition)")
+				try database.delete(from: CardFieldValue.table, where: "id \(id.id.queryCondition)")
 				continue
 			}
 
-			guard !id.value.isEmpty else {
+			guard !(isNewRow || id.id.value.isEmpty) else {
 				// Create new field.
-				guard let newId = SwlID.new,
+				guard let newId = isNewRow ? id.id : SwlID.new,
 				      let encryptedValue = crypto?.encrypt(value)
 				else {
 					throw Error.writeFailure
@@ -329,7 +350,7 @@ class SwlDatabase {
 				continue
 			}
 
-			try update(id: id) { current -> CardFieldValue? in
+			try update(id: id.id) { current -> CardFieldValue? in
 				guard let encryptedValue = crypto?.encrypt(value) else {
 					return nil
 				}
