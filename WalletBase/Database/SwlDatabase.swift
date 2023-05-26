@@ -289,6 +289,23 @@ class SwlDatabase {
 		case writeFailureIndeterminite
 	}
 
+	func encrypt(text: String, emptyIsNull: Bool = false) -> Data? {
+		let encryptedValue: Data?
+		if text.isEmpty {
+			if emptyIsNull {
+				return nil
+			}
+			// Strings are typically nullable in the swl database but in practice a X'00000000' value is used rather than NULL.
+			encryptedValue = Data(count: 4)
+		}
+		else {
+			guard let encrypted = crypto?.encrypt(text) else {
+				return nil
+			}
+			encryptedValue = encrypted
+		}
+		return encryptedValue
+	}
 
 	enum IDType: Hashable {
 		case new(SwlID)
@@ -364,17 +381,7 @@ class SwlDatabase {
 
 		if let editedDescription {
 			try update(id: cardId) { current -> Card? in
-				let encryptedValue: Data?
-				if editedDescription.isEmpty {
-					// Description is documented as nullable, but in practice a X'00000000' value is used rather than NULL.
-					encryptedValue = Data(count: 4)
-				}
-				else {
-					guard let encrypted = crypto?.encrypt(editedDescription) else {
-						return nil
-					}
-					encryptedValue = encrypted
-				}
+				let encryptedValue = encrypt(text: editedDescription)
 
 				return Card(id: current.id,
 				            name: current.name,
@@ -398,7 +405,7 @@ class SwlDatabase {
 		}
 	}
 
-	private func insert<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(
+	func insert<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(
 		value: T) throws
 	{
 		do {
