@@ -26,11 +26,11 @@ extension SwlDatabase {
 		let parent: SwlID
 		/// The ID of the icon of this card.
 		let iconID: SwlID
-		/// Something
+		/// Something.
 		let hitCount: Int32
-		/// Something
+		/// Something. Starts at -1.
 		let syncID: Int32
-		/// Something
+		/// Something. Starts at -1.
 		let createSyncID: Int32
 	}
 }
