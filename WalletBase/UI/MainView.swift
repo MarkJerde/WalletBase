@@ -445,6 +445,8 @@ struct MainView: View {
 					}, importFile: FileStorage.contains(databaseFile) ? nil : {
 						guard let importedFile = FileStorage.importFile(at: databaseFile) else { return }
 						state = .buttonToUnlock(databaseFile: importedFile)
+					}, pickOther: {
+						state = .loadingDatabase
 					})
 				case .unlocking(let database):
 					Text("Unlocking...")

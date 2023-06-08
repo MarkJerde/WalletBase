@@ -11,6 +11,7 @@ struct UnlockView: View {
 	let file: String
 	let unlock: () -> Void
 	let importFile: (() -> Void)?
+	let pickOther: () -> Void
 
 	var body: some View {
 		VStack {
@@ -46,6 +47,9 @@ struct UnlockView: View {
 			} else {
 				Spacer()
 			}
+			Button("Pick another wallet") {
+				pickOther()
+			}
 		}
 		.padding(.all, 20)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -61,6 +65,8 @@ struct UnlockView_Previews: PreviewProvider {
 		UnlockView(file: "something.swl") {
 			// No-op
 		} importFile: {
+			// No-op
+		} pickOther: {
 			// No-op
 		}
 	}
