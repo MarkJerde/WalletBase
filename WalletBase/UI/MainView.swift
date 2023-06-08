@@ -277,31 +277,68 @@ struct MainView: View {
 		}
 	}
 
-	private func mostCommonTemplateID(in database: SwlDatabase) -> SwlDatabase.SwlID? {
-		guard let cards: [SwlDatabase.Card] = try? database.database.select().compactMap({ $0 }) else {
+	private func mostCommonID<T: SQLiteDatabaseItem>(in database: SwlDatabase, selecting select: (T) -> SwlDatabase.SwlID) -> SwlDatabase.SwlID? where T: SQLiteQuerySelectable {
+		guard let records: [T] = try? database.database.select().compactMap({ $0 }) else {
 			return nil
 		}
-		let templateIDs = cards.map { $0.templateID }
-		let countedSet = NSCountedSet(array: templateIDs)
+		let ids = records.map { select($0) }
+		let countedSet = NSCountedSet(array: ids)
 		let mostFrequent = countedSet.max { countedSet.count(for: $0) < countedSet.count(for: $1) }
 		return mostFrequent as? SwlDatabase.SwlID
 	}
 
-	private func mostCommonIconID(in database: SwlDatabase) -> SwlDatabase.SwlID? {
-		guard let cards: [SwlDatabase.Card] = try? database.database.select().compactMap({ $0 }) else {
-			return nil
+	private func createFolder(named: String, in database: SwlDatabase, category: SwlDatabase.Category?) {
+		// FIXME: Need an iconID. Just pick the most common.
+		guard let iconID = mostCommonID(in: database, selecting: { category in category.iconID } as (SwlDatabase.Category) -> SwlDatabase.SwlID),
+		      // FIXME: Need an defaultTemplateID. Just pick the most common.
+		      let defaultTemplateID = mostCommonID(in: database, selecting: { category in category.defaultTemplateID } as (SwlDatabase.Category) -> SwlDatabase.SwlID)
+		else {
+			return
 		}
-		let templateIDs = cards.map { $0.iconID }
-		let countedSet = NSCountedSet(array: templateIDs)
-		let mostFrequent = countedSet.max { countedSet.count(for: $0) < countedSet.count(for: $1) }
-		return mostFrequent as? SwlDatabase.SwlID
+
+		guard let encryptedName = database.encrypt(text: named),
+		      let description = database.encrypt(text: ""), // Strings are typically nullable in the swl database but in practice a X'00000000' value is used rather than NULL.
+		      let categoryID = SwlDatabase.SwlID.new else { return }
+		let parent = category?.id ?? .rootCategory
+		let category = SwlDatabase.Category(id: categoryID,
+		                                    name: [UInt8](encryptedName),
+		                                    description: [UInt8](description),
+		                                    iconID: iconID,
+		                                    defaultTemplateID: defaultTemplateID,
+		                                    parent: parent,
+		                                    syncID: -1,
+		                                    createSyncID: -1)
+
+		do {
+			try database.insert(value: category)
+		} catch {
+			if let error = error as? SwlDatabase.Error {
+				switch error {
+				case .writeFailureIndeterminite:
+					let alert = NSAlert()
+					alert.messageText = "Save Failed"
+					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
+					alert.alertStyle = .critical
+					alert.addButton(withTitle: "Close Wallet")
+					alert.addButton(withTitle: "Take More Risks")
+					guard alert.runModal() == .alertFirstButtonReturn else { return }
+					folder = nil
+					lock(database: database)
+					return
+				default:
+					break
+				}
+			}
+			showFailedToSaveAlert()
+			return
+		}
 	}
 
 	private func createCard(named: String, in database: SwlDatabase, category: SwlDatabase.Category) {
 		// FIXME: Need a template ID.
-		guard let templateID = mostCommonTemplateID(in: database),
+		guard let templateID = mostCommonID(in: database, selecting: { category in category.templateID } as (SwlDatabase.Card) -> SwlDatabase.SwlID),
 		      // FIXME: Need an iconID. Just pick the most common.
-		      let iconID = mostCommonIconID(in: database)
+		      let iconID = mostCommonID(in: database, selecting: { category in category.iconID } as (SwlDatabase.Card) -> SwlDatabase.SwlID)
 		else {
 			return
 		}

@@ -18,7 +18,7 @@ extension SwlDatabase {
 		let hexString: String
 
 		/// Children of the root category have an empty string for their ID.
-		var rootCategory: Self { .init(value: [], hexString: "") }
+		static var rootCategory: Self { .init(value: [], hexString: "") }
 
 		var encoded: SQLiteDataType {
 			.varchar(value: .init(arrayValue: value))

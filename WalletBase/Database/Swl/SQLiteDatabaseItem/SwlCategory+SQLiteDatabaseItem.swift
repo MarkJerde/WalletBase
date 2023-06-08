@@ -23,9 +23,21 @@ extension SwlDatabase.Category: SQLiteDatabaseItem {
 		var column = column
 		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
 		guard let name: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
-		guard let parent: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		let description: [UInt8]? = .decode(from: statement, column: column, nextColumn: { column = $0 })
+		guard let iconID: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		guard let defaultTemplateID: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		guard let parent: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let syncID: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let createSyncID: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
 
 		// Build and return the instance.
-		return .init(id: id, name: name, parent: parent)
+		return .init(id: id,
+		             name: name,
+		             description: description,
+		             iconID: iconID,
+		             defaultTemplateID: defaultTemplateID,
+		             parent: parent,
+		             syncID: syncID,
+		             createSyncID: createSyncID)
 	}
 }
