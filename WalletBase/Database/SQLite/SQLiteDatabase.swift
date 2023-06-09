@@ -177,7 +177,7 @@ class SQLiteDatabase {
 
 	func insert<Table>(into table: Table, values: [SQLiteDataType]) throws where Table: SQLiteTable {
 		guard canBackupDatabaseFile,
-		      backupDatabaseFile()
+		      try backupDatabaseFile()
 		else {
 			throw LayerError(site: .backup, problem: .generalError)
 		}
@@ -215,7 +215,7 @@ class SQLiteDatabase {
 
 	func update<Table, Column>(from table: Table, values: [Column: SQLiteDataType], primary: Column) throws where Table: SQLiteTable, Column: Hashable & RawRepresentable, Column.RawValue == String {
 		guard canBackupDatabaseFile,
-		      backupDatabaseFile()
+		      try backupDatabaseFile()
 		else {
 			throw LayerError(site: .backup, problem: .generalError)
 		}
@@ -247,7 +247,7 @@ class SQLiteDatabase {
 
 	func delete<Table>(from table: Table, where whereClause: String) throws where Table: SQLiteTable {
 		guard canBackupDatabaseFile,
-		      backupDatabaseFile()
+		      try backupDatabaseFile()
 		else {
 			throw LayerError(site: .backup, problem: .generalError)
 		}
@@ -274,8 +274,16 @@ class SQLiteDatabase {
 		FileStorage.contains(file)
 	}
 
-	func backupDatabaseFile() -> Bool {
+	func backupDatabaseFile() throws -> Bool {
+		let transactionInProgress = transactionInProgress
+		if transactionInProgress {
+			try commitTransaction()
+		}
 		guard close() else { return false }
-		return FileStorage.backupFile(at: file) != nil
+		let result = FileStorage.backupFile(at: file) != nil
+		if transactionInProgress {
+			try beginTransaction()
+		}
+		return result
 	}
 }
