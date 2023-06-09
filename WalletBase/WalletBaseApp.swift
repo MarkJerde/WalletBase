@@ -31,7 +31,7 @@ class CompatibilityAppDelegate: AppDelegate {
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
 		// Create the SwiftUI view that provides the window contents.
-		let contentView = MainView()
+		let contentView = MainView(appState: .init())
 			.frame(width: 976, height: 576, alignment: .center)
 
 		// Create the window and set the content view.
@@ -91,16 +91,18 @@ struct WalletBaseApp: App {
 	@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 #endif
 
+	@StateObject var appState = AppState()
+
 	var body: some Scene {
 		WindowGroup {
 #if os(macOS)
-			MainView()
+			MainView(appState: appState)
 				.frame(minWidth: 976, maxWidth: .infinity, minHeight: 576, maxHeight: .infinity, alignment: .center)
 				.onDisappear {
 					ActivityMonitor.shared.onInactivity?()
 				}
 #else
-			MainView()
+			MainView(appState: appState)
 #endif
 		}
 	}

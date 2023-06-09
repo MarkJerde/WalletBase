@@ -93,6 +93,7 @@
 		8D6A211729BA0B37003A4941 /* RandomizedCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6A211629BA0B37003A4941 /* RandomizedCrypto.swift */; };
 		8D6A211929BECA42003A4941 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6A211829BECA42003A4941 /* MenuView.swift */; };
 		8D6A211B29C009A2003A4941 /* Color+tappableClear.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6A211A29C009A2003A4941 /* Color+tappableClear.swift */; };
+		8D7C76CA2A32BEAC00B1C589 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7C76C92A32BEAC00B1C589 /* AppState.swift */; };
 		8D97CE34288791DE00373192 /* UnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE33288791DE00373192 /* UnlockView.swift */; };
 		8D97CE35288792F400373192 /* ActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D61A0277ABBDB00F95986 /* ActivityMonitor.swift */; };
 		8D97CE362887930B00373192 /* UnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D97CE33288791DE00373192 /* UnlockView.swift */; };
@@ -194,6 +195,7 @@
 		8D6A211629BA0B37003A4941 /* RandomizedCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizedCrypto.swift; sourceTree = "<group>"; };
 		8D6A211829BECA42003A4941 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		8D6A211A29C009A2003A4941 /* Color+tappableClear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+tappableClear.swift"; sourceTree = "<group>"; };
+		8D7C76C92A32BEAC00B1C589 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		8D97CE33288791DE00373192 /* UnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockView.swift; sourceTree = "<group>"; };
 		8D97CE37288797C400373192 /* FileStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStorage.swift; sourceTree = "<group>"; };
 		8D97CE3A2887AD6900373192 /* String+splitOnLastOccurenceOf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+splitOnLastOccurenceOf.swift"; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 				8D50F3DF27419B5A00A754CB /* Database */,
 				8D5D614B2751E62E00F95986 /* Util */,
 				8D50F3E127419B8F00A754CB /* UI */,
+				8D7C76C92A32BEAC00B1C589 /* AppState.swift */,
 				8D50F3AB273CBF1D00A754CB /* WalletBaseApp.swift */,
 				8D50F3AF273CBF1F00A754CB /* Assets.xcassets */,
 				8D50F3B4273CBF1F00A754CB /* WalletBase.entitlements */,
@@ -623,6 +626,7 @@
 				8D50F3DA274196BB00A754CB /* SwlCrypto.swift in Sources */,
 				8D97CE47289A22E200373192 /* String+SplitByLength.swift in Sources */,
 				8D5D614D2751E65B00F95986 /* Sequence+Sorted.swift in Sources */,
+				8D7C76CA2A32BEAC00B1C589 /* AppState.swift in Sources */,
 				8D5D61512751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift in Sources */,
 				8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */,
 				8D6A211729BA0B37003A4941 /* RandomizedCrypto.swift in Sources */,

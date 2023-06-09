@@ -42,16 +42,16 @@ protocol ItemGridItem: Hashable {
 }
 
 struct ItemGrid<Item: ItemGridItem>: View {
-	internal init(items: Binding<[Item]>,
-	              container: Binding<Item?>,
+	internal init(items: [Item],
+	              container: Item?,
 	              emptyMessage: String? = "Empty",
 	              onItemTap: @escaping (Item) -> Void,
 	              onBackTap: @escaping () -> Void,
 	              onNewTap: (() -> Void)? = nil,
 	              onSearch: ((String) -> Void)? = nil)
 	{
-		self._items = items
-		self._container = container
+		self.items = items
+		self.container = container
 		self.emptyMessage = emptyMessage
 		self.onItemTap = onItemTap
 		self.onBackTap = onBackTap
@@ -59,8 +59,8 @@ struct ItemGrid<Item: ItemGridItem>: View {
 		self.onSearch = onSearch
 	}
 
-	@Binding var items: [Item]
-	@Binding var container: Item?
+	var items: [Item]
+	var container: Item?
 	let emptyMessage: String?
 	let onItemTap: (Item) -> Void
 	let onBackTap: () -> Void
@@ -125,8 +125,8 @@ struct ItemGrid_Previews: PreviewProvider {
 	]
 	static let container: ItemGrid_Previews_Item? = ItemGrid_Previews_Item(name: "Zulu", type: .category)
 	static var previews: some View {
-		ItemGrid(items: .constant(items),
-		         container: .constant(container)) {
+		ItemGrid(items: items,
+		         container: container) {
 			NSLog("tapped \($0)")
 		} onBackTap: {
 			NSLog("tapBack")

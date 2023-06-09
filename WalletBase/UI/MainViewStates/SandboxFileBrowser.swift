@@ -13,6 +13,7 @@ struct SandboxFileBrowser: View {
 	let onItemTap: (WalletFile) -> Void
 	let browse: () -> Void
 	@State private var filtered: Bool = false
+	@State private var previousSearch: String?
 
 	fileprivate func loadFiles(searchString: String? = nil) {
 		// Look for already-imported files.
@@ -52,8 +53,8 @@ struct SandboxFileBrowser: View {
 				}
 		} else {
 			VStack {
-				ItemGrid(items: $files,
-				         container: $folder,
+				ItemGrid(items: files,
+				         container: folder,
 				         emptyMessage: "No filenames match search.",
 				         onItemTap: { item in
 				         	onItemTap(item)
@@ -63,6 +64,8 @@ struct SandboxFileBrowser: View {
 				         },
 				         onNewTap: nil,
 				         onSearch: { searchString in
+				         	guard searchString != previousSearch else { return }
+				         	previousSearch = searchString
 				         	loadFiles(searchString: searchString)
 				         })
 				#if DEBUG
