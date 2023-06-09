@@ -10,6 +10,9 @@ import AppKit
 class AppState: ObservableObject {
 	init() {}
 
+	var canCreateNewCard = false
+	var canCreateNewFolder = false
+
 	enum MyState {
 		case loadingDatabase
 		case buttonToUnlock(databaseFile: URL)
@@ -23,6 +26,8 @@ class AppState: ObservableObject {
 	@Published var state: MyState = .loadingDatabase {
 		// FIXME: Letting others set the state is a little sloppy. A private(set) would be better but further changes are needed to make that happen.
 		didSet {
+			setMenuEnables()
+
 			switch state {
 			case .loadingDatabase,
 			     .buttonToUnlock:
@@ -44,6 +49,18 @@ class AppState: ObservableObject {
 		}
 	}
 
+	func setMenuEnables() {
+		let newCanCreateNewCard: Bool
+		switch state {
+		case .browseContent:
+			newCanCreateNewCard = category != nil
+		default:
+			newCanCreateNewCard = false
+		}
+		guard canCreateNewCard != newCanCreateNewCard else { return }
+		canCreateNewCard = newCanCreateNewCard
+	}
+
 	struct Prompt {
 		let title: String?
 		let message: String?
@@ -53,22 +70,34 @@ class AppState: ObservableObject {
 
 	@Published var prompt: Prompt? = nil
 
-	func showPromptForNewFolderOrCard() {
+	func currentDatabaseAndCategory() -> (SwlDatabase, SwlDatabase.Category?)? {
 		let database: SwlDatabase
 		switch state {
 		case .browseContent(let aDatabase):
 			database = aDatabase
 		default:
-			return
+			return nil
 		}
-		let createInCategory: SwlDatabase.Category?
+		let resultCategory: SwlDatabase.Category?
 		if let category,
 		   case .category(let swlCategory) = category.itemType
 		{
-			createInCategory = swlCategory
+			resultCategory = swlCategory
 		} else {
-			createInCategory = nil
+			resultCategory = nil
 		}
+		return (database, resultCategory)
+	}
+
+	func showPromptForNewCard() {
+		guard let (database, createInCategory) = currentDatabaseAndCategory() else { return }
+		promptToCreateNewFolderOrCard(isNewFolder: false,
+		                              in: database,
+		                              category: createInCategory)
+	}
+
+	func showPromptForNewFolderOrCard() {
+		guard let (database, createInCategory) = currentDatabaseAndCategory() else { return }
 		prompt = newFolderOrCardPrompt(in: database, category: createInCategory)
 	}
 
@@ -83,53 +112,10 @@ class AppState: ObservableObject {
 			options = CreateNew.allCases
 		}
 		return Self.promptToCreateNew(options: options) { response in
-			let prompt: String
-			let fieldName: String
 			let isNewFolder = response == CreateNew.folder.rawValue.capitalized
-			if isNewFolder {
-				prompt = "Create new folder"
-				fieldName = "Folder name"
-			} else {
-				prompt = "Create new card"
-				fieldName = "Card name"
-			}
-			self.prompt = Self.promptForField(
-				prompt: prompt,
-				fieldName: fieldName,
-				completion: { newName in
-					if isNewFolder {
-						self.createFolder(named: newName, in: database, category: category)
-					} else if let category {
-						self.createCard(named: newName, in: database, category: category)
-					}
-					self.prompt = nil
-					// Navigate to reload the content.
-					self.navigate(toDatabase: database, category: self.category, card: nil)
-				}, cancel: {
-					self.prompt = nil
-				}, error: { errorDetail in
-					guard errorDetail.hasPrefix("missing: "),
-					      let missingItem = errorDetail.components(separatedBy: "missing: ").last,
-					      !missingItem.isEmpty
-					else {
-						self.prompt = .init(title: "Error",
-						                    message: "An error occurred.",
-						                    options: [
-						                    	.button(text: "Okay"),
-						                    ], handler: { _, _ in
-						                    	self.prompt = nil
-						                    })
-						return
-					}
-
-					self.prompt = .init(title: "Error",
-					                    message: "\(missingItem) is required.",
-					                    options: [
-					                    	.button(text: "Okay"),
-					                    ], handler: { _, _ in
-					                    	self.prompt = nil
-					                    })
-				})
+			self.promptToCreateNewFolderOrCard(isNewFolder: isNewFolder,
+			                                   in: database,
+			                                   category: category)
 		} cancel: {
 			self.prompt = nil
 		}
@@ -153,6 +139,55 @@ class AppState: ObservableObject {
 				}
 
 				completion(selection)
+			})
+	}
+
+	private func promptToCreateNewFolderOrCard(isNewFolder: Bool, in database: SwlDatabase, category: SwlDatabase.Category?) {
+		let prompt: String
+		let fieldName: String
+		if isNewFolder {
+			prompt = "Create new folder"
+			fieldName = "Folder name"
+		} else {
+			prompt = "Create new card"
+			fieldName = "Card name"
+		}
+		self.prompt = Self.promptForField(
+			prompt: prompt,
+			fieldName: fieldName,
+			completion: { newName in
+				if isNewFolder {
+					self.createFolder(named: newName, in: database, category: category)
+				} else if let category {
+					self.createCard(named: newName, in: database, category: category)
+				}
+				self.prompt = nil
+				// Navigate to reload the content.
+				self.navigate(toDatabase: database, category: self.category, card: nil)
+			}, cancel: {
+				self.prompt = nil
+			}, error: { errorDetail in
+				guard errorDetail.hasPrefix("missing: "),
+				      let missingItem = errorDetail.components(separatedBy: "missing: ").last,
+				      !missingItem.isEmpty
+				else {
+					self.prompt = .init(title: "Error",
+					                    message: "An error occurred.",
+					                    options: [
+					                    	.button(text: "Okay"),
+					                    ], handler: { _, _ in
+					                    	self.prompt = nil
+					                    })
+					return
+				}
+
+				self.prompt = .init(title: "Error",
+				                    message: "\(missingItem) is required.",
+				                    options: [
+				                    	.button(text: "Okay"),
+				                    ], handler: { _, _ in
+				                    	self.prompt = nil
+				                    })
 			})
 	}
 

@@ -105,5 +105,23 @@ struct WalletBaseApp: App {
 			MainView(appState: appState)
 #endif
 		}
+		.commands {
+			CommandGroup(replacing: .newItem) {
+				Button(action: {
+					self.appState.showPromptForNewCard()
+				}, label: {
+					Text("New Card")
+				})
+				.disabled(!appState.canCreateNewCard)
+				.keyboardShortcut("N")
+				// I don't really want a New Window menu item. This just makes a good note for how to do modifiers and what the normal keyboard shortcut for New Window is.
+				/* Button(action: {
+				 	print("Menu Button selected")
+				 }, label: {
+				 	Text("New Window")
+				 })
+				 .keyboardShortcut("N", modifiers: [.option, .command]) */
+			}
+		}
 	}
 }
