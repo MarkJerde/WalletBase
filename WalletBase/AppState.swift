@@ -51,14 +51,21 @@ class AppState: ObservableObject {
 
 	func setMenuEnables() {
 		let newCanCreateNewCard: Bool
+		let newCanCreateNewFolder: Bool
 		switch state {
 		case .browseContent:
 			newCanCreateNewCard = category != nil
+			newCanCreateNewFolder = true
 		default:
 			newCanCreateNewCard = false
+			newCanCreateNewFolder = false
 		}
-		guard canCreateNewCard != newCanCreateNewCard else { return }
-		canCreateNewCard = newCanCreateNewCard
+		if canCreateNewCard != newCanCreateNewCard {
+			canCreateNewCard = newCanCreateNewCard
+		}
+		if canCreateNewFolder != newCanCreateNewFolder {
+			canCreateNewFolder = newCanCreateNewFolder
+		}
 	}
 
 	struct Prompt {
@@ -90,8 +97,16 @@ class AppState: ObservableObject {
 	}
 
 	func showPromptForNewCard() {
+		showPromptForNew(isNewFolder: false)
+	}
+
+	func showPromptForNewFolder() {
+		showPromptForNew(isNewFolder: true)
+	}
+
+	private func showPromptForNew(isNewFolder: Bool) {
 		guard let (database, createInCategory) = currentDatabaseAndCategory() else { return }
-		promptToCreateNewFolderOrCard(isNewFolder: false,
+		promptToCreateNewFolderOrCard(isNewFolder: isNewFolder,
 		                              in: database,
 		                              category: createInCategory)
 	}
@@ -113,9 +128,7 @@ class AppState: ObservableObject {
 		}
 		return Self.promptToCreateNew(options: options) { response in
 			let isNewFolder = response == CreateNew.folder.rawValue.capitalized
-			self.promptToCreateNewFolderOrCard(isNewFolder: isNewFolder,
-			                                   in: database,
-			                                   category: category)
+			self.showPromptForNew(isNewFolder: isNewFolder)
 		} cancel: {
 			self.prompt = nil
 		}

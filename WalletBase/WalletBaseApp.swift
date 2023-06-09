@@ -114,6 +114,13 @@ struct WalletBaseApp: App {
 				})
 				.disabled(!appState.canCreateNewCard)
 				.keyboardShortcut("N")
+				Button(action: {
+					self.appState.showPromptForNewFolder()
+				}, label: {
+					Text("New Folder")
+				})
+				.disabled(!appState.canCreateNewFolder)
+				.keyboardShortcut("N", modifiers: [.shift, .command])
 				// I don't really want a New Window menu item. This just makes a good note for how to do modifiers and what the normal keyboard shortcut for New Window is.
 				/* Button(action: {
 				 	print("Menu Button selected")
