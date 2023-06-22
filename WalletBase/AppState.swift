@@ -12,6 +12,8 @@ class AppState: ObservableObject {
 
 	var canCreateNewCard = false
 	var canCreateNewFolder = false
+	@Published var currentCreatableTypes: [NewItemView.ItemType] = []
+	@Published var shouldPresentCreateSheet = false
 
 	enum MyState {
 		case loadingDatabase
@@ -66,16 +68,25 @@ class AppState: ObservableObject {
 		if canCreateNewFolder != newCanCreateNewFolder {
 			canCreateNewFolder = newCanCreateNewFolder
 		}
+		if canCreateNewCard {
+			if currentCreatableTypes.firstIndex(of: .card) == nil {
+				currentCreatableTypes.append(.card)
+			}
+		} else {
+			if let index = currentCreatableTypes.firstIndex(of: .card) {
+				currentCreatableTypes.remove(at: index)
+			}
+		}
+		if canCreateNewFolder {
+			if currentCreatableTypes.firstIndex(of: .folder) == nil {
+				currentCreatableTypes.insert(.folder, at: 0)
+			}
+		} else {
+			if let index = currentCreatableTypes.firstIndex(of: .folder) {
+				currentCreatableTypes.remove(at: index)
+			}
+		}
 	}
-
-	struct Prompt {
-		let title: String?
-		let message: String?
-		let options: [MenuView.Option]
-		let handler: (String, [String: String]) -> Void
-	}
-
-	@Published var prompt: Prompt? = nil
 
 	func currentDatabaseAndCategory() -> (SwlDatabase, SwlDatabase.Category?)? {
 		let database: SwlDatabase
@@ -97,137 +108,13 @@ class AppState: ObservableObject {
 	}
 
 	func showPromptForNewCard() {
-		showPromptForNew(isNewFolder: false)
+		currentCreatableTypes = [.card]
+		shouldPresentCreateSheet = true
 	}
 
 	func showPromptForNewFolder() {
-		showPromptForNew(isNewFolder: true)
-	}
-
-	private func showPromptForNew(isNewFolder: Bool) {
-		guard let (database, createInCategory) = currentDatabaseAndCategory() else { return }
-		promptToCreateNewFolderOrCard(isNewFolder: isNewFolder,
-		                              in: database,
-		                              category: createInCategory)
-	}
-
-	func showPromptForNewFolderOrCard() {
-		guard let (database, createInCategory) = currentDatabaseAndCategory() else { return }
-		prompt = newFolderOrCardPrompt(in: database, category: createInCategory)
-	}
-
-	func newFolderOrCardPrompt(in database: SwlDatabase, category: SwlDatabase.Category?) -> Prompt {
-		let options: [CreateNew]
-		if category == nil {
-			options = [
-				.folder,
-				.cancel,
-			]
-		} else {
-			options = CreateNew.allCases
-		}
-		return Self.promptToCreateNew(options: options) { response in
-			let isNewFolder = response == CreateNew.folder.rawValue.capitalized
-			self.showPromptForNew(isNewFolder: isNewFolder)
-		} cancel: {
-			self.prompt = nil
-		}
-	}
-
-	private static func promptToCreateNew(options: [CreateNew], completion: @escaping (String) -> Void, cancel: @escaping () -> Void) -> Prompt {
-		.init(
-			title: "Create new:",
-			message: nil,
-			options: options
-				.map {
-					$0.rawValue.capitalized
-				}
-				.map {
-					.button(text: $0)
-				},
-			handler: { selection, _ in
-				guard selection != CreateNew.cancel.rawValue.capitalized else {
-					cancel()
-					return
-				}
-
-				completion(selection)
-			})
-	}
-
-	private func promptToCreateNewFolderOrCard(isNewFolder: Bool, in database: SwlDatabase, category: SwlDatabase.Category?) {
-		let prompt: String
-		let fieldName: String
-		if isNewFolder {
-			prompt = "Create new folder"
-			fieldName = "Folder name"
-		} else {
-			prompt = "Create new card"
-			fieldName = "Card name"
-		}
-		self.prompt = Self.promptForField(
-			prompt: prompt,
-			fieldName: fieldName,
-			completion: { newName in
-				if isNewFolder {
-					self.createFolder(named: newName, in: database, category: category)
-				} else if let category {
-					self.createCard(named: newName, in: database, category: category)
-				}
-				self.prompt = nil
-				// Navigate to reload the content.
-				self.navigate(toDatabase: database, category: self.category, card: nil)
-			}, cancel: {
-				self.prompt = nil
-			}, error: { errorDetail in
-				guard errorDetail.hasPrefix("missing: "),
-				      let missingItem = errorDetail.components(separatedBy: "missing: ").last,
-				      !missingItem.isEmpty
-				else {
-					self.prompt = .init(title: "Error",
-					                    message: "An error occurred.",
-					                    options: [
-					                    	.button(text: "Okay"),
-					                    ], handler: { _, _ in
-					                    	self.prompt = nil
-					                    })
-					return
-				}
-
-				self.prompt = .init(title: "Error",
-				                    message: "\(missingItem) is required.",
-				                    options: [
-				                    	.button(text: "Okay"),
-				                    ], handler: { _, _ in
-				                    	self.prompt = nil
-				                    })
-			})
-	}
-
-	private static func promptForField(prompt: String, fieldName: String, completion: @escaping (String) -> Void, cancel: @escaping () -> Void, error: @escaping (String) -> Void) -> Prompt {
-		.init(
-			title: prompt,
-			message: nil,
-			options: [
-				.field(id: fieldName),
-				.button(text: "Create"),
-				.button(text: "Cancel"),
-			],
-			handler: { selection, fieldValues in
-				guard selection != "Cancel" else {
-					cancel()
-					return
-				}
-
-				guard let value = fieldValues[fieldName],
-				      !value.isEmpty
-				else {
-					error("missing: \(fieldName)")
-					return
-				}
-
-				completion(value)
-			})
+		currentCreatableTypes = [.folder]
+		shouldPresentCreateSheet = true
 	}
 
 	@Published var category: SwlDatabase.Item?
@@ -356,7 +243,8 @@ class AppState: ObservableObject {
 		return mostFrequent as? SwlDatabase.SwlID
 	}
 
-	private func createFolder(named: String, in database: SwlDatabase, category: SwlDatabase.Category?) {
+	func createFolder(named: String) {
+		guard let (database, category) = currentDatabaseAndCategory() else { return }
 		// FIXME: Need an iconID. Just pick the most common.
 		guard let iconID = mostCommonID(in: database, selecting: { category in category.iconID } as (SwlDatabase.Category) -> SwlDatabase.SwlID),
 		      // FIXME: Need an defaultTemplateID. Just pick the most common.
@@ -369,17 +257,17 @@ class AppState: ObservableObject {
 		      let description = database.encrypt(text: ""), // Strings are typically nullable in the swl database but in practice a X'00000000' value is used rather than NULL.
 		      let categoryID = SwlDatabase.SwlID.new else { return }
 		let parent = category?.id ?? .rootCategory
-		let category = SwlDatabase.Category(id: categoryID,
-		                                    name: [UInt8](encryptedName),
-		                                    description: [UInt8](description),
-		                                    iconID: iconID,
-		                                    defaultTemplateID: defaultTemplateID,
-		                                    parent: parent,
-		                                    syncID: -1,
-		                                    createSyncID: -1)
+		let newCategory = SwlDatabase.Category(id: categoryID,
+		                                       name: [UInt8](encryptedName),
+		                                       description: [UInt8](description),
+		                                       iconID: iconID,
+		                                       defaultTemplateID: defaultTemplateID,
+		                                       parent: parent,
+		                                       syncID: -1,
+		                                       createSyncID: -1)
 
 		do {
-			try database.insert(value: category)
+			try database.insert(value: newCategory)
 		} catch {
 			if let error = error as? SwlDatabase.Error {
 				switch error {
@@ -403,7 +291,9 @@ class AppState: ObservableObject {
 		}
 	}
 
-	private func createCard(named: String, in database: SwlDatabase, category: SwlDatabase.Category) {
+	func createCard(named: String) {
+		guard let (database, category) = currentDatabaseAndCategory(),
+		      let category else { return }
 		// FIXME: Need a template ID.
 		guard let templateID = mostCommonID(in: database, selecting: { category in category.templateID } as (SwlDatabase.Card) -> SwlDatabase.SwlID),
 		      // FIXME: Need an iconID. Just pick the most common.

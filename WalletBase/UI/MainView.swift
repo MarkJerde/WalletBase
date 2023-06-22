@@ -91,7 +91,7 @@ struct MainView: View {
 						         	self.appState.navigate(toDatabase: database, category: parent)
 						         },
 						         onNewTap: {
-						         	self.appState.showPromptForNewFolderOrCard()
+						         	appState.shouldPresentCreateSheet = true
 						         },
 						         onSearch: (self.appState.category == nil ? { searchString in
 						         	guard searchString != previousSearch else { return }
@@ -109,6 +109,30 @@ struct MainView: View {
 							self.appState.lock(database: database)
 						}
 						.padding(.all, 20)
+					}
+					.sheet(isPresented: $appState.shouldPresentCreateSheet) {
+						// No-op. Called on dismiss.
+					} content: {
+						NewItemView(types: appState.currentCreatableTypes,
+						            availableTemplates: []) { itemToCreate, name in
+							switch itemToCreate {
+							case .folder:
+								appState.createFolder(named: name)
+							case .card:
+								appState.createCard(named: name)
+							}
+							// Navigate to reload the content.
+							appState.navigate(toDatabase: database, category: appState.category, card: nil)
+							appState.shouldPresentCreateSheet = false
+							// If the sheet is presented from the Menu, then the available create types were overridden to match the specific menu item selected, so we need to reset the menu enables as they also set the sheet options.
+							appState.setMenuEnables()
+						} cancel: {
+							appState.shouldPresentCreateSheet = false
+							// If the sheet is presented from the Menu, then the available create types were overridden to match the specific menu item selected, so we need to reset the menu enables as they also set the sheet options.
+							appState.setMenuEnables()
+						}
+						.padding()
+						.frame(minWidth: 400)
 					}
 				case .viewCard(let database):
 					VStack {
@@ -196,17 +220,6 @@ struct MainView: View {
 						return button
 					}
 				}
-			}
-			.blur(radius: appState.prompt == nil ? 0 : 5)
-
-			if let prompt = appState.prompt {
-				MenuView(title: prompt.title,
-				         message: prompt.message,
-				         options: prompt.options,
-				         handler: prompt.handler)
-					.backgroundColor(.blue)
-					.foregroundColor(.white)
-					.fixedSize()
 			}
 		}
 	}
