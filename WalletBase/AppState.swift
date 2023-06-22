@@ -233,22 +233,12 @@ class AppState: ObservableObject {
 		}
 	}
 
-	private func mostCommonID<T: SQLiteDatabaseItem>(in database: SwlDatabase, selecting select: (T) -> SwlDatabase.SwlID) -> SwlDatabase.SwlID? where T: SQLiteQuerySelectable {
-		guard let records: [T] = try? database.database.select().compactMap({ $0 }) else {
-			return nil
-		}
-		let ids = records.map { select($0) }
-		let countedSet = NSCountedSet(array: ids)
-		let mostFrequent = countedSet.max { countedSet.count(for: $0) < countedSet.count(for: $1) }
-		return mostFrequent as? SwlDatabase.SwlID
-	}
-
 	func createFolder(named: String) {
 		guard let (database, category) = currentDatabaseAndCategory() else { return }
 		// FIXME: Need an iconID. Just pick the most common.
-		guard let iconID = mostCommonID(in: database, selecting: { category in category.iconID } as (SwlDatabase.Category) -> SwlDatabase.SwlID),
+		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Category) -> SwlDatabase.SwlID),
 		      // FIXME: Need an defaultTemplateID. Just pick the most common.
-		      let defaultTemplateID = mostCommonID(in: database, selecting: { category in category.defaultTemplateID } as (SwlDatabase.Category) -> SwlDatabase.SwlID)
+		      let defaultTemplateID = database.mostCommonID(selecting: { category in category.defaultTemplateID } as (SwlDatabase.Category) -> SwlDatabase.SwlID)
 		else {
 			return
 		}
@@ -295,9 +285,9 @@ class AppState: ObservableObject {
 		guard let (database, category) = currentDatabaseAndCategory(),
 		      let category else { return }
 		// FIXME: Need a template ID.
-		guard let templateID = mostCommonID(in: database, selecting: { category in category.templateID } as (SwlDatabase.Card) -> SwlDatabase.SwlID),
+		guard let templateID = database.mostCommonID(selecting: { category in category.templateID } as (SwlDatabase.Card) -> SwlDatabase.SwlID),
 		      // FIXME: Need an iconID. Just pick the most common.
-		      let iconID = mostCommonID(in: database, selecting: { category in category.iconID } as (SwlDatabase.Card) -> SwlDatabase.SwlID)
+		      let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Card) -> SwlDatabase.SwlID)
 		else {
 			return
 		}

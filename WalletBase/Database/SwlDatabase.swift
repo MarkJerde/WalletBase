@@ -461,6 +461,53 @@ class SwlDatabase {
 		}
 	}
 
+	enum TemplateSort {
+		case none
+		case categoryDefault
+		case cardUse
+	}
+
+	func templates(sort: TemplateSort = .none) -> ([Template], [Template]) {
+		do {
+			// Find everything that matches.
+			var templates: [Template] = try database.select().compactMap { $0 }
+
+			// Sort by template name in the event of equal frequency.
+			let secondarySort: ((SwlID, SwlID) -> Bool) = { lID, rID in
+				guard let lTemplate = templates.first(where: { template in template.id == lID }),
+				      let rTemplate = templates.first(where: { template in template.id == rID })
+				else {
+					return false
+				}
+				return (self.decryptString(bytes: lTemplate.name) ?? "") < (self.decryptString(bytes: rTemplate.name) ?? "")
+			}
+
+			let orderedTemplateIDs: [SwlID]
+			switch sort {
+			case .none:
+				return (templates, [])
+			case .categoryDefault:
+				orderedTemplateIDs = frequencyOrderedIDs(selecting: { category in category.defaultTemplateID } as (Category) -> SwlID, secondarySort: secondarySort)
+			case .cardUse:
+				orderedTemplateIDs = frequencyOrderedIDs(selecting: { category in category.templateID } as (Card) -> SwlID, secondarySort: secondarySort)
+			}
+
+			// Sort templates by order of IDs.
+			let orderedTemplates = orderedTemplateIDs.compactMap { id in templates.first(where: { $0.id == id }) }
+
+			// Sort the remainder by name.
+			templates.removeAll { template in orderedTemplates.contains { orderedTemplate in
+				template.id == orderedTemplate.id
+			} }
+			templates.sort { (decryptString(bytes: $0.name) ?? "") < (decryptString(bytes: $1.name) ?? "") }
+
+			return (orderedTemplates, templates)
+		}
+		catch {
+			return ([], [])
+		}
+	}
+
 	/// Obtains the encrypted template of a given id.
 	/// - Parameter templateId: The template ID.
 	/// - Returns: The template.
@@ -512,6 +559,38 @@ class SwlDatabase {
 		catch {
 			return []
 		}
+	}
+
+	private func countedSetOfIDs<T: SQLiteDatabaseItem>(selecting select: (T) -> SwlID) -> NSCountedSet where T: SQLiteQuerySelectable {
+		guard let records: [T] = try? database.select().compactMap({ $0 }) else {
+			return []
+		}
+		let ids = records.map { select($0) }
+		let countedSet = NSCountedSet(array: ids)
+		return countedSet
+	}
+
+	func frequencyOrderedIDs<T: SQLiteDatabaseItem>(selecting select: (T) -> SwlID, secondarySort: ((SwlID, SwlID) -> Bool)? = nil) -> [SwlID] where T: SQLiteQuerySelectable {
+		let countedSet = countedSetOfIDs(selecting: select)
+		let sorted = countedSet.sorted(by: {
+			let lCount = countedSet.count(for: $0)
+			let rCount = countedSet.count(for: $1)
+			guard lCount == rCount else {
+				// >= To sort frequency descending, while if they are equal our secondarySort will probably be name ascending.
+				return lCount >= rCount
+			}
+			guard let secondarySort,
+			      let lID = $0 as? SwlID,
+			      let rID = $1 as? SwlID else { return false }
+			return secondarySort(lID, rID)
+		})
+		return Array(sorted) as? [SwlID] ?? []
+	}
+
+	func mostCommonID<T: SQLiteDatabaseItem>(selecting select: (T) -> SwlID) -> SwlID? where T: SQLiteQuerySelectable {
+		let countedSet = countedSetOfIDs(selecting: select)
+		let mostFrequent = countedSet.max { countedSet.count(for: $0) < countedSet.count(for: $1) }
+		return mostFrequent as? SwlID
 	}
 
 	func decryptString(bytes: [UInt8]) -> String? {
