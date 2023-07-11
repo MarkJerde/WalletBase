@@ -113,13 +113,14 @@ struct MainView: View {
 					.sheet(isPresented: $appState.shouldPresentCreateSheet) {
 						// No-op. Called on dismiss.
 					} content: {
-						NewItemView(types: appState.currentCreatableTypes,
-						            availableTemplates: []) { itemToCreate, name in
+						NewItemView(types: appState.currentCreatableTypes) { itemType in
+							appState.getAvailableTemplates(itemType: itemType)
+						} create: { itemToCreate, name, templateID in
 							switch itemToCreate {
 							case .folder:
-								appState.createFolder(named: name)
+								appState.createFolder(named: name, defaultTemplateID: templateID)
 							case .card:
-								appState.createCard(named: name)
+								appState.createCard(named: name, templateID: templateID)
 							}
 							// Navigate to reload the content.
 							appState.navigate(toDatabase: database, category: appState.category, card: nil)
@@ -160,7 +161,7 @@ struct MainView: View {
 									fieldValues: Dictionary(uniqueKeysWithValues: edits.map { (key: CardValuesComposite<SwlDatabase.SwlID>.CardValue, value: String) in
 										let id = key.id
 										let idType: SwlDatabase.IDType
-										if id.value.isEmpty,
+										if id == .zero,
 										   let newId = SwlDatabase.SwlID.new
 										{
 											idType = .new(newId)

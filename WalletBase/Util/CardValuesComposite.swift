@@ -84,7 +84,7 @@ struct CardValuesComposite<IDType>: CardViewItem where IDType: Hashable {
 		                                                    				fieldValue.field?.id == field.id
 		                                                    			}) else {
 		                                                    				return FieldValue(field: field,
-		                                                    				                  value: .init(id: .init(value: [], hexString: "0x0"),
+		                                                    				                  value: .init(id: .zero,
 		                                                    				                               cardId: card.id,
 		                                                    				                               templateFieldId: field.id,
 		                                                    				                               value: []))

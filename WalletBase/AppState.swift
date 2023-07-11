@@ -233,12 +233,35 @@ class AppState: ObservableObject {
 		}
 	}
 
-	func createFolder(named: String) {
+	func getAvailableTemplates(itemType: NewItemView.ItemType) -> [NewItemView.Template] {
+		guard let (database, category) = currentDatabaseAndCategory() else { return [] }
+		var nextId = SwlDatabase.SwlID.zero
+		let getNextId: () -> SwlDatabase.SwlID = {
+			let newId = nextId
+			nextId = nextId.next
+			return newId
+		}
+		return database.templates(
+			sort: itemType == .folder
+				? .categoryDefault
+				: .cardUse,
+			category: category)
+			.filter { !$0.isEmpty }
+			.joined(separator: [.init(id: .zero, name: [], description: nil, cardViewID: .zero, syncID: 0, createSyncID: 0)])
+			.map { template -> NewItemView.Template? in
+				guard template.id != .zero else {
+					return NewItemView.Template(id: getNextId(), name: nil)
+				}
+				guard let name = database.decryptString(bytes: template.name) else { return nil }
+				return NewItemView.Template(id: template.id, name: name)
+			}
+			.compactMap { $0 }
+	}
+
+	func createFolder(named: String, defaultTemplateID: SwlDatabase.SwlID) {
 		guard let (database, category) = currentDatabaseAndCategory() else { return }
 		// FIXME: Need an iconID. Just pick the most common.
-		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Category) -> SwlDatabase.SwlID),
-		      // FIXME: Need an defaultTemplateID. Just pick the most common.
-		      let defaultTemplateID = database.mostCommonID(selecting: { category in category.defaultTemplateID } as (SwlDatabase.Category) -> SwlDatabase.SwlID)
+		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Category) -> SwlDatabase.SwlID)
 		else {
 			return
 		}
@@ -281,13 +304,11 @@ class AppState: ObservableObject {
 		}
 	}
 
-	func createCard(named: String) {
+	func createCard(named: String, templateID: SwlDatabase.SwlID) {
 		guard let (database, category) = currentDatabaseAndCategory(),
 		      let category else { return }
-		// FIXME: Need a template ID.
-		guard let templateID = database.mostCommonID(selecting: { category in category.templateID } as (SwlDatabase.Card) -> SwlDatabase.SwlID),
-		      // FIXME: Need an iconID. Just pick the most common.
-		      let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Card) -> SwlDatabase.SwlID)
+		// FIXME: Need an iconID. Just pick the most common.
+		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Card) -> SwlDatabase.SwlID)
 		else {
 			return
 		}

@@ -29,6 +29,16 @@ extension SwlDatabase {
 
 			return Self(value: value, hexString: value.map { String(format: "%02X", $0) }.joined())
 		}
+
+		static var zero: Self {
+			Self(value: [0], hexString: "0x0")
+		}
+
+		/// Provide the next ID. Only valid if starting from .zero.
+		var next: Self {
+			let newValue = (value.last ?? 0) + 1
+			return Self(value: [newValue], hexString: String(format: "%02X", newValue))
+		}
 	}
 }
 

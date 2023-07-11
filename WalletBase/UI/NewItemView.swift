@@ -22,19 +22,20 @@ extension Binding {
 
 struct NewItemView: View {
 	internal init(types: [NewItemView.ItemType],
-	              availableTemplates: [SwlDatabase.Template],
-	              create: @escaping (NewItemView.ItemType, String) -> Void,
+	              getAvailableTemplates: @escaping (ItemType) -> [Template],
+	              create: @escaping (NewItemView.ItemType, String, SwlDatabase.SwlID) -> Void,
 	              cancel: @escaping () -> Void)
 	{
 		self.types = types
-		self.availableTemplates = availableTemplates
+		self.getAvailableTemplates = getAvailableTemplates
 		self.create = create
 		self.cancel = cancel
 	}
 
-	let types: [ItemType]
-	let create: (ItemType, String) -> Void
-	let cancel: () -> Void
+	private let types: [ItemType]
+	private let getAvailableTemplates: (ItemType) -> [Template]
+	private let create: (NewItemView.ItemType, String, SwlDatabase.SwlID) -> Void
+	private let cancel: () -> Void
 
 	enum ItemType: String, Identifiable {
 		case folder
@@ -43,11 +44,16 @@ struct NewItemView: View {
 		var id: String { rawValue }
 	}
 
+	struct Template: Hashable {
+		let id: SwlDatabase.SwlID
+		let name: String?
+	}
+
 	@State private var currentType: ItemType?
 	@State private var name: String = ""
-	@State private var templateName: String = ""
-	private let availableTemplates: [SwlDatabase.Template]
-	@State private var template: SwlDatabase.Template? = nil
+	@State private var availableTemplates: [Template] = []
+	// This must be non-optional for the Picker to work. Otherwise it will show options but never reflect the selected value.
+	@State private var template = Template(id: .zero, name: "")
 	@State private var canCreate = false
 	@State private var createButtonText: String = ""
 
@@ -93,6 +99,10 @@ struct NewItemView: View {
 			if types.count > 1 {
 				Picker(selection: $currentType.onChange { _ in
 					updateCanCreate()
+					availableTemplates = getAvailableTemplates(currentType ?? .folder)
+					if let first = availableTemplates.first {
+						template = first
+					}
 				},
 				label: Text("")) {
 					ForEach(types) { item in
@@ -111,11 +121,20 @@ struct NewItemView: View {
 					updateCanCreate()
 				})
 			}
-			HStack {
-				Text(currentType == .folder ? "Default Template:" : "Template:")
-				TextField("Name", text: $templateName, onCommit: {
-					updateCanCreate()
-				})
+			Picker(currentType == .folder ? "Default Template:" : "Template:", selection: $template) {
+				ForEach(availableTemplates, id: \.id) { template in
+					if let name = template.name {
+						Text(name)
+							.tag(template)
+					} else {
+						// Per Stack Overflow, the Divider didn't work properly for this until macOS 12.4 or something. Assume 12.0 is where the difference happened until hearing otherwise. https://stackoverflow.com/a/63037859
+						if #available(OSX 12.0, *) {
+							Divider()
+						} else {
+							VStack { Divider().padding(.leading) }
+						}
+					}
+				}
 			}
 			HStack {
 				Spacer()
@@ -126,25 +145,38 @@ struct NewItemView: View {
 						cancel()
 						return
 					}
-					create(currentType, name)
+					create(currentType, name, template.id)
 				}
 				.buttonStyle(RoundedRectangleButtonStyle(foregroundColor: .white, backgroundColor: canCreate ? .blue : .gray))
 				.buttonStyle(.automatic)
 				.disabled(!canCreate)
+				.compatibilityKeyboardShortcut(.defaultAction) { window in
+					// NOTE: This may not be correct at all, but will need to be tested on an older OS to find out.
+					guard let firstSubviews = (window.contentViewController?.view ?? window.contentView)?.subviews,
+					      let secondSubviews = firstSubviews.prefix(2).last?.subviews,
+					      let button = secondSubviews.first as? NSButton else { return nil }
+					return button
+				}
 			}
 		}
 		.onAppear {
 			// Set these in onAppear rather than in init because setting them in init is not effective.
-			currentType = types.first
+			currentType = types.last
 			updateCanCreate()
+			availableTemplates = getAvailableTemplates(currentType ?? .folder)
+			if let first = availableTemplates.first {
+				template = first
+			}
 		}
 	}
 }
 
 struct NewItemView_Previews: PreviewProvider {
 	static var previews: some View {
-		NewItemView(types: [.folder, .card], availableTemplates: []) { type, name in
-			NSLog("Creating \(type) with name \(name)")
+		NewItemView(types: [.folder, .card]) { _ in
+			[]
+		} create: { type, name, templateID in
+			NSLog("Creating \(type) with name \(name) template \(templateID)")
 		} cancel: {
 			NSLog("Cancel")
 		}

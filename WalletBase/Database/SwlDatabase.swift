@@ -467,7 +467,7 @@ class SwlDatabase {
 		case cardUse
 	}
 
-	func templates(sort: TemplateSort = .none) -> ([Template], [Template]) {
+	func templates(sort: TemplateSort = .none, category: Category? = nil) -> [[Template]] {
 		do {
 			// Find everything that matches.
 			var templates: [Template] = try database.select().compactMap { $0 }
@@ -485,7 +485,7 @@ class SwlDatabase {
 			let orderedTemplateIDs: [SwlID]
 			switch sort {
 			case .none:
-				return (templates, [])
+				return [templates]
 			case .categoryDefault:
 				orderedTemplateIDs = frequencyOrderedIDs(selecting: { category in category.defaultTemplateID } as (Category) -> SwlID, secondarySort: secondarySort)
 			case .cardUse:
@@ -493,7 +493,7 @@ class SwlDatabase {
 			}
 
 			// Sort templates by order of IDs.
-			let orderedTemplates = orderedTemplateIDs.compactMap { id in templates.first(where: { $0.id == id }) }
+			var orderedTemplates = orderedTemplateIDs.compactMap { id in templates.first(where: { $0.id == id }) }
 
 			// Sort the remainder by name.
 			templates.removeAll { template in orderedTemplates.contains { orderedTemplate in
@@ -501,10 +501,26 @@ class SwlDatabase {
 			} }
 			templates.sort { (decryptString(bytes: $0.name) ?? "") < (decryptString(bytes: $1.name) ?? "") }
 
-			return (orderedTemplates, templates)
+			if sort == .cardUse,
+			   let category
+			{
+				// Get the default template ID, find the template for it and remove from both lists, then return three lists of the default, most common, and alphabetical.
+				let defaultTemplateID = category.defaultTemplateID
+				let findDefaultTemplate: (Template) -> Bool = { template in
+					template.id == defaultTemplateID
+				}
+				let defaultTemplate = orderedTemplates.first(where: findDefaultTemplate) ?? templates.first(where: findDefaultTemplate)
+				if let defaultTemplate {
+					orderedTemplates.removeAll(where: findDefaultTemplate)
+					templates.removeAll(where: findDefaultTemplate)
+					return [[defaultTemplate], orderedTemplates, templates]
+				}
+			}
+
+			return [orderedTemplates, templates]
 		}
 		catch {
-			return ([], [])
+			return [[], []]
 		}
 	}
 
