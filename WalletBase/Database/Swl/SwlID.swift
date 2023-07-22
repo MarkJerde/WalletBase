@@ -34,6 +34,10 @@ extension SwlDatabase {
 			Self(value: [0], hexString: "0x0")
 		}
 
+		static var null: Self {
+			Self(value: [], hexString: "")
+		}
+
 		/// Provide the next ID. Only valid if starting from .zero.
 		var next: Self {
 			let newValue = (value.last ?? 0) + 1

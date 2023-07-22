@@ -127,6 +127,74 @@ class AppState: ObservableObject {
 		shouldPresentCreateSheet = true
 	}
 
+	// MARK: - Cut/Paste
+
+	var currentCutItemType: ItemGridItemType?
+	var currentCutItemId: SwlDatabase.SwlID?
+	func cut(item: SwlDatabase.Item) {
+		currentCutItemType = item.type
+		switch item.itemType {
+		case .card(let card):
+			currentCutItemId = card.id
+		case .category(let category):
+			currentCutItemId = category.id
+		}
+	}
+
+	func paste() -> String? {
+		guard let currentCutItemType,
+		      let currentCutItemId
+		else {
+			return "Nothing to paste."
+		}
+		guard let (database, category) = currentDatabaseAndCategory() else {
+			return "No wallet open."
+		}
+		switch currentCutItemType {
+		case .card:
+			guard let category else {
+				return "Cannot place cards in the topmost folder."
+			}
+			do {
+				try database.update(id: currentCutItemId) { current -> SwlDatabase.Card? in
+					SwlDatabase.Card(id: current.id,
+					                 name: current.name,
+					                 description: current.description,
+					                 cardViewID: current.cardViewID,
+					                 hasOwnCardView: current.hasOwnCardView,
+					                 templateID: current.templateID,
+					                 parent: category.id,
+					                 iconID: current.iconID,
+					                 hitCount: current.hitCount,
+					                 syncID: current.syncID,
+					                 createSyncID: current.createSyncID)
+				}
+			} catch {
+				return "An error occurred while moving the card."
+			}
+		case .category:
+			do {
+				try database.update(id: currentCutItemId) { current -> SwlDatabase.Category? in
+					SwlDatabase.Category(id: current.id,
+					                     name: current.name,
+					                     description: current.description,
+					                     iconID: current.iconID,
+					                     defaultTemplateID: current.defaultTemplateID,
+					                     parent: category?.id ?? .null,
+					                     syncID: current.syncID,
+					                     createSyncID: current.createSyncID)
+				}
+			} catch {
+				return "An error occurred while moving the folder."
+			}
+		default:
+			return "Cannot paste files."
+		}
+		self.currentCutItemType = nil
+		self.currentCutItemId = nil
+		return nil
+	}
+
 	// MARK: - Publishers
 
 	@Published var category: SwlDatabase.Item?

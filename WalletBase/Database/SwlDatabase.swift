@@ -425,8 +425,8 @@ class SwlDatabase {
 		}
 	}
 
-	private func update<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(id: SwlID,
-	                                                                                       transform: (T) -> T?) throws
+	func update<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(id: SwlID,
+	                                                                               transform: (T) -> T?) throws
 	{
 		let current: [T]? = try? database.select(where: "id \(id.queryCondition)").compactMap { $0 }
 		guard let current = current,

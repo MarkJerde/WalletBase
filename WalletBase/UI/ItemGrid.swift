@@ -48,7 +48,9 @@ struct ItemGrid<Item: ItemGridItem>: View {
 	              onItemTap: @escaping (Item) -> Void,
 	              onBackTap: @escaping () -> Void,
 	              onNewTap: (() -> Void)? = nil,
-	              onSearch: ((String) -> Void)? = nil)
+	              onSearch: ((String) -> Void)? = nil,
+	              onItemCut: ((Item) -> Void)? = nil,
+	              onPaste: (() -> Void)? = nil)
 	{
 		self.items = items
 		self.container = container
@@ -57,15 +59,21 @@ struct ItemGrid<Item: ItemGridItem>: View {
 		self.onBackTap = onBackTap
 		self.onNewTap = onNewTap
 		self.onSearch = onSearch
+		self.onItemCut = onItemCut
+		self.onPaste = onPaste
 	}
 
 	var items: [Item]
 	var container: Item?
 	let emptyMessage: String?
+
 	let onItemTap: (Item) -> Void
 	let onBackTap: () -> Void
 	let onNewTap: (() -> Void)?
 	let onSearch: ((String) -> Void)?
+	let onItemCut: ((Item) -> Void)?
+	let onPaste: (() -> Void)?
+
 	var body: some View {
 		NavigationFrame(currentName: container?.name,
 		                onBackTap: onBackTap,
@@ -82,6 +90,31 @@ struct ItemGrid<Item: ItemGridItem>: View {
 				ScrollView {
 					CompatibilityVGrid(data: items, id: \.self) { item in
 						ItemGridItem(item: item, onItemTap: onItemTap)
+							.contextMenu {
+								if let onItemCut {
+									Button(action: {
+										onItemCut(item)
+									}) {
+										if #available(macOS 11.0, *) {
+											Image(systemName: "scissors")
+										}
+										Text("Cut")
+									}
+								}
+							}
+					}
+				}
+				.frame(maxHeight: .infinity)
+				.contextMenu {
+					if let onPaste {
+						Button(action: {
+							onPaste()
+						}) {
+							if #available(macOS 11.0, *) {
+								Image(systemName: "paintbrush")
+							}
+							Text("Paste")
+						}
 					}
 				}
 			}

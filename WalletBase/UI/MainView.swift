@@ -104,7 +104,25 @@ struct MainView: View {
 						         	self.appState.numCards = nil
 						         	self.appState.cardIndex = nil
 						         	self.appState.state = .browseContent(database: database)
-						         } : nil))
+						         } : nil),
+						         onItemCut: { item in
+						         	self.appState.cut(item: item)
+						         },
+						         onPaste: {
+						         	// FIXME: Cannot paste into empty folder.
+						         	let errorText = self.appState.paste()
+						         	guard let errorText else {
+						         		// Navigate to reload the content.
+						         		appState.navigate(toDatabase: database, category: appState.category, card: nil)
+						         		return
+						         	}
+						         	let alert = NSAlert()
+						         	alert.messageText = "Paste Failed"
+						         	alert.informativeText = errorText
+						         	alert.alertStyle = .critical
+						         	alert.addButton(withTitle: "OK")
+						         	_ = alert.runModal()
+						         })
 						Button("Lock") {
 							self.appState.lock(database: database)
 						}
