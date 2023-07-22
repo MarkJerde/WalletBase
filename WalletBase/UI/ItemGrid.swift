@@ -50,7 +50,9 @@ struct ItemGrid<Item: ItemGridItem>: View {
 	              onNewTap: (() -> Void)? = nil,
 	              onSearch: ((String) -> Void)? = nil,
 	              onItemCut: ((Item) -> Void)? = nil,
-	              onPaste: (() -> Void)? = nil)
+	              onPaste: (() -> Void)? = nil,
+	              onItemRename: ((Item) -> Void)? = nil,
+	              onItemDelete: ((Item) -> Void)? = nil)
 	{
 		self.items = items
 		self.container = container
@@ -61,6 +63,8 @@ struct ItemGrid<Item: ItemGridItem>: View {
 		self.onSearch = onSearch
 		self.onItemCut = onItemCut
 		self.onPaste = onPaste
+		self.onItemRename = onItemRename
+		self.onItemDelete = onItemDelete
 	}
 
 	var items: [Item]
@@ -73,6 +77,8 @@ struct ItemGrid<Item: ItemGridItem>: View {
 	let onSearch: ((String) -> Void)?
 	let onItemCut: ((Item) -> Void)?
 	let onPaste: (() -> Void)?
+	let onItemRename: ((Item) -> Void)?
+	let onItemDelete: ((Item) -> Void)?
 
 	var body: some View {
 		NavigationFrame(currentName: container?.name,
@@ -99,6 +105,26 @@ struct ItemGrid<Item: ItemGridItem>: View {
 											Image(systemName: "scissors")
 										}
 										Text("Cut")
+									}
+								}
+								if let onItemRename {
+									Button(action: {
+										onItemRename(item)
+									}) {
+										if #available(macOS 11.0, *) {
+											Image(systemName: "pencil")
+										}
+										Text("Rename")
+									}
+								}
+								if let onItemDelete {
+									Button(action: {
+										onItemDelete(item)
+									}) {
+										if #available(macOS 11.0, *) {
+											Image(systemName: "trash")
+										}
+										Text("Delete")
 									}
 								}
 							}

@@ -57,9 +57,6 @@ class AppState: ObservableObject {
 	@Published var cardIndex: Int?
 	@Published var numCards: Int?
 
-	@Published var restoreCategoryId: SwlDatabase.SwlID?
-	@Published var restoreCardId: SwlDatabase.SwlID?
-
 	// MARK: - Creation
 
 	// Menu item flags
@@ -322,42 +319,47 @@ class AppState: ObservableObject {
 
 	// MARK: - Navigation
 
-	func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, card: SwlDatabase.Card? = nil) {
-		if category == nil,
-		   card == nil,
-		   restoreCategoryId != nil,
-		   let category = database.categoryItem(forId: restoreCategoryId)
-		{
-			let cards: [SwlDatabase.Card] = items(of: category, in: database).compactMap { item in
-				switch item.itemType {
-				case .card(let card):
-					return card
-				default:
-					return nil
-				}
-			}
-			let card: SwlDatabase.Card?
-			if let restoreCardId = restoreCardId {
-				card = cards.first(where: { $0.id == restoreCardId })
-			} else {
-				card = nil
-			}
-			restoreCategoryId = nil
-			restoreCardId = nil
+	private var restoreCategoryId: SwlDatabase.SwlID?
+	private var restoreCardId: SwlDatabase.SwlID?
 
-			// Save numCards and cardIndex to restore later.
-			let numCards = self.numCards
-			let cardIndex = self.cardIndex
-
-			navigate(toDatabase: database, category: category, card: card)
-
-			// Restore `numCards` and `cardIndex` which will have been cleared by navigate(:::) since the category `items` are not retained while viewing a card and without that the count and index aren't determined by navigate(:::).
-			self.numCards = numCards
-			self.cardIndex = cardIndex
-
-			return
+	func restoreNavigation(inDatabase database: SwlDatabase) -> Bool {
+		guard restoreCategoryId != nil,
+		      let category = database.categoryItem(forId: restoreCategoryId)
+		else {
+			return false
 		}
 
+		let cards: [SwlDatabase.Card] = items(of: category, in: database).compactMap { item in
+			switch item.itemType {
+			case .card(let card):
+				return card
+			default:
+				return nil
+			}
+		}
+		let card: SwlDatabase.Card?
+		if let restoreCardId = restoreCardId {
+			card = cards.first(where: { $0.id == restoreCardId })
+		} else {
+			card = nil
+		}
+		restoreCategoryId = nil
+		restoreCardId = nil
+
+		// Save numCards and cardIndex to restore later.
+		let numCards = self.numCards
+		let cardIndex = self.cardIndex
+
+		navigate(toDatabase: database, category: category, card: card)
+
+		// Restore `numCards` and `cardIndex` which will have been cleared by navigate(:::) since the category `items` are not retained while viewing a card and without that the count and index aren't determined by navigate(:::).
+		self.numCards = numCards
+		self.cardIndex = cardIndex
+
+		return true
+	}
+
+	func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, card: SwlDatabase.Card? = nil) {
 		ActivityMonitor.shared.didActivity()
 		switch category?.itemType {
 		case .category(let category):
@@ -402,7 +404,29 @@ class AppState: ObservableObject {
 		state = .browseContent(database: database)
 	}
 
-	func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, index: Int) {
+	func navigateToPrevious() {
+		// FIXME: Show warning before navigating out of a card with unsaved edits.
+		guard let (database, _) = currentDatabaseAndCategory(),
+		      let cardIndex
+		else {
+			return
+		}
+
+		navigate(toDatabase: database, category: category, index: cardIndex - 1)
+	}
+
+	func navigateToNext() {
+		// FIXME: Show warning before navigating out of a card with unsaved edits.
+		guard let (database, _) = currentDatabaseAndCategory(),
+		      let cardIndex
+		else {
+			return
+		}
+
+		navigate(toDatabase: database, category: category, index: cardIndex + 1)
+	}
+
+	private func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, index: Int) {
 		guard let numCards = numCards else {
 			return
 		}
@@ -428,7 +452,7 @@ class AppState: ObservableObject {
 		}
 	}
 
-	func items(of category: SwlDatabase.Item?, in database: SwlDatabase) -> [SwlDatabase.Item] {
+	private func items(of category: SwlDatabase.Item?, in database: SwlDatabase) -> [SwlDatabase.Item] {
 		var swlCategory: SwlDatabase.Category?
 		if let category = category,
 		   case .category(let category) = category.itemType
@@ -445,11 +469,78 @@ class AppState: ObservableObject {
 		return categories + cards
 	}
 
-	func items(of searchString: String, in database: SwlDatabase) -> [SwlDatabase.Item] {
+	private func items(of searchString: String, in database: SwlDatabase) -> [SwlDatabase.Item] {
 		database.cards(in: searchString).sorted(by: \.name)
 	}
 
 	// MARK: - Actions
+
+	private var previousSearch: String?
+	func search(searchString: String) {
+		guard let (database, _) = currentDatabaseAndCategory(),
+		      searchString != previousSearch else { return }
+		previousSearch = searchString
+		guard !searchString.isEmpty else {
+			items = items(of: category, in: database)
+			return
+		}
+		items = items(of: searchString, in: database)
+		numCards = nil
+		cardIndex = nil
+		state = .browseContent(database: database)
+	}
+
+	func save(edits: [CardValuesComposite<SwlDatabase.SwlID>.CardValue: String], editedDescription: String?) -> Bool {
+		guard let (database, _) = currentDatabaseAndCategory(),
+		      let card
+		else {
+			showFailedToSaveAlert()
+			return false
+		}
+		do {
+			try database.update(
+				fieldValues: Dictionary(uniqueKeysWithValues: edits.map { (key: CardValuesComposite<SwlDatabase.SwlID>.CardValue, value: String) in
+					let id = key.id
+					let idType: SwlDatabase.IDType
+					if id.value.isEmpty || id == .zero || id == .null,
+					   let newId = SwlDatabase.SwlID.new
+					{
+						idType = .new(newId)
+					} else {
+						idType = .existing(id)
+					}
+					return (idType, (value, key.templateFieldId))
+				}),
+				editedDescription: editedDescription,
+				in: card.id)
+		} catch {
+			if let error = error as? SwlDatabase.Error {
+				switch error {
+				case .writeFailureIndeterminite:
+					let alert = NSAlert()
+					alert.messageText = "Save Failed"
+					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
+					alert.alertStyle = .critical
+					alert.addButton(withTitle: "Close Wallet")
+					alert.addButton(withTitle: "Take More Risks")
+					guard alert.runModal() == .alertFirstButtonReturn else { return false }
+					lock(database: database)
+					return true
+				default:
+					break
+				}
+			}
+			showFailedToSaveAlert()
+			return false
+		}
+		// Navigate to updated card.
+		guard let cardIndex else {
+			navigate(toDatabase: database, category: category)
+			return true
+		}
+		navigate(toDatabase: database, category: category, index: cardIndex)
+		return true
+	}
 
 	func showFailedToSaveAlert() {
 		let alert = NSAlert()
@@ -507,7 +598,8 @@ class AppState: ObservableObject {
 	private func currentDatabaseAndCategory() -> (SwlDatabase, SwlDatabase.Category?)? {
 		let database: SwlDatabase
 		switch state {
-		case .browseContent(let aDatabase):
+		case .browseContent(let aDatabase),
+		     .viewCard(let aDatabase):
 			database = aDatabase
 		default:
 			return nil

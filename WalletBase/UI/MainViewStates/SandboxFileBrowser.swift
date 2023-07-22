@@ -8,12 +8,21 @@
 import SwiftUI
 
 struct SandboxFileBrowser: View {
-	@Binding var folder: WalletFile?
-	@Binding var files: [WalletFile]
+	@State private var folder: WalletFile?
+	@State private var files: [WalletFile] = []
 	let onItemTap: (WalletFile) -> Void
 	let browse: () -> Void
 	@State private var filtered: Bool = false
 	@State private var previousSearch: String?
+
+	init(folder: WalletFile? = nil, files: [WalletFile] = [], onItemTap: @escaping (WalletFile) -> Void, browse: @escaping () -> Void) {
+		_folder = .init(initialValue: folder)
+		_files = .init(initialValue: files)
+		self.onItemTap = onItemTap
+		self.browse = browse
+		self.filtered = filtered
+		self.previousSearch = previousSearch
+	}
 
 	fileprivate func loadFiles(searchString: String? = nil) {
 		// Look for already-imported files.
@@ -93,9 +102,9 @@ struct SandboxFileBrowser: View {
 
 struct SandboxFileBrowser_Previews: PreviewProvider {
 	static var previews: some View {
-		SandboxFileBrowser(folder: .constant(nil),
-		                   files: .constant([WalletFile(url: URL(fileURLWithPath: "example.swl"),
-		                                                type: .file)])) { _ in
+		SandboxFileBrowser(folder: nil,
+		                   files: [WalletFile(url: URL(fileURLWithPath: "example.swl"),
+		                                      type: .file)]) { _ in
 			// No-op
 		} browse: {
 			// No-op

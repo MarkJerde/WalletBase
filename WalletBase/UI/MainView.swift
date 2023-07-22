@@ -10,17 +10,12 @@ import SwiftUI
 struct MainView: View {
 	@ObservedObject var appState: AppState
 
-	@State private var folder: WalletFile?
-	@State private var files: [WalletFile] = []
-	@State private var previousSearch: String?
-
 	var body: some View {
 		ZStack {
 			Group {
 				switch appState.state {
 				case .loadingDatabase:
-					SandboxFileBrowser(folder: $folder,
-					                   files: $files) { item in
+					SandboxFileBrowser { item in
 						self.appState.state = .buttonToUnlock(databaseFile: item.url)
 					} browse: {
 						self.appState.loadFile()
@@ -44,6 +39,10 @@ struct MainView: View {
 								guard success else {
 									appState.state = .error(message: "Unable to open database",
 									                        then: .buttonToUnlock(databaseFile: database.file))
+									return
+								}
+
+								guard !appState.restoreNavigation(inDatabase: database) else {
 									return
 								}
 
@@ -86,24 +85,13 @@ struct MainView: View {
 						         	      case .category(let swlCategory) = category.itemType else { return }
 						         	let parentId = swlCategory.parent
 						         	let parent = database.categoryItem(forId: parentId)
-						         	// Clear the restore category so it won't try to keep restoring if we navigate back to the root.
-						         	self.appState.restoreCategoryId = nil
 						         	self.appState.navigate(toDatabase: database, category: parent)
 						         },
 						         onNewTap: {
 						         	appState.shouldPresentCreateSheet = true
 						         },
 						         onSearch: (self.appState.category == nil ? { searchString in
-						         	guard searchString != previousSearch else { return }
-						         	previousSearch = searchString
-						         	guard !searchString.isEmpty else {
-						         		self.appState.items = self.appState.items(of: self.appState.category, in: database)
-						         		return
-						         	}
-						         	self.appState.items = appState.items(of: searchString, in: database)
-						         	self.appState.numCards = nil
-						         	self.appState.cardIndex = nil
-						         	self.appState.state = .browseContent(database: database)
+						         	appState.search(searchString: searchString)
 						         } : nil),
 						         onItemCut: { item in
 						         	self.appState.cut(item: item)
@@ -159,68 +147,11 @@ struct MainView: View {
 							// FIXME: Show warning before navigating out of a card with unsaved edits.
 							appState.navigate(toDatabase: database, category: appState.category)
 						}, onPreviousTap: appState.cardIndex == nil || appState.cardIndex! <= 0 ? nil : {
-							// FIXME: Show warning before navigating out of a card with unsaved edits.
-							guard let cardIndex = appState.cardIndex else {
-								return
-							}
-
-							appState.navigate(toDatabase: database, category: appState.category, index: cardIndex - 1)
+							appState.navigateToPrevious()
 						}, onNextTap: appState.cardIndex == nil || appState.numCards == nil || appState.cardIndex! + 1 >= appState.numCards! ? nil : {
-							// FIXME: Show warning before navigating out of a card with unsaved edits.
-							guard let cardIndex = appState.cardIndex else {
-								return
-							}
-
-							appState.navigate(toDatabase: database, category: appState.category, index: cardIndex + 1)
+							appState.navigateToNext()
 						}, onSave: { edits, editedDescription in
-							guard let card = appState.card else {
-								appState.showFailedToSaveAlert()
-								return false
-							}
-							do {
-								try database.update(
-									fieldValues: Dictionary(uniqueKeysWithValues: edits.map { (key: CardValuesComposite<SwlDatabase.SwlID>.CardValue, value: String) in
-										let id = key.id
-										let idType: SwlDatabase.IDType
-										if id == .zero,
-										   let newId = SwlDatabase.SwlID.new
-										{
-											idType = .new(newId)
-										} else {
-											idType = .existing(id)
-										}
-										return (idType, (value, key.templateFieldId))
-									}),
-									editedDescription: editedDescription,
-									in: card.id)
-							} catch {
-								if let error = error as? SwlDatabase.Error {
-									switch error {
-									case .writeFailureIndeterminite:
-										let alert = NSAlert()
-										alert.messageText = "Save Failed"
-										alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
-										alert.alertStyle = .critical
-										alert.addButton(withTitle: "Close Wallet")
-										alert.addButton(withTitle: "Take More Risks")
-										guard alert.runModal() == .alertFirstButtonReturn else { return false }
-										folder = nil
-										appState.lock(database: database)
-										return true
-									default:
-										break
-									}
-								}
-								appState.showFailedToSaveAlert()
-								return false
-							}
-							// Navigate to updated card.
-							guard let cardIndex = appState.cardIndex else {
-								appState.navigate(toDatabase: database, category: appState.category)
-								return true
-							}
-							appState.navigate(toDatabase: database, category: appState.category, index: cardIndex)
-							return true
+							appState.save(edits: edits, editedDescription: editedDescription)
 						})
 						Button("Lock") {
 							// FIXME: Show warning before locking out of a card with unsaved edits.
