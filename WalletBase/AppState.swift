@@ -10,13 +10,6 @@ import AppKit
 class AppState: ObservableObject {
 	init() {}
 
-	// MARK: - Creation
-
-	var canCreateNewCard = false
-	var canCreateNewFolder = false
-	@Published var currentCreatableTypes: [NewItemView.ItemType] = []
-	@Published var shouldPresentCreateSheet = false
-
 	// MARK: - State
 
 	enum MyState {
@@ -55,8 +48,29 @@ class AppState: ObservableObject {
 		}
 	}
 
+	// MARK: - State Publishers
+
+	@Published var category: SwlDatabase.Item?
+
+	@Published var items: [SwlDatabase.Item] = []
+	@Published var card: CardValuesComposite<SwlDatabase.SwlID>?
+	@Published var cardIndex: Int?
+	@Published var numCards: Int?
+
+	@Published var restoreCategoryId: SwlDatabase.SwlID?
+	@Published var restoreCardId: SwlDatabase.SwlID?
+
 	// MARK: - Creation
 
+	// Menu item flags
+	var canCreateNewCard = false
+	var canCreateNewFolder = false
+
+	// Create sheet control
+	@Published var currentCreatableTypes: [NewItemView.ItemType] = []
+	@Published var shouldPresentCreateSheet = false
+
+	/// A method which updates properties to inform and control creation options per the current state.
 	func setMenuEnables() {
 		let newCanCreateNewCard: Bool
 		let newCanCreateNewFolder: Bool
@@ -94,37 +108,148 @@ class AppState: ObservableObject {
 		}
 	}
 
-	// MARK: - Helper
-
-	private func currentDatabaseAndCategory() -> (SwlDatabase, SwlDatabase.Category?)? {
-		let database: SwlDatabase
-		switch state {
-		case .browseContent(let aDatabase):
-			database = aDatabase
-		default:
-			return nil
-		}
-		let resultCategory: SwlDatabase.Category?
-		if let category,
-		   case .category(let swlCategory) = category.itemType
-		{
-			resultCategory = swlCategory
-		} else {
-			resultCategory = nil
-		}
-		return (database, resultCategory)
-	}
-
-	// MARK: - Creation
-
+	/// A method to invoke the creation sheet for Card creation only.
 	func showPromptForNewCard() {
 		currentCreatableTypes = [.card]
 		shouldPresentCreateSheet = true
 	}
 
+	/// A method to invoke the creation sheet for Folder creation only.
 	func showPromptForNewFolder() {
 		currentCreatableTypes = [.folder]
 		shouldPresentCreateSheet = true
+	}
+
+	/// Gets the appropriate template list for the specified creation type.
+	/// - Parameter itemType: The type of item being created.
+	/// - Returns: The list of templates.
+	func getAvailableTemplates(itemType: NewItemView.ItemType) -> [NewItemView.Template] {
+		guard let (database, category) = currentDatabaseAndCategory() else { return [] }
+		var nextId = SwlDatabase.SwlID.zero
+		let getNextId: () -> SwlDatabase.SwlID = {
+			let newId = nextId
+			nextId = nextId.next
+			return newId
+		}
+		return database.templates(
+			sort: itemType == .folder
+				? .categoryDefault
+				: .cardUse,
+			category: category)
+			.filter { !$0.isEmpty }
+			.joined(separator: [.init(id: .zero, name: [], description: nil, cardViewID: .zero, syncID: 0, createSyncID: 0)])
+			.map { template -> NewItemView.Template? in
+				guard template.id != .zero else {
+					return NewItemView.Template(id: getNextId(), name: nil)
+				}
+				guard let name = database.decryptString(bytes: template.name) else { return nil }
+				return NewItemView.Template(id: template.id, name: name)
+			}
+			.compactMap { $0 }
+	}
+
+	/// Creates a folder with the provided name and default template ID in the current state.
+	/// - Parameters:
+	///   - named: The folder name.
+	///   - defaultTemplateID: The default template ID for cards in this folder.
+	func createFolder(named: String, defaultTemplateID: SwlDatabase.SwlID) {
+		guard let (database, category) = currentDatabaseAndCategory() else { return }
+		// FIXME: Need an iconID. Just pick the most common.
+		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Category) -> SwlDatabase.SwlID)
+		else {
+			return
+		}
+
+		guard let encryptedName = database.encrypt(text: named),
+		      let description = database.encrypt(text: ""), // Strings are typically nullable in the swl database but in practice a X'00000000' value is used rather than NULL.
+		      let categoryID = SwlDatabase.SwlID.new else { return }
+		let parent = category?.id ?? .rootCategory
+		let newCategory = SwlDatabase.Category(id: categoryID,
+		                                       name: [UInt8](encryptedName),
+		                                       description: [UInt8](description),
+		                                       iconID: iconID,
+		                                       defaultTemplateID: defaultTemplateID,
+		                                       parent: parent,
+		                                       syncID: -1,
+		                                       createSyncID: -1)
+
+		do {
+			try database.insert(value: newCategory)
+		} catch {
+			if let error = error as? SwlDatabase.Error {
+				switch error {
+				case .writeFailureIndeterminite:
+					let alert = NSAlert()
+					alert.messageText = "Save Failed"
+					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
+					alert.alertStyle = .critical
+					alert.addButton(withTitle: "Close Wallet")
+					alert.addButton(withTitle: "Take More Risks")
+					guard alert.runModal() == .alertFirstButtonReturn else { return }
+					// folder = nil
+					lock(database: database)
+					return
+				default:
+					break
+				}
+			}
+			showFailedToSaveAlert()
+			return
+		}
+	}
+
+	/// Creates a card with the provided name and template ID.
+	/// - Parameters:
+	///   - named: The card name.
+	///   - templateID: The template ID.
+	func createCard(named: String, templateID: SwlDatabase.SwlID) {
+		guard let (database, category) = currentDatabaseAndCategory(),
+		      let category else { return }
+		// FIXME: Need an iconID. Just pick the most common.
+		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Card) -> SwlDatabase.SwlID)
+		else {
+			return
+		}
+
+		guard let encryptedName = database.encrypt(text: named),
+		      let description = database.encrypt(text: ""), // Strings are typically nullable in the swl database but in practice a X'00000000' value is used rather than NULL.
+		      let cardID = SwlDatabase.SwlID.new,
+		      let cardViewID = SwlDatabase.SwlID.new else { return }
+		let card = SwlDatabase.Card(id: cardID,
+		                            name: [UInt8](encryptedName),
+		                            description: [UInt8](description),
+		                            cardViewID: cardViewID,
+		                            hasOwnCardView: 0,
+		                            templateID: templateID,
+		                            parent: category.id,
+		                            iconID: iconID,
+		                            hitCount: 0,
+		                            syncID: -1,
+		                            createSyncID: -1)
+
+		do {
+			try database.insert(value: card)
+		} catch {
+			if let error = error as? SwlDatabase.Error {
+				switch error {
+				case .writeFailureIndeterminite:
+					let alert = NSAlert()
+					alert.messageText = "Save Failed"
+					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
+					alert.alertStyle = .critical
+					alert.addButton(withTitle: "Close Wallet")
+					alert.addButton(withTitle: "Take More Risks")
+					guard alert.runModal() == .alertFirstButtonReturn else { return }
+					// folder = nil
+					lock(database: database)
+					return
+				default:
+					break
+				}
+			}
+			showFailedToSaveAlert()
+			return
+		}
 	}
 
 	// MARK: - Cut/Paste
@@ -194,18 +319,6 @@ class AppState: ObservableObject {
 		self.currentCutItemId = nil
 		return nil
 	}
-
-	// MARK: - Publishers
-
-	@Published var category: SwlDatabase.Item?
-
-	@Published var items: [SwlDatabase.Item] = []
-	@Published var card: CardValuesComposite<SwlDatabase.SwlID>?
-	@Published var cardIndex: Int?
-	@Published var numCards: Int?
-
-	@Published var restoreCategoryId: SwlDatabase.SwlID?
-	@Published var restoreCardId: SwlDatabase.SwlID?
 
 	// MARK: - Navigation
 
@@ -315,129 +428,6 @@ class AppState: ObservableObject {
 		}
 	}
 
-	// MARK: - Creation
-
-	func getAvailableTemplates(itemType: NewItemView.ItemType) -> [NewItemView.Template] {
-		guard let (database, category) = currentDatabaseAndCategory() else { return [] }
-		var nextId = SwlDatabase.SwlID.zero
-		let getNextId: () -> SwlDatabase.SwlID = {
-			let newId = nextId
-			nextId = nextId.next
-			return newId
-		}
-		return database.templates(
-			sort: itemType == .folder
-				? .categoryDefault
-				: .cardUse,
-			category: category)
-			.filter { !$0.isEmpty }
-			.joined(separator: [.init(id: .zero, name: [], description: nil, cardViewID: .zero, syncID: 0, createSyncID: 0)])
-			.map { template -> NewItemView.Template? in
-				guard template.id != .zero else {
-					return NewItemView.Template(id: getNextId(), name: nil)
-				}
-				guard let name = database.decryptString(bytes: template.name) else { return nil }
-				return NewItemView.Template(id: template.id, name: name)
-			}
-			.compactMap { $0 }
-	}
-
-	func createFolder(named: String, defaultTemplateID: SwlDatabase.SwlID) {
-		guard let (database, category) = currentDatabaseAndCategory() else { return }
-		// FIXME: Need an iconID. Just pick the most common.
-		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Category) -> SwlDatabase.SwlID)
-		else {
-			return
-		}
-
-		guard let encryptedName = database.encrypt(text: named),
-		      let description = database.encrypt(text: ""), // Strings are typically nullable in the swl database but in practice a X'00000000' value is used rather than NULL.
-		      let categoryID = SwlDatabase.SwlID.new else { return }
-		let parent = category?.id ?? .rootCategory
-		let newCategory = SwlDatabase.Category(id: categoryID,
-		                                       name: [UInt8](encryptedName),
-		                                       description: [UInt8](description),
-		                                       iconID: iconID,
-		                                       defaultTemplateID: defaultTemplateID,
-		                                       parent: parent,
-		                                       syncID: -1,
-		                                       createSyncID: -1)
-
-		do {
-			try database.insert(value: newCategory)
-		} catch {
-			if let error = error as? SwlDatabase.Error {
-				switch error {
-				case .writeFailureIndeterminite:
-					let alert = NSAlert()
-					alert.messageText = "Save Failed"
-					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
-					alert.alertStyle = .critical
-					alert.addButton(withTitle: "Close Wallet")
-					alert.addButton(withTitle: "Take More Risks")
-					guard alert.runModal() == .alertFirstButtonReturn else { return }
-					// folder = nil
-					lock(database: database)
-					return
-				default:
-					break
-				}
-			}
-			showFailedToSaveAlert()
-			return
-		}
-	}
-
-	func createCard(named: String, templateID: SwlDatabase.SwlID) {
-		guard let (database, category) = currentDatabaseAndCategory(),
-		      let category else { return }
-		// FIXME: Need an iconID. Just pick the most common.
-		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Card) -> SwlDatabase.SwlID)
-		else {
-			return
-		}
-
-		guard let encryptedName = database.encrypt(text: named),
-		      let description = database.encrypt(text: ""), // Strings are typically nullable in the swl database but in practice a X'00000000' value is used rather than NULL.
-		      let cardID = SwlDatabase.SwlID.new,
-		      let cardViewID = SwlDatabase.SwlID.new else { return }
-		let card = SwlDatabase.Card(id: cardID,
-		                            name: [UInt8](encryptedName),
-		                            description: [UInt8](description),
-		                            cardViewID: cardViewID,
-		                            hasOwnCardView: 0,
-		                            templateID: templateID,
-		                            parent: category.id,
-		                            iconID: iconID,
-		                            hitCount: 0,
-		                            syncID: -1,
-		                            createSyncID: -1)
-
-		do {
-			try database.insert(value: card)
-		} catch {
-			if let error = error as? SwlDatabase.Error {
-				switch error {
-				case .writeFailureIndeterminite:
-					let alert = NSAlert()
-					alert.messageText = "Save Failed"
-					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
-					alert.alertStyle = .critical
-					alert.addButton(withTitle: "Close Wallet")
-					alert.addButton(withTitle: "Take More Risks")
-					guard alert.runModal() == .alertFirstButtonReturn else { return }
-					// folder = nil
-					lock(database: database)
-					return
-				default:
-					break
-				}
-			}
-			showFailedToSaveAlert()
-			return
-		}
-	}
-
 	func items(of category: SwlDatabase.Item?, in database: SwlDatabase) -> [SwlDatabase.Item] {
 		var swlCategory: SwlDatabase.Category?
 		if let category = category,
@@ -477,13 +467,8 @@ class AppState: ObservableObject {
 		state = .buttonToUnlock(databaseFile: database.file)
 	}
 
-	private enum CreateNew: String, CaseIterable {
-		case card
-		case folder
-		case cancel
-	}
-
 #if DEBUG
+	/// A flag to control automatic unlock of the sample wallet used for development.
 	static var didAutoUnlockSampleWallet = false
 #endif
 
@@ -515,5 +500,26 @@ class AppState: ObservableObject {
 
 			self.state = .buttonToUnlock(databaseFile: url)
 		}
+	}
+
+	// MARK: - Helper
+
+	private func currentDatabaseAndCategory() -> (SwlDatabase, SwlDatabase.Category?)? {
+		let database: SwlDatabase
+		switch state {
+		case .browseContent(let aDatabase):
+			database = aDatabase
+		default:
+			return nil
+		}
+		let resultCategory: SwlDatabase.Category?
+		if let category,
+		   case .category(let swlCategory) = category.itemType
+		{
+			resultCategory = swlCategory
+		} else {
+			resultCategory = nil
+		}
+		return (database, resultCategory)
 	}
 }
