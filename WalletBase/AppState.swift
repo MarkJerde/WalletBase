@@ -10,10 +10,14 @@ import AppKit
 class AppState: ObservableObject {
 	init() {}
 
+	// MARK: - Creation
+
 	var canCreateNewCard = false
 	var canCreateNewFolder = false
 	@Published var currentCreatableTypes: [NewItemView.ItemType] = []
 	@Published var shouldPresentCreateSheet = false
+
+	// MARK: - State
 
 	enum MyState {
 		case loadingDatabase
@@ -50,6 +54,8 @@ class AppState: ObservableObject {
 			}
 		}
 	}
+
+	// MARK: - Creation
 
 	func setMenuEnables() {
 		let newCanCreateNewCard: Bool
@@ -88,7 +94,9 @@ class AppState: ObservableObject {
 		}
 	}
 
-	func currentDatabaseAndCategory() -> (SwlDatabase, SwlDatabase.Category?)? {
+	// MARK: - Helper
+
+	private func currentDatabaseAndCategory() -> (SwlDatabase, SwlDatabase.Category?)? {
 		let database: SwlDatabase
 		switch state {
 		case .browseContent(let aDatabase):
@@ -107,6 +115,8 @@ class AppState: ObservableObject {
 		return (database, resultCategory)
 	}
 
+	// MARK: - Creation
+
 	func showPromptForNewCard() {
 		currentCreatableTypes = [.card]
 		shouldPresentCreateSheet = true
@@ -117,6 +127,8 @@ class AppState: ObservableObject {
 		shouldPresentCreateSheet = true
 	}
 
+	// MARK: - Publishers
+
 	@Published var category: SwlDatabase.Item?
 
 	@Published var items: [SwlDatabase.Item] = []
@@ -126,6 +138,8 @@ class AppState: ObservableObject {
 
 	@Published var restoreCategoryId: SwlDatabase.SwlID?
 	@Published var restoreCardId: SwlDatabase.SwlID?
+
+	// MARK: - Navigation
 
 	func navigate(toDatabase database: SwlDatabase, category: SwlDatabase.Item? = nil, card: SwlDatabase.Card? = nil) {
 		if category == nil,
@@ -232,6 +246,8 @@ class AppState: ObservableObject {
 			break
 		}
 	}
+
+	// MARK: - Creation
 
 	func getAvailableTemplates(itemType: NewItemView.ItemType) -> [NewItemView.Template] {
 		guard let (database, category) = currentDatabaseAndCategory() else { return [] }
@@ -375,6 +391,8 @@ class AppState: ObservableObject {
 		database.cards(in: searchString).sorted(by: \.name)
 	}
 
+	// MARK: - Actions
+
 	func showFailedToSaveAlert() {
 		let alert = NSAlert()
 		alert.messageText = "Save Failed"
@@ -400,6 +418,8 @@ class AppState: ObservableObject {
 #if DEBUG
 	static var didAutoUnlockSampleWallet = false
 #endif
+
+	// MARK: - File Loading
 
 	func loadFile() {
 		DispatchQueue.main.async {
