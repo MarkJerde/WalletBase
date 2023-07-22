@@ -156,14 +156,17 @@ struct MainView: View {
 				case .viewCard(let database):
 					VStack {
 						CardView(item: $appState.card, onBackTap: {
+							// FIXME: Show warning before navigating out of a card with unsaved edits.
 							appState.navigate(toDatabase: database, category: appState.category)
 						}, onPreviousTap: appState.cardIndex == nil || appState.cardIndex! <= 0 ? nil : {
+							// FIXME: Show warning before navigating out of a card with unsaved edits.
 							guard let cardIndex = appState.cardIndex else {
 								return
 							}
 
 							appState.navigate(toDatabase: database, category: appState.category, index: cardIndex - 1)
 						}, onNextTap: appState.cardIndex == nil || appState.numCards == nil || appState.cardIndex! + 1 >= appState.numCards! ? nil : {
+							// FIXME: Show warning before navigating out of a card with unsaved edits.
 							guard let cardIndex = appState.cardIndex else {
 								return
 							}
@@ -220,6 +223,7 @@ struct MainView: View {
 							return true
 						})
 						Button("Lock") {
+							// FIXME: Show warning before locking out of a card with unsaved edits.
 							appState.lock(database: database)
 						}
 						.padding(.all, 20)
