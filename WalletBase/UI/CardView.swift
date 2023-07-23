@@ -87,15 +87,62 @@ struct CardView<Item: CardViewItem>: View {
 	@State private var edits: [Item.Value: String] = [:]
 	@State private var editableDescription: String = ""
 
+	private func isOkayToNavigate() -> Bool {
+		guard isEditing,
+		      !edits.isEmpty
+		else {
+			return true
+		}
+
+		let alert = NSAlert()
+		alert.messageText = "Save Changes?"
+		alert.informativeText = "Would you like to save changes before leaving this card?"
+		alert.alertStyle = .warning
+		alert.addButton(withTitle: "Save")
+		alert.addButton(withTitle: "Discard")
+		alert.addButton(withTitle: "Cancel")
+		let result = alert.runModal()
+		guard result != .alertThirdButtonReturn else { return false }
+		if result == .alertFirstButtonReturn {
+			guard save() else { return false }
+		}
+		return true
+	}
+
+	private func save() -> Bool {
+		guard let onSave,
+		      isEditing else { return true }
+
+		// A nil description indicates no description changes.
+		var description: String?
+		if editableDescription != (item?.description?.decryptedDescription ?? "") {
+			// Set description to communicate changes.
+			description = editableDescription
+		}
+		guard onSave(edits, description) else { return false }
+		isEditing = false
+
+		return true
+	}
+
 	var body: some View {
 		NavigationFrame(currentName: item?.name ?? "",
-		                onBackTap: onBackTap,
+		                onBackTap: {
+		                	guard isOkayToNavigate() else { return }
+		                	onBackTap()
+		                },
 		                onNewTap: nil,
-		                onPreviousTap: onPreviousTap,
-		                onNextTap: onNextTap,
+		                onPreviousTap: (onPreviousTap == nil) ? nil : {
+		                	guard isOkayToNavigate() else { return }
+		                	onPreviousTap?()
+		                },
+		                onNextTap: (onNextTap == nil) ? nil : {
+		                	guard isOkayToNavigate() else { return }
+		                	onNextTap?()
+		                },
 		                onSearch: nil) {
 			ScrollView {
-				if let onSave = onSave {
+				if onSave != nil {
 					if !isEditing {
 						Button("Edit") {
 							isEditing = true
@@ -106,14 +153,7 @@ struct CardView<Item: CardViewItem>: View {
 								isEditing = false
 							}
 							Button("Save") {
-								// A nil description indicates no description changes.
-								var description: String?
-								if editableDescription != (item?.description?.decryptedDescription ?? "") {
-									// Set description to communicate changes.
-									description = editableDescription
-								}
-								guard onSave(edits, description) else { return }
-								isEditing = false
+								_ = save()
 							}
 						}
 					}

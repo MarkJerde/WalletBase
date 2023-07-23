@@ -144,7 +144,6 @@ struct MainView: View {
 				case .viewCard(let database):
 					VStack {
 						CardView(item: $appState.card, onBackTap: {
-							// FIXME: Show warning before navigating out of a card with unsaved edits.
 							appState.navigate(toDatabase: database, category: appState.category)
 						}, onPreviousTap: appState.cardIndex == nil || appState.cardIndex! <= 0 ? nil : {
 							appState.navigateToPrevious()
@@ -154,7 +153,6 @@ struct MainView: View {
 							appState.save(edits: edits, editedDescription: editedDescription)
 						})
 						Button("Lock") {
-							// FIXME: Show warning before locking out of a card with unsaved edits.
 							appState.lock(database: database)
 						}
 						.padding(.all, 20)

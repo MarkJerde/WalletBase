@@ -405,7 +405,6 @@ class AppState: ObservableObject {
 	}
 
 	func navigateToPrevious() {
-		// FIXME: Show warning before navigating out of a card with unsaved edits.
 		guard let (database, _) = currentDatabaseAndCategory(),
 		      let cardIndex
 		else {
@@ -416,7 +415,6 @@ class AppState: ObservableObject {
 	}
 
 	func navigateToNext() {
-		// FIXME: Show warning before navigating out of a card with unsaved edits.
 		guard let (database, _) = currentDatabaseAndCategory(),
 		      let cardIndex
 		else {
