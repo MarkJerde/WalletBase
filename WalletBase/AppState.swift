@@ -145,6 +145,14 @@ class AppState: ObservableObject {
 			.compactMap { $0 }
 	}
 
+	private func showWriteFailureIndeterminiteAlert(_ database: SwlDatabase) {
+		Alert.writeFailureIndeterminite.show { response in
+
+			guard response == "Close Wallet" else { return }
+			self.lock(database: database)
+		}
+	}
+
 	/// Creates a folder with the provided name and default template ID in the current state.
 	/// - Parameters:
 	///   - named: The folder name.
@@ -176,15 +184,7 @@ class AppState: ObservableObject {
 			if let error = error as? SwlDatabase.Error {
 				switch error {
 				case .writeFailureIndeterminite:
-					let alert = NSAlert()
-					alert.messageText = "Save Failed"
-					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
-					alert.alertStyle = .critical
-					alert.addButton(withTitle: "Close Wallet")
-					alert.addButton(withTitle: "Take More Risks")
-					guard alert.runModal() == .alertFirstButtonReturn else { return }
-					// folder = nil
-					lock(database: database)
+					showWriteFailureIndeterminiteAlert(database)
 					return
 				default:
 					break
@@ -230,15 +230,7 @@ class AppState: ObservableObject {
 			if let error = error as? SwlDatabase.Error {
 				switch error {
 				case .writeFailureIndeterminite:
-					let alert = NSAlert()
-					alert.messageText = "Save Failed"
-					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
-					alert.alertStyle = .critical
-					alert.addButton(withTitle: "Close Wallet")
-					alert.addButton(withTitle: "Take More Risks")
-					guard alert.runModal() == .alertFirstButtonReturn else { return }
-					// folder = nil
-					lock(database: database)
+					showWriteFailureIndeterminiteAlert(database)
 					return
 				default:
 					break
@@ -322,12 +314,7 @@ class AppState: ObservableObject {
 		do {
 			try database.delete(value: card)
 		} catch {
-			let alert = NSAlert()
-			alert.messageText = "Delete"
-			alert.informativeText = "An error occurred while trying to delete the card."
-			alert.alertStyle = .critical
-			alert.addButton(withTitle: "Ok")
-			alert.runModal()
+			Alert.deleteError(itemType: "card").show()
 		}
 	}
 
@@ -336,19 +323,9 @@ class AppState: ObservableObject {
 		do {
 			try database.delete(value: category)
 		} catch SwlDatabase.Error.stillNeeded {
-			let alert = NSAlert()
-			alert.messageText = "Delete"
-			alert.informativeText = "This folder cannot be deleted because it is not empty."
-			alert.alertStyle = .informational
-			alert.addButton(withTitle: "Ok")
-			alert.runModal()
+			Alert.deleteErrorNotEmpty(itemType: "folder").show()
 		} catch {
-			let alert = NSAlert()
-			alert.messageText = "Delete"
-			alert.informativeText = "An error occurred while trying to delete the folder."
-			alert.alertStyle = .critical
-			alert.addButton(withTitle: "Ok")
-			alert.runModal()
+			Alert.deleteError(itemType: "folder").show()
 		}
 	}
 
@@ -550,14 +527,7 @@ class AppState: ObservableObject {
 			if let error = error as? SwlDatabase.Error {
 				switch error {
 				case .writeFailureIndeterminite:
-					let alert = NSAlert()
-					alert.messageText = "Save Failed"
-					alert.informativeText = "Something went wrong while trying to save. Enough so that the wallet may be corrupted. You should probably at least close the wallet, reopen it, and check to see if things look right."
-					alert.alertStyle = .critical
-					alert.addButton(withTitle: "Close Wallet")
-					alert.addButton(withTitle: "Take More Risks")
-					guard alert.runModal() == .alertFirstButtonReturn else { return false }
-					lock(database: database)
+					showWriteFailureIndeterminiteAlert(database)
 					return true
 				default:
 					break
@@ -576,12 +546,7 @@ class AppState: ObservableObject {
 	}
 
 	func showFailedToSaveAlert() {
-		let alert = NSAlert()
-		alert.messageText = "Save Failed"
-		alert.informativeText = "Something went wrong while trying to save. Please try again."
-		alert.alertStyle = .warning
-		alert.addButton(withTitle: "OK")
-		_ = alert.runModal()
+		Alert.failedToSave.show()
 	}
 
 	func lock(database: SwlDatabase) {

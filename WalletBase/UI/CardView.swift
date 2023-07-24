@@ -87,26 +87,27 @@ struct CardView<Item: CardViewItem>: View {
 	@State private var edits: [Item.Value: String] = [:]
 	@State private var editableDescription: String = ""
 
-	private func isOkayToNavigate() -> Bool {
+	private func isOkayToNavigate(completion: @escaping (Bool) -> Void) {
 		guard isEditing,
 		      !edits.isEmpty
 		else {
-			return true
+			completion(true)
+			return
 		}
 
-		let alert = NSAlert()
-		alert.messageText = "Save Changes?"
-		alert.informativeText = "Would you like to save changes before leaving this card?"
-		alert.alertStyle = .warning
-		alert.addButton(withTitle: "Save")
-		alert.addButton(withTitle: "Discard")
-		alert.addButton(withTitle: "Cancel")
-		let result = alert.runModal()
-		guard result != .alertThirdButtonReturn else { return false }
-		if result == .alertFirstButtonReturn {
-			guard save() else { return false }
+		Alert.savePendingChanges.show { response in
+			guard response != "Cancel" else {
+				completion(false)
+				return
+			}
+			if response == "Save" {
+				guard save() else {
+					completion(false)
+					return
+				}
+			}
+			completion(true)
 		}
-		return true
 	}
 
 	private func save() -> Bool {
@@ -128,17 +129,23 @@ struct CardView<Item: CardViewItem>: View {
 	var body: some View {
 		NavigationFrame(currentName: item?.name ?? "",
 		                onBackTap: {
-		                	guard isOkayToNavigate() else { return }
-		                	onBackTap()
+		                	isOkayToNavigate { isOkay in
+		                		guard isOkay else { return }
+		                		onBackTap()
+		                	}
 		                },
 		                onNewTap: nil,
 		                onPreviousTap: (onPreviousTap == nil) ? nil : {
-		                	guard isOkayToNavigate() else { return }
-		                	onPreviousTap?()
+		                	isOkayToNavigate { isOkay in
+		                		guard isOkay else { return }
+		                		onPreviousTap?()
+		                	}
 		                },
 		                onNextTap: (onNextTap == nil) ? nil : {
-		                	guard isOkayToNavigate() else { return }
-		                	onNextTap?()
+		                	isOkayToNavigate { isOkay in
+		                		guard isOkay else { return }
+		                		onNextTap?()
+		                	}
 		                },
 		                onSearch: nil) {
 			ScrollView {
@@ -205,25 +212,21 @@ struct CardView<Item: CardViewItem>: View {
 				Text(item.decryptedName ?? "???")
 			}
 			.onTapGesture {
-				let alert = NSAlert()
-				alert.messageText = "Save compressed attachment?"
-				alert.informativeText = "Attachments are compressed, though it's not clear what compression was used. But at least it's decrypted. Do you still want to save?"
-				alert.alertStyle = .warning
-				alert.addButton(withTitle: "OK")
-				alert.addButton(withTitle: "Cancel")
-				guard alert.runModal() == .alertFirstButtonReturn else { return }
+				Alert.saveCompressedAttachement.show { response in
+					guard response == "OK" else { return }
 
-				let dialog = NSSavePanel()
+					let dialog = NSSavePanel()
 
-				dialog.title = "Save attachment"
-				dialog.nameFieldStringValue = item.decryptedName ?? "Unknown"
-				dialog.canCreateDirectories = true
-				dialog.showsResizeIndicator = true
+					dialog.title = "Save attachment"
+					dialog.nameFieldStringValue = item.decryptedName ?? "Unknown"
+					dialog.canCreateDirectories = true
+					dialog.showsResizeIndicator = true
 
-				guard dialog.runModal() == .OK,
-				      let url = dialog.url else { return }
+					guard dialog.runModal() == .OK,
+					      let url = dialog.url else { return }
 
-				try? item.decryptedData?.write(to: url)
+					try? item.decryptedData?.write(to: url)
+				}
 			}
 		}
 	}
