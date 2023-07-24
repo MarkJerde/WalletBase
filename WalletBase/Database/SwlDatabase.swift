@@ -287,6 +287,7 @@ class SwlDatabase {
 	enum Error: Swift.Error {
 		case writeFailure
 		case writeFailureIndeterminite
+		case stillNeeded
 	}
 
 	func encrypt(text: String, emptyIsNull: Bool = false) -> Data? {
@@ -446,6 +447,57 @@ class SwlDatabase {
 
 		do {
 			try database.update(record: updated, from: current)
+		}
+		catch {
+			do {
+				try database.rollbackTransaction()
+			}
+			catch {
+				if error is SQLiteDatabase.DatabaseError {
+					throw Error.writeFailure // We can't be sure it is indeterminite, since SQLite returns an error in some rollback cases which occur after an automatically rollbacked error.
+				}
+				throw Error.writeFailureIndeterminite // This should be indeterminite, since it did not fail in SQLite.
+			}
+			throw Error.writeFailure
+		}
+	}
+
+	func delete<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(
+		value: T) throws
+	{
+		do {
+			if let card = value as? Card {
+				do {
+					try database.beginTransaction()
+				}
+				catch {
+					throw Error.writeFailure
+				}
+
+				let fieldValues = fieldValues(in: card)
+
+				for fieldValue in fieldValues {
+					try database.delete(from: CardFieldValue.table, where: "id \(fieldValue.id.queryCondition)")
+				}
+
+				try database.delete(from: Card.table, where: "id \(card.id.queryCondition)")
+
+				try database.commitTransaction()
+			}
+			else if let category = value as? Category {
+				// Ensure category is empty.
+				guard cards(in: category).isEmpty,
+				      categories(in: category).isEmpty
+				else {
+					throw Error.stillNeeded
+				}
+
+				// Delete category.
+				try database.delete(from: Category.table, where: "id \(category.id.queryCondition)")
+			}
+		}
+		catch Error.stillNeeded {
+			throw Error.stillNeeded
 		}
 		catch {
 			do {

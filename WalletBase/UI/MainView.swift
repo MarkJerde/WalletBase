@@ -110,6 +110,39 @@ struct MainView: View {
 						         	alert.alertStyle = .critical
 						         	alert.addButton(withTitle: "OK")
 						         	_ = alert.runModal()
+						         },
+						         onItemRename: { _ in
+						         	// TODO: Show a rename sheet.
+						         },
+						         onItemDelete: { item in
+
+						         	let itemType: String
+						         	switch item.type {
+						         	case .file:
+						         		itemType = "Wallet"
+						         	case .category:
+						         		itemType = "Folder"
+						         	case .card:
+						         		itemType = "Card"
+						         	}
+
+						         	let alert = NSAlert()
+						         	alert.messageText = "Delete \(itemType)?"
+						         	alert.informativeText = "Are you sure you want to delete the \"\(item.name)\" \(itemType.lowercased())? This action cannot be undone."
+						         	alert.alertStyle = .critical
+						         	alert.addButton(withTitle: "Cancel")
+						         	alert.addButton(withTitle: "Yes")
+						         	guard alert.runModal() == .alertSecondButtonReturn else { return }
+
+						         	switch item.itemType {
+						         	case .category(let category):
+						         		self.appState.delete(category: category)
+						         	case .card(let card):
+						         		self.appState.delete(card: card)
+						         	}
+
+						         	// Navigate to reload the content.
+						         	appState.navigate(toDatabase: database, category: appState.category, card: nil)
 						         })
 						Button("Lock") {
 							self.appState.lock(database: database)

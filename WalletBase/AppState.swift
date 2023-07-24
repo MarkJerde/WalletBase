@@ -317,6 +317,41 @@ class AppState: ObservableObject {
 		return nil
 	}
 
+	func delete(card: SwlDatabase.Card) {
+		guard let (database, _) = currentDatabaseAndCategory() else { return }
+		do {
+			try database.delete(value: card)
+		} catch {
+			let alert = NSAlert()
+			alert.messageText = "Delete"
+			alert.informativeText = "An error occurred while trying to delete the card."
+			alert.alertStyle = .critical
+			alert.addButton(withTitle: "Ok")
+			alert.runModal()
+		}
+	}
+
+	func delete(category: SwlDatabase.Category) {
+		guard let (database, _) = currentDatabaseAndCategory() else { return }
+		do {
+			try database.delete(value: category)
+		} catch SwlDatabase.Error.stillNeeded {
+			let alert = NSAlert()
+			alert.messageText = "Delete"
+			alert.informativeText = "This folder cannot be deleted because it is not empty."
+			alert.alertStyle = .informational
+			alert.addButton(withTitle: "Ok")
+			alert.runModal()
+		} catch {
+			let alert = NSAlert()
+			alert.messageText = "Delete"
+			alert.informativeText = "An error occurred while trying to delete the folder."
+			alert.alertStyle = .critical
+			alert.addButton(withTitle: "Ok")
+			alert.runModal()
+		}
+	}
+
 	// MARK: - Navigation
 
 	private var restoreCategoryId: SwlDatabase.SwlID?
