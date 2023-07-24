@@ -213,8 +213,8 @@ class SwlDatabase {
 		}
 	}
 
-	/// Obtains the decrypted card items in a given category.
-	/// - Parameter category: The category.
+	/// Obtains the decrypted card items matching a given search string.
+	/// - Parameter searchString: The string to search.
 	/// - Returns: The items.
 	func cards(in searchString: String) -> [Item] {
 		guard let crypto = crypto,
