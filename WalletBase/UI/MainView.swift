@@ -97,7 +97,6 @@ struct MainView: View {
 						         	self.appState.cut(item: item)
 						         },
 						         onPaste: {
-						         	// FIXME: Cannot paste into empty folder.
 						         	let errorText = self.appState.paste()
 						         	guard let errorText else {
 						         		// Navigate to reload the content.

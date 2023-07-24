@@ -91,7 +91,20 @@ struct ItemGrid<Item: ItemGridItem>: View {
 			   let emptyMessage = emptyMessage
 			{
 				Text(emptyMessage)
-					.frame(maxHeight: .infinity)
+					.frame(maxWidth: .infinity, maxHeight: .infinity)
+					.background(Color("ordinaryBackground"))
+					.contextMenu {
+						if let onPaste {
+							Button(action: {
+								onPaste()
+							}) {
+								if #available(macOS 11.0, *) {
+									Image(systemName: "paintbrush")
+								}
+								Text("Paste")
+							}
+						}
+					}
 			} else {
 				ScrollView {
 					CompatibilityVGrid(data: items, id: \.self) { item in
@@ -185,6 +198,17 @@ struct ItemGrid_Previews: PreviewProvider {
 	static let container: ItemGrid_Previews_Item? = ItemGrid_Previews_Item(name: "Zulu", type: .category)
 	static var previews: some View {
 		ItemGrid(items: items,
+		         container: container) {
+			NSLog("tapped \($0)")
+		} onBackTap: {
+			NSLog("tapBack")
+		} onNewTap: {
+			NSLog("tapNew")
+		} onSearch: { searchString in
+			NSLog("searching \(searchString)")
+		}
+
+		ItemGrid(items: [],
 		         container: container) {
 			NSLog("tapped \($0)")
 		} onBackTap: {
