@@ -245,6 +245,9 @@ class AppState: ObservableObject {
 
 	var currentCutItemType: ItemGridItemType?
 	var currentCutItemId: SwlDatabase.SwlID?
+
+	@Published var canPaste = false
+
 	func cut(item: SwlDatabase.Item) {
 		currentCutItemType = item.type
 		switch item.itemType {
@@ -253,6 +256,7 @@ class AppState: ObservableObject {
 		case .category(let category):
 			currentCutItemId = category.id
 		}
+		canPaste = true
 	}
 
 	func paste() -> String? {
@@ -306,6 +310,7 @@ class AppState: ObservableObject {
 		}
 		self.currentCutItemType = nil
 		self.currentCutItemId = nil
+		canPaste = false
 		return nil
 	}
 

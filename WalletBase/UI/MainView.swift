@@ -96,7 +96,7 @@ struct MainView: View {
 						         onItemCut: { item in
 						         	self.appState.cut(item: item)
 						         },
-						         onPaste: {
+						         onPaste: appState.canPaste ? {
 						         	let errorText = self.appState.paste()
 						         	guard let errorText else {
 						         		// Navigate to reload the content.
@@ -104,7 +104,7 @@ struct MainView: View {
 						         		return
 						         	}
 						         	Alert.pasteFailed(errorText: errorText).show()
-						         },
+						         } : nil,
 						         onItemRename: { _ in
 						         	// TODO: Show a rename sheet.
 						         },
