@@ -105,9 +105,9 @@ struct MainView: View {
 						         	}
 						         	Alert.pasteFailed(errorText: errorText).show()
 						         } : nil,
-						         onItemRename: { _ in
-						         	// TODO: Show a rename sheet.
-						         },
+						         onItemRename: nil /* { _ in
+						          	// TODO: Show a rename sheet.
+						          } */,
 						         onItemDelete: { item in
 
 						         	let itemType: String
