@@ -22,13 +22,26 @@ struct CardValue<Item: CardViewValue>: View {
 
 	private let item: Item
 	@State private var value: String
-	// FIXME: newValue is displayed on subsequent edit. Might be a SwiftUI bug.
 	@State private var newValue: String = ""
 	@State private var isEncrypted: Bool
 	@State private var isActive: Bool = false
 	private let isEditing: Bool
 	private var onSet: (String) -> Void
-	@State private var isShowingPopover: Bool = false
+	@State private var isShowingPopover: Bool = false {
+		didSet {
+			guard isShowingPopover != oldValue else { return }
+			// Clear the newValue when toggling the popover. Without this the value previously entered is displayed again when editing a subsequent time.
+			guard isShowingPopover
+			else {
+				// Delay one second because Catalina has shown that assigning the value synchronously when dismissing the popover will cause the value assigned to become the new value for the field. Possibly a nuance of when it calls the onCommit.
+				DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+					newValue = ""
+				}
+				return
+			}
+			newValue = ""
+		}
+	}
 
 	func makePopoverInputFirstResponder() {
 		makeViewFirstResponder {
@@ -42,7 +55,8 @@ struct CardValue<Item: CardViewValue>: View {
 		onSet(newValue)
 		value = isEncrypted ? "********" : newValue
 		isShowingPopover = false
-		newValue = "alphabet"
+		// FIXME: This shows up on 10.15 after user enters a new username.
+		// newValue = "alphabet"
 	}
 
 	struct DefaultButtonStyle: ButtonStyle {
