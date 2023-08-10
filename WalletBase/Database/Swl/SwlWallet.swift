@@ -18,7 +18,7 @@ extension SwlDatabase {
 		let currentSyncID: Int32
 		/// Something. Starts at -1.
 		let syncID: Int32
-		/// Something, data but it doesn't appear to be encrypted.
+		/// Something, data but it doesn't appear to be encrypted. Example is an alternating "xx MMMMMM" "xx NNNNNN" pattern where the MMMMMM and NNNNNN are two six digit hex numbers and each xx is a somewhat random two digit hex number. The xx values seem somewhat zoned, moreso in the 2nd, 4th, 6th, etc xx values, and can contain repeats. There are twelve x-M-x-N sets followed by one final x-M.
 		let syncInfo: [UInt8]?
 		/// Something. Starts at -1.
 		let createSyncID: Int32
