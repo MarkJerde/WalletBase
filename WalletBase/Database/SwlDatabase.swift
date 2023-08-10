@@ -672,16 +672,16 @@ class SwlDatabase {
 	private var isUnlocked = false
 
 	enum Tables: String, SQLiteTable {
-		case databaseVersion = "spb_DatabaseVersion" // TODO:
-		case wallet = "spbwlt_Wallet" // TODO:
-		case categories = "spbwlt_Category"
-		case cards = "spbwlt_Card"
-		case cardFieldValues = "spbwlt_CardFieldValue"
-		case cardAttachments = "spbwlt_CardAttachment"
+		case databaseVersion = "spb_DatabaseVersion" // TODO: Needed, R/W for encryption upgrade.
+		case wallet = "spbwlt_Wallet" // R/W
+		case categories = "spbwlt_Category" // R/W
+		case cards = "spbwlt_Card" // R/W
+		case cardFieldValues = "spbwlt_CardFieldValue" // R/W
+		case cardAttachments = "spbwlt_CardAttachment" // RO
 		case cardViews = "spbwlt_CardView" // TODO:
 		case cardViewFields = "spbwlt_CardViewField" // TODO:
-		case templates = "spbwlt_Template"
-		case templateFields = "spbwlt_TemplateField"
+		case templates = "spbwlt_Template" // RO
+		case templateFields = "spbwlt_TemplateField" // R/W
 		case templateFieldTypes = "spbwlt_TemplateFieldType" // TODO:
 		case icon = "spbwlt_Icon" // TODO:
 		case image = "spbwlt_Image" // TODO:
