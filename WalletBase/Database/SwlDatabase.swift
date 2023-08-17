@@ -678,8 +678,8 @@ class SwlDatabase {
 		case cards = "spbwlt_Card" // R/W
 		case cardFieldValues = "spbwlt_CardFieldValue" // R/W
 		case cardAttachments = "spbwlt_CardAttachment" // R/W
-		case cardViews = "spbwlt_CardView" // TODO:
-		case cardViewFields = "spbwlt_CardViewField" // TODO:
+		case cardViews = "spbwlt_CardView" // TODO: Implement. Seems to be free of any encryption.
+		case cardViewFields = "spbwlt_CardViewField" // TODO: Implement. Seems to be free of any encryption.
 		case templates = "spbwlt_Template" // RO
 		case templateFields = "spbwlt_TemplateField" // R/W
 		case templateFieldTypes = "spbwlt_TemplateFieldType" // TODO:
