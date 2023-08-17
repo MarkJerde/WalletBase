@@ -43,8 +43,8 @@ extension SwlDatabase.Category: SQLiteQueryReadWritable {
 			.iconID: iconID.encoded,
 			.defaultTemplateID: defaultTemplateID.encoded,
 			.parentCategoryID: parent.encoded,
-			.syncID: .integer(value: -1), // (default: -1)
-			.createSyncID: .integer(value: -1), // (default: -1)
+			.syncID: .integer(value: syncID),
+			.createSyncID: .integer(value: createSyncID),
 		]
 	}
 }
