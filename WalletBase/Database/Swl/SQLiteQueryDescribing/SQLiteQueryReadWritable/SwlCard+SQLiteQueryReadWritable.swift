@@ -48,13 +48,13 @@ extension SwlDatabase.Card: SQLiteQueryReadWritable {
 			.name: .blob(value: .init(arrayValue: name)),
 			.description: .nullableBlob(value: (description == nil) ? nil : .init(arrayValue: description!)),
 			.cardViewID: cardViewID.encoded,
-			.hasOwnCardView: .integer(value: 0), // (default: 0)
+			.hasOwnCardView: .integer(value: hasOwnCardView),
 			.templateID: templateID.encoded,
 			.parentCategoryID: parent.encoded,
 			.iconID: iconID.encoded,
-			.hitCount: .integer(value: 0), // (default: 0)
-			.syncID: .integer(value: -1), // (default: -1)
-			.createSyncID: .integer(value: -1), // (default: -1)
+			.hitCount: .integer(value: hitCount),
+			.syncID: .integer(value: syncID),
+			.createSyncID: .integer(value: createSyncID),
 		]
 	}
 }
