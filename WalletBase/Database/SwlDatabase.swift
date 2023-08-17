@@ -677,7 +677,7 @@ class SwlDatabase {
 		case categories = "spbwlt_Category" // R/W
 		case cards = "spbwlt_Card" // R/W
 		case cardFieldValues = "spbwlt_CardFieldValue" // R/W
-		case cardAttachments = "spbwlt_CardAttachment" // RO
+		case cardAttachments = "spbwlt_CardAttachment" // R/W
 		case cardViews = "spbwlt_CardView" // TODO:
 		case cardViewFields = "spbwlt_CardViewField" // TODO:
 		case templates = "spbwlt_Template" // RO

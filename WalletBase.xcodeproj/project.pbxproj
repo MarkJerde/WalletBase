@@ -78,8 +78,8 @@
 		8D5D6190276FC0D200F95986 /* SwlCategory+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D618E276FC0D200F95986 /* SwlCategory+SQLiteQueryReadWritable.swift */; };
 		8D5D6192276FC15300F95986 /* SwlCardDescription+SQLiteQuerySelectable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6191276FC15300F95986 /* SwlCardDescription+SQLiteQuerySelectable.swift */; };
 		8D5D6193276FC15300F95986 /* SwlCardDescription+SQLiteQuerySelectable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6191276FC15300F95986 /* SwlCardDescription+SQLiteQuerySelectable.swift */; };
-		8D5D6195276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift */; };
-		8D5D6196276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift */; };
+		8D5D6195276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift */; };
+		8D5D6196276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift */; };
 		8D5D6198276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6197276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift */; };
 		8D5D6199276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D6197276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift */; };
 		8D5D619B276FC27100F95986 /* SwlTemplateField+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryReadWritable.swift */; };
@@ -189,7 +189,7 @@
 		8D5D618B276FBF4A00F95986 /* SwlCard+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCard+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
 		8D5D618E276FC0D200F95986 /* SwlCategory+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCategory+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
 		8D5D6191276FC15300F95986 /* SwlCardDescription+SQLiteQuerySelectable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCardDescription+SQLiteQuerySelectable.swift"; sourceTree = "<group>"; };
-		8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCardAttachment+SQLiteQuerySelectable.swift"; sourceTree = "<group>"; };
+		8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCardAttachment+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
 		8D5D6197276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlCardFieldValue+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
 		8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateField+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
 		8D5D619D2770B3F500F95986 /* URL+Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Crypto.swift"; sourceTree = "<group>"; };
@@ -419,7 +419,6 @@
 			isa = PBXGroup;
 			children = (
 				8D5D6191276FC15300F95986 /* SwlCardDescription+SQLiteQuerySelectable.swift */,
-				8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift */,
 				8D6A211429A868D6003A4941 /* SwlTemplate+SQLiteQuerySelectable.swift */,
 			);
 			path = SQLiteQuerySelectable;
@@ -447,6 +446,7 @@
 			isa = PBXGroup;
 			children = (
 				8D5D618B276FBF4A00F95986 /* SwlCard+SQLiteQueryReadWritable.swift */,
+				8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift */,
 				8D5D6197276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift */,
 				8D5D618E276FC0D200F95986 /* SwlCategory+SQLiteQueryReadWritable.swift */,
 				8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryReadWritable.swift */,
@@ -635,7 +635,7 @@
 				8D50F3DD2741974B00A754CB /* CryptoProvider.swift in Sources */,
 				8D7C76D02A83363700B1C589 /* SwlWallet.swift in Sources */,
 				8D50F3E327419BF000A754CB /* PasswordPrompt.swift in Sources */,
-				8D5D6195276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift in Sources */,
+				8D5D6195276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift in Sources */,
 				8D5D615327550F8900F95986 /* SwlCardFieldValue.swift in Sources */,
 				8D6A211529A868D6003A4941 /* SwlTemplate+SQLiteQuerySelectable.swift in Sources */,
 				8D7C76CC2A40D97F00B1C589 /* NewItemView.swift in Sources */,
@@ -708,7 +708,7 @@
 				8D5D61652759B36A00F95986 /* SwlCardFieldValue+SQLiteDatabaseItem.swift in Sources */,
 				8D97CE5A28B0507400373192 /* SwlCryptoTests.swift in Sources */,
 				8D5D61612759B35B00F95986 /* SwlCard.swift in Sources */,
-				8D5D6196276FC1B300F95986 /* SwlCardAttachment+SQLiteQuerySelectable.swift in Sources */,
+				8D5D6196276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift in Sources */,
 				8D5D61662759B36D00F95986 /* SwlCategory+SQLiteDatabaseItem.swift in Sources */,
 				8D5D619F2770B3F500F95986 /* URL+Crypto.swift in Sources */,
 				8D5D61672759B37200F95986 /* Sequence+Sorted.swift in Sources */,

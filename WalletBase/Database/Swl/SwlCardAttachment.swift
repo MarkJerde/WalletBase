@@ -18,5 +18,9 @@ extension SwlDatabase {
 		let name: [UInt8]
 		/// The encrypted data of this attachment.
 		let data: [UInt8]
+		/// Something. Starts at -1.
+		let syncID: Int32
+		/// Something. Starts at -1.
+		let createSyncID: Int32
 	}
 }

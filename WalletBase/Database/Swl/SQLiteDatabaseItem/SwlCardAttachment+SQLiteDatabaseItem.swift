@@ -21,12 +21,19 @@ extension SwlDatabase.CardAttachment: SQLiteDatabaseItem {
 
 		// Decode the parts.
 		var column = column
-		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
-		guard let cardId: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
-		guard let name: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
-		guard let data: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
+		guard let id: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let cardId: SwlDatabase.SwlID = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let name: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let data: [UInt8] = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let syncID: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }),
+		      let createSyncID: Int32 = .decode(from: statement, column: column, nextColumn: { column = $0 }) else { return nil }
 
 		// Build and return the instance.
-		return .init(id: id, cardId: cardId, name: name, data: data)
+		return .init(id: id,
+		             cardId: cardId,
+		             name: name,
+		             data: data,
+		             syncID: syncID,
+		             createSyncID: createSyncID)
 	}
 }
