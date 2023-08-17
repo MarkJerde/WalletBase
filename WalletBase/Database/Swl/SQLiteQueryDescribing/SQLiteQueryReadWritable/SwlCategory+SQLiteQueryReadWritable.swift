@@ -9,17 +9,17 @@ import Foundation
 
 extension SwlDatabase.Category: SQLiteQueryReadWritable {
 	/*
-		CREATE TABLE IF NOT EXISTS "spbwlt_Category" (^M
-		"ID" VARCHAR(22) UNIQUE NOT NULL PRIMARY KEY,^M
-		"Name" BLOB NOT NULL,^M
-		"Description" BLOB NULL,^M
-		"IconID" VARCHAR(22)  NOT NULL,^M
-		"DefaultTemplateID" VARCHAR(22),^M
-		"ParentCategoryID" VARCHAR(22)  NOT NULL,^M
-		"SyncID" INTEGER NOT NULL DEFAULT -1,^M
-		"CreateSyncID" INTEGER NOT NULL DEFAULT -1^M
-		);
-		*/
+	 CREATE TABLE IF NOT EXISTS "spbwlt_Category" (^M
+	 "ID" VARCHAR(22) UNIQUE NOT NULL PRIMARY KEY,^M
+	 "Name" BLOB NOT NULL,^M
+	 "Description" BLOB NULL,^M
+	 "IconID" VARCHAR(22)  NOT NULL,^M
+	 "DefaultTemplateID" VARCHAR(22),^M
+	 "ParentCategoryID" VARCHAR(22)  NOT NULL,^M
+	 "SyncID" INTEGER NOT NULL DEFAULT -1,^M
+	 "CreateSyncID" INTEGER NOT NULL DEFAULT -1^M
+	 );
+	 */
 
 	enum Column: String, CaseIterable {
 		case id
