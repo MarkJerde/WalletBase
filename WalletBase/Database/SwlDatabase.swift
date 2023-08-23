@@ -683,8 +683,8 @@ class SwlDatabase {
 		case templates = "spbwlt_Template" // R/W
 		case templateFields = "spbwlt_TemplateField" // R/W
 		case templateFieldTypes = "spbwlt_TemplateFieldType" // TODO:
-		case icon = "spbwlt_Icon" // TODO:
-		case image = "spbwlt_Image" // TODO:
+		case icon = "spbwlt_Icon" // R/W
+		case image = "spbwlt_Image" // R/W
 
 		var name: String {
 			return rawValue
