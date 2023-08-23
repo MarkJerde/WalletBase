@@ -127,6 +127,9 @@
 		8D9B89962A95AAB90042BAAD /* SwlImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B89952A95AAB90042BAAD /* SwlImage.swift */; };
 		8D9B89982A95AB260042BAAD /* SwlImage+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B89972A95AB260042BAAD /* SwlImage+SQLiteDatabaseItem.swift */; };
 		8D9B899A2A95AB520042BAAD /* SwlImage+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B89992A95AB520042BAAD /* SwlImage+SQLiteQueryReadWritable.swift */; };
+		8D9B899C2A95AC210042BAAD /* SwlTemplateFieldType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B899B2A95AC210042BAAD /* SwlTemplateFieldType.swift */; };
+		8D9B899E2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B899D2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift */; };
+		8D9B89A02A95B46D0042BAAD /* SwlTemplateFieldType+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B899F2A95B46D0042BAAD /* SwlTemplateFieldType+SQLiteQueryReadWritable.swift */; };
 		8D9DC80F296508D900D392CE /* Image+OldOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC80E296508D900D392CE /* Image+OldOS.swift */; };
 		8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */; };
 		8DA75A9D299F1C6200E83E9C /* MultilineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */; };
@@ -229,6 +232,9 @@
 		8D9B89952A95AAB90042BAAD /* SwlImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlImage.swift; sourceTree = "<group>"; };
 		8D9B89972A95AB260042BAAD /* SwlImage+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlImage+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
 		8D9B89992A95AB520042BAAD /* SwlImage+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlImage+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
+		8D9B899B2A95AC210042BAAD /* SwlTemplateFieldType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlTemplateFieldType.swift; sourceTree = "<group>"; };
+		8D9B899D2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateFieldType+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
+		8D9B899F2A95B46D0042BAAD /* SwlTemplateFieldType+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateFieldType+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
 		8D9DC80E296508D900D392CE /* Image+OldOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+OldOS.swift"; sourceTree = "<group>"; };
 		8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityVGrid.swift; sourceTree = "<group>"; };
 		8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineTextField.swift; sourceTree = "<group>"; };
@@ -375,6 +381,7 @@
 				8D9B89952A95AAB90042BAAD /* SwlImage.swift */,
 				8D6A211029A866E3003A4941 /* SwlTemplate.swift */,
 				8D5D616F275C70F200F95986 /* SwlTemplateField.swift */,
+				8D9B899B2A95AC210042BAAD /* SwlTemplateFieldType.swift */,
 				8D7C76CF2A83363700B1C589 /* SwlWallet.swift */,
 				8D5D614A2751963E00F95986 /* SQLiteDatabaseItem */,
 				8D97CE442899661300373192 /* SQLiteQueryDescribing */,
@@ -405,6 +412,7 @@
 				8D9B89972A95AB260042BAAD /* SwlImage+SQLiteDatabaseItem.swift */,
 				8D6A211229A867C2003A4941 /* SwlTemplate+SQLiteDatabaseItem.swift */,
 				8D5D6172275C754300F95986 /* SwlTemplateField+SQLiteDatabaseItem.swift */,
+				8D9B899D2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift */,
 				8D7C76D12A83391400B1C589 /* SwlWallet+SQLiteDatabaseItem.swift */,
 			);
 			path = SQLiteDatabaseItem;
@@ -468,6 +476,7 @@
 				8D9B89992A95AB520042BAAD /* SwlImage+SQLiteQueryReadWritable.swift */,
 				8D6A211429A868D6003A4941 /* SwlTemplate+SQLiteQueryReadWritable.swift */,
 				8D5D619A276FC27000F95986 /* SwlTemplateField+SQLiteQueryReadWritable.swift */,
+				8D9B899F2A95B46D0042BAAD /* SwlTemplateFieldType+SQLiteQueryReadWritable.swift */,
 				8D7C76D32A83D63700B1C589 /* SwlWallet+SQLiteQueryReadWritable.swift */,
 			);
 			path = SQLiteQueryReadWritable;
@@ -685,12 +694,14 @@
 				8D5D6140275194C500F95986 /* SwlItem.swift in Sources */,
 				8D97CE3E2887B97B00373192 /* WalletFile.swift in Sources */,
 				8D5D6185276EDB5E00F95986 /* SwlCardDescription.swift in Sources */,
+				8D9B899E2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift in Sources */,
 				8D5D619B276FC27100F95986 /* SwlTemplateField+SQLiteQueryReadWritable.swift in Sources */,
 				8D97CE54289A23CA00373192 /* SQLiteDataItem.swift in Sources */,
 				8D5D613C275193EF00F95986 /* SwlID.swift in Sources */,
 				8D50F3AC273CBF1D00A754CB /* WalletBaseApp.swift in Sources */,
 				8D6A211129A866E3003A4941 /* SwlTemplate.swift in Sources */,
 				8D5D6176275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */,
+				8D9B899C2A95AC210042BAAD /* SwlTemplateFieldType.swift in Sources */,
 				8D5D6170275C70F200F95986 /* SwlTemplateField.swift in Sources */,
 				8D5D618C276FBF4A00F95986 /* SwlCard+SQLiteQueryReadWritable.swift in Sources */,
 				8D5D617C275E381000F95986 /* CardValue.swift in Sources */,
@@ -718,6 +729,7 @@
 				8D5D61552755140600F95986 /* SwlCardFieldValue+SQLiteDatabaseItem.swift in Sources */,
 				8D5D616A2759B4E100F95986 /* CardView.swift in Sources */,
 				8D5D6134274757C900F95986 /* SQLiteDatabase.swift in Sources */,
+				8D9B89A02A95B46D0042BAAD /* SwlTemplateFieldType+SQLiteQueryReadWritable.swift in Sources */,
 				8D6A211929BECA42003A4941 /* MenuView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

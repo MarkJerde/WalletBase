@@ -682,7 +682,7 @@ class SwlDatabase {
 		case cardViewFields = "spbwlt_CardViewField" // TODO: Implement. Seems to be free of any encryption.
 		case templates = "spbwlt_Template" // R/W
 		case templateFields = "spbwlt_TemplateField" // R/W
-		case templateFieldTypes = "spbwlt_TemplateFieldType" // TODO:
+		case templateFieldTypes = "spbwlt_TemplateFieldType" // R/W
 		case icon = "spbwlt_Icon" // R/W
 		case image = "spbwlt_Image" // R/W
 
