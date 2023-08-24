@@ -672,7 +672,7 @@ class SwlDatabase {
 	private var isUnlocked = false
 
 	enum Tables: String, SQLiteTable {
-		case databaseVersion = "spb_DatabaseVersion" // TODO: Needed, R/W for encryption upgrade.
+		case databaseVersion = "spb_DatabaseVersion" // R/W
 		case wallet = "spbwlt_Wallet" // R/W
 		case categories = "spbwlt_Category" // R/W
 		case cards = "spbwlt_Card" // R/W

@@ -130,6 +130,9 @@
 		8D9B899C2A95AC210042BAAD /* SwlTemplateFieldType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B899B2A95AC210042BAAD /* SwlTemplateFieldType.swift */; };
 		8D9B899E2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B899D2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift */; };
 		8D9B89A02A95B46D0042BAAD /* SwlTemplateFieldType+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B899F2A95B46D0042BAAD /* SwlTemplateFieldType+SQLiteQueryReadWritable.swift */; };
+		8D9B89A22A96E8D50042BAAD /* SwlDatabaseVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B89A12A96E8D50042BAAD /* SwlDatabaseVersion.swift */; };
+		8D9B89A42A96EA0B0042BAAD /* SwlDatabaseVersion+SQLiteDatabaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B89A32A96EA0B0042BAAD /* SwlDatabaseVersion+SQLiteDatabaseItem.swift */; };
+		8D9B89A62A96EAEF0042BAAD /* SwlDatabaseVersion+SQLiteQueryReadWritable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9B89A52A96EAEF0042BAAD /* SwlDatabaseVersion+SQLiteQueryReadWritable.swift */; };
 		8D9DC80F296508D900D392CE /* Image+OldOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC80E296508D900D392CE /* Image+OldOS.swift */; };
 		8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */; };
 		8DA75A9D299F1C6200E83E9C /* MultilineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */; };
@@ -235,6 +238,9 @@
 		8D9B899B2A95AC210042BAAD /* SwlTemplateFieldType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlTemplateFieldType.swift; sourceTree = "<group>"; };
 		8D9B899D2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateFieldType+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
 		8D9B899F2A95B46D0042BAAD /* SwlTemplateFieldType+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlTemplateFieldType+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
+		8D9B89A12A96E8D50042BAAD /* SwlDatabaseVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwlDatabaseVersion.swift; sourceTree = "<group>"; };
+		8D9B89A32A96EA0B0042BAAD /* SwlDatabaseVersion+SQLiteDatabaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlDatabaseVersion+SQLiteDatabaseItem.swift"; sourceTree = "<group>"; };
+		8D9B89A52A96EAEF0042BAAD /* SwlDatabaseVersion+SQLiteQueryReadWritable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwlDatabaseVersion+SQLiteQueryReadWritable.swift"; sourceTree = "<group>"; };
 		8D9DC80E296508D900D392CE /* Image+OldOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+OldOS.swift"; sourceTree = "<group>"; };
 		8D9DC810296BD3E900D392CE /* CompatibilityVGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityVGrid.swift; sourceTree = "<group>"; };
 		8DA75A9C299F1C6200E83E9C /* MultilineTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineTextField.swift; sourceTree = "<group>"; };
@@ -370,6 +376,7 @@
 		8D5D613A275193D100F95986 /* Swl */ = {
 			isa = PBXGroup;
 			children = (
+				8D9B89A12A96E8D50042BAAD /* SwlDatabaseVersion.swift */,
 				8D5D613B275193EF00F95986 /* SwlID.swift */,
 				8D5D613F275194C500F95986 /* SwlItem.swift */,
 				8D5D614E2751E89C00F95986 /* SwlCard.swift */,
@@ -402,6 +409,7 @@
 		8D5D614A2751963E00F95986 /* SQLiteDatabaseItem */ = {
 			isa = PBXGroup;
 			children = (
+				8D9B89A32A96EA0B0042BAAD /* SwlDatabaseVersion+SQLiteDatabaseItem.swift */,
 				8D5D61462751959900F95986 /* SwlID+SQLiteDatabaseItem.swift */,
 				8D5D61502751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift */,
 				8D5D61812764495900F95986 /* SwlCardAttachment+SQLiteDatabaseItem.swift */,
@@ -468,6 +476,7 @@
 		8D97CE452899665700373192 /* SQLiteQueryReadWritable */ = {
 			isa = PBXGroup;
 			children = (
+				8D9B89A52A96EAEF0042BAAD /* SwlDatabaseVersion+SQLiteQueryReadWritable.swift */,
 				8D5D618B276FBF4A00F95986 /* SwlCard+SQLiteQueryReadWritable.swift */,
 				8D5D6194276FC1B300F95986 /* SwlCardAttachment+SQLiteQueryReadWritable.swift */,
 				8D5D6197276FC1F600F95986 /* SwlCardFieldValue+SQLiteQueryReadWritable.swift */,
@@ -672,6 +681,7 @@
 				8D97CE47289A22E200373192 /* String+SplitByLength.swift in Sources */,
 				8D5D614D2751E65B00F95986 /* Sequence+Sorted.swift in Sources */,
 				8D7C76CA2A32BEAC00B1C589 /* AppState.swift in Sources */,
+				8D9B89A62A96EAEF0042BAAD /* SwlDatabaseVersion+SQLiteQueryReadWritable.swift in Sources */,
 				8D5D61512751E96E00F95986 /* SwlCard+SQLiteDatabaseItem.swift in Sources */,
 				8D9B89922A95A96D0042BAAD /* SwlIcon+SQLiteDatabaseItem.swift in Sources */,
 				8D9DC811296BD3E900D392CE /* CompatibilityVGrid.swift in Sources */,
@@ -695,11 +705,13 @@
 				8D97CE3E2887B97B00373192 /* WalletFile.swift in Sources */,
 				8D5D6185276EDB5E00F95986 /* SwlCardDescription.swift in Sources */,
 				8D9B899E2A95B2830042BAAD /* SwlTemplateFieldType+SQLiteDatabaseItem.swift in Sources */,
+				8D9B89A42A96EA0B0042BAAD /* SwlDatabaseVersion+SQLiteDatabaseItem.swift in Sources */,
 				8D5D619B276FC27100F95986 /* SwlTemplateField+SQLiteQueryReadWritable.swift in Sources */,
 				8D97CE54289A23CA00373192 /* SQLiteDataItem.swift in Sources */,
 				8D5D613C275193EF00F95986 /* SwlID.swift in Sources */,
 				8D50F3AC273CBF1D00A754CB /* WalletBaseApp.swift in Sources */,
 				8D6A211129A866E3003A4941 /* SwlTemplate.swift in Sources */,
+				8D9B89A22A96E8D50042BAAD /* SwlDatabaseVersion.swift in Sources */,
 				8D5D6176275C76F100F95986 /* Int32+SQLiteDatabaseItem.swift in Sources */,
 				8D9B899C2A95AC210042BAAD /* SwlTemplateFieldType.swift in Sources */,
 				8D5D6170275C70F200F95986 /* SwlTemplateField.swift in Sources */,
