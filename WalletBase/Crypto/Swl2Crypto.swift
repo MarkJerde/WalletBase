@@ -1,8 +1,8 @@
 //
-//  SwlCrypto.swift
+//  Swl2Crypto.swift
 //  WalletBase
 //
-//  Created by Mark Jerde on 11/14/21.
+//  Created by Mark Jerde on 8/23/23.
 //
 
 import CommonCrypto
@@ -10,39 +10,40 @@ import Foundation
 
 // Thanks, Stack Overflow! https://stackoverflow.com/a/25762128
 extension String {
-	func sha1() -> String {
-		let data = Data(utf8)
-		var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
-		data.withUnsafeBytes {
-			_ = CC_SHA1($0.baseAddress, CC_LONG(data.count), &digest)
+	func sha256() -> String {
+		Data(utf8).sha256().string02hhx
+	}
+}
+
+extension Data {
+	func sha256() -> [UInt8] {
+		var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+		withUnsafeBytes {
+			_ = CC_SHA256($0.baseAddress, CC_LONG(count), &digest)
 		}
-		let hexBytes = digest.map { String(format: "%02hhx", $0) }
+		return digest
+	}
+}
+
+extension [UInt8] {
+	var string02hhx: String {
+		let hexBytes = map { String(format: "%02hhx", $0) }
 		return hexBytes.joined()
 	}
 }
 
-class SwlCrypto: CryptoProvider {
+class Swl2Crypto: CryptoProvider {
 	func unlock(password: String, completion: @escaping (Bool) -> Void) {
-		let password = "\(password)\0" // .map { "\($0)\00" }.joined(separator: "")
-		// let sha1 = password.sha1()
+		let password = "\(password)\0"
 
 		// Adapted from https://stackoverflow.com/a/25762128
 		guard let utf16leData = password.data(using: .utf16LittleEndian) else {
 			completion(false)
 			return
 		}
-		var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
-		utf16leData.withUnsafeBytes {
-			_ = CC_SHA1($0.baseAddress, CC_LONG(utf16leData.count), &digest)
-		}
-		// let hexBytes = digest.map { String(format: "%02hhx", $0) }
-		// let sha1 = hexBytes.joined()
+		let digest = utf16leData.sha256()
 
-		// Take the first 20 bytes and then the first 12 bytes to create 32 bytes. Why the repetition? Probably because SHA1 is only 20 bytes, so it's just repeating the SHA1 to achieve 32 bytes. I wonder if this provides any benefit over just using zero for the remaining twelve bytes.
-		var keyArray = Array(digest.prefix(20))
-		keyArray.append(contentsOf: digest.prefix(12))
-		// let keyString = "\(sha1.prefix(20))\(sha1.prefix(12)))"
-		let key = Data(keyArray) // Data(keyString.utf8)
+		let key = Data(digest)
 		self.key = key
 		completion(true)
 	}
@@ -87,7 +88,7 @@ class SwlCrypto: CryptoProvider {
 				key.withUnsafeBytes { key in
 					let success = CCCrypt(CCOperation(kCCDecrypt),
 					                      CCAlgorithm(kCCAlgorithmAES),
-					                      CCOptions(kCCOptionECBMode),
+					                      CCOptions(kCCOptionPKCS7Padding),
 					                      key.baseAddress,
 					                      key.count,
 					                      nil,
@@ -103,7 +104,7 @@ class SwlCrypto: CryptoProvider {
 				}
 			}
 		}
-		guard successBytes > 0 else { return nil }
+		guard successBytes > paddingSize else { return nil }
 
 		dataOut.count = successBytes - Int(paddingSize)
 		return dataOut
@@ -117,7 +118,8 @@ class SwlCrypto: CryptoProvider {
 			dataIn.append(0)
 			paddingSize += 1
 		}
-		var dataOut = Data(count: dataIn.count)
+		// "A general rule for the size of the output buffer which must be provided by the caller is that for block ciphers, the output length is never larger than the input length plus the block size." (https://opensource.apple.com/source/CommonCrypto/CommonCrypto-60061/include/CommonCryptor.h#:~:text=A%20general%20rule%20for%20the,same%20as%20the%20input%20length.)
+		var dataOut = Data(count: dataIn.count + kCCBlockSizeAES128)
 		var numBytesDecrypted: size_t = 0
 		var successBytes = 0
 		dataOut.withUnsafeMutableBytes { dataOut in
@@ -125,14 +127,14 @@ class SwlCrypto: CryptoProvider {
 				key.withUnsafeBytes { key in
 					let success = CCCrypt(CCOperation(kCCEncrypt),
 					                      CCAlgorithm(kCCAlgorithmAES),
-					                      CCOptions(kCCOptionECBMode),
+					                      CCOptions(kCCOptionPKCS7Padding),
 					                      key.baseAddress,
 					                      key.count,
 					                      nil,
 					                      dataIn.baseAddress,
 					                      dataIn.count,
 					                      dataOut.baseAddress,
-					                      dataIn.count,
+					                      dataOut.count,
 					                      &numBytesDecrypted)
 
 					guard Int32(success) == UInt32(kCCSuccess) else { return }

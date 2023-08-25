@@ -40,37 +40,48 @@ class SwlDatabase {
 			}
 		}
 
-		let crypto = SwlCrypto()
+		password { password in
+			self.unlock(crypto: Swl2Crypto(), password: password, completion: completion)
+		}
+	}
+
+	private func unlock(crypto: CryptoProvider, password: String, completion: @escaping (Bool) -> Void) {
 		self.crypto = crypto
 		crypto.unlock(password: password, completion: { success in
 			// Attempt to verify the password was correct before calling our caller's completion with success equals true.
 			guard success else {
-				completion(false)
+				if crypto is Swl2Crypto {
+					// Try to fall back to SwlCrypto.
+					self.unlock(crypto: SwlCrypto(), password: password, completion: completion)
+				}
+				else {
+					completion(false)
+				}
 				return
 			}
 
 			do {
 				/* Harvest SwlIds for analysis:
 				 let templateFieldsToPrint: [TemplateField] = try self.database.select()
-				 	.compactMap { $0 }
+				 .compactMap { $0 }
 				 templateFieldsToPrint.forEach { NSLog("swlid: \($0.id.hexString) TemplateField(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
 				 let cardsToPrint: [Card] = try self.database.select()
-				 	.compactMap { $0 }
+				 .compactMap { $0 }
 				 cardsToPrint.forEach { NSLog("swlid: \($0.id.hexString) Card(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
 				 let cardAttachmentsToPrint: [CardAttachment] = try self.database.select()
-				 	.compactMap { $0 }
+				 .compactMap { $0 }
 				 cardAttachmentsToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardAttachment(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
 				 let cardDescriptionsToPrint: [CardDescription] = try self.database.select()
-				 	.compactMap { $0 }
+				 .compactMap { $0 }
 				 cardDescriptionsToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardDescription(\(self.decryptString(bytes: $0.description ?? []) ?? "nil"))") }
 				 let cardFieldValuesToPrint: [CardFieldValue] = try self.database.select()
-				 	.compactMap { $0 }
+				 .compactMap { $0 }
 				 cardFieldValuesToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardFieldValue(\($0.templateFieldId.hexString) \($0.cardId.hexString))") }
 				 let categorysToPrint: [Category] = try self.database.select()
-				 	.compactMap { $0 }
+				 .compactMap { $0 }
 				 categorysToPrint.forEach { NSLog("swlid: \($0.id.hexString) Category(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
 				 let templatesToPrint: [Template] = try self.database.select()
-				 	.compactMap { $0 }
+				 .compactMap { $0 }
 				 templatesToPrint.forEach { NSLog("swlid: \($0.id.hexString) Template(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
 				  */
 
@@ -80,12 +91,24 @@ class SwlDatabase {
 					self.decryptString(bytes: $0.name) == "Password"
 				}
 				guard index != nil else {
-					completion(false)
+					if crypto is Swl2Crypto {
+						// Try to fall back to SwlCrypto.
+						self.unlock(crypto: SwlCrypto(), password: password, completion: completion)
+					}
+					else {
+						completion(false)
+					}
 					return
 				}
 			}
 			catch {
-				completion(false)
+				if crypto is Swl2Crypto {
+					// Try to fall back to SwlCrypto.
+					self.unlock(crypto: SwlCrypto(), password: password, completion: completion)
+				}
+				else {
+					completion(false)
+				}
 				return
 			}
 
