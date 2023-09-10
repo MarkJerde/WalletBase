@@ -20,7 +20,7 @@ extension SwlDatabase {
 		let fieldTypeId: Int32
 		/// The priority of this field.
 		let priority: Int32
-		/// The encrypted advanced info of this field.
+		/// The advanced info of this field.
 		let advancedInfo: [UInt8]?
 
 		enum FieldType: Int32 {
