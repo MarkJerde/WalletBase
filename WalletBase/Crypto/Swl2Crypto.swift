@@ -95,7 +95,7 @@ class Swl2Crypto: CryptoProvider {
 					                      dataIn.baseAddress,
 					                      dataIn.count,
 					                      dataOut.baseAddress,
-					                      dataIn.count,
+					                      dataOut.count,
 					                      &numBytesDecrypted)
 
 					guard Int32(success) == UInt32(kCCSuccess) else { return }
