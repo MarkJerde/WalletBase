@@ -10,6 +10,9 @@ import Foundation
 
 enum Alert {
 	case useAtYourOwnRisk
+	case weakCrypto
+	case cryptoConversionFailed
+	case cryptoConversionCompleted
 	case pasteFailed(errorText: String)
 	case delete(type: String, name: String)
 	case savePendingChanges
@@ -91,6 +94,25 @@ enum Alert {
 			             	"Accept",
 			             	"Cancel",
 			             ])
+
+		case .weakCrypto:
+			return .init(title: "Your secrets are not safe.",
+			             body: "This wallet uses weak encryption with critical flaws that make it not recommended in the industry. Upgrade to modern 256-bit AES CBC encryption?",
+			             buttons: [
+			             	"Encrypt",
+			             	"Skip",
+			             ],
+			             style: .critical)
+
+		case .cryptoConversionFailed:
+			return .init(title: "Error!",
+			             body: "Failed to upgrade encryption.",
+			             style: .informational)
+
+		case .cryptoConversionCompleted:
+			return .init(title: "Done!",
+			             body: "Encryption upgraded to 256-bit AES CBC encryption.",
+			             style: .informational)
 
 		case .pasteFailed(let errorText):
 			return .init(title: "Paste Failed",

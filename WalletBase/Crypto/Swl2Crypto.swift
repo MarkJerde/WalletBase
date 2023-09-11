@@ -33,19 +33,18 @@ extension [UInt8] {
 }
 
 class Swl2Crypto: CryptoProvider {
-	func unlock(password: String, completion: @escaping (Bool) -> Void) {
+	func unlock(password: String) -> Bool {
 		let password = "\(password)\0"
 
 		// Adapted from https://stackoverflow.com/a/25762128
 		guard let utf16leData = password.data(using: .utf16LittleEndian) else {
-			completion(false)
-			return
+			return false
 		}
 		let digest = utf16leData.sha256()
 
 		let key = Data(digest)
 		self.key = key
-		completion(true)
+		return true
 	}
 
 	func decryptString(data: Data) -> String? {
@@ -110,7 +109,7 @@ class Swl2Crypto: CryptoProvider {
 		return dataOut
 	}
 
-	private func encrypt(data: Data) -> Data? {
+	func encrypt(data: Data) -> Data? {
 		guard let key = key else { return nil }
 		var dataIn = data
 		var paddingSize: UInt8 = 0

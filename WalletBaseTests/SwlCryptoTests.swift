@@ -19,11 +19,7 @@ class SwlCryptoTests: XCTestCase {
 	}
 
 	private func unlock() {
-		crypto.unlock { givePassword in
-			givePassword("abc123")
-		} completion: { _ in
-			// No op
-		}
+		_ = crypto.unlock(password: "abc123")
 	}
 
 	//

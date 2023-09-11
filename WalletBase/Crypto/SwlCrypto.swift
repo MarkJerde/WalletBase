@@ -22,14 +22,13 @@ extension String {
 }
 
 class SwlCrypto: CryptoProvider {
-	func unlock(password: String, completion: @escaping (Bool) -> Void) {
+	func unlock(password: String) -> Bool {
 		let password = "\(password)\0" // .map { "\($0)\00" }.joined(separator: "")
 		// let sha1 = password.sha1()
 
 		// Adapted from https://stackoverflow.com/a/25762128
 		guard let utf16leData = password.data(using: .utf16LittleEndian) else {
-			completion(false)
-			return
+			return false
 		}
 		var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
 		utf16leData.withUnsafeBytes {
@@ -44,7 +43,7 @@ class SwlCrypto: CryptoProvider {
 		// let keyString = "\(sha1.prefix(20))\(sha1.prefix(12)))"
 		let key = Data(keyArray) // Data(keyString.utf8)
 		self.key = key
-		completion(true)
+		return true
 	}
 
 	func decryptString(data: Data) -> String? {
@@ -109,7 +108,7 @@ class SwlCrypto: CryptoProvider {
 		return dataOut
 	}
 
-	private func encrypt(data: Data) -> Data? {
+	func encrypt(data: Data) -> Data? {
 		guard let key = key else { return nil }
 		var dataIn = data
 		var paddingSize: UInt8 = 0

@@ -9,7 +9,7 @@ import Foundation
 
 extension SwlDatabase {
 	/// An swl database card attachment.
-	struct CardAttachment: Equatable, Hashable {
+	struct CardAttachment: Equatable, SwlIdentifiable {
 		/// The ID of this attachment.
 		let id: SwlID
 		/// The card ID of this attachment.

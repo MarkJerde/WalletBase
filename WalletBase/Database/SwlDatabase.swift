@@ -47,77 +47,264 @@ class SwlDatabase {
 
 	private func unlock(crypto: CryptoProvider, password: String, completion: @escaping (Bool) -> Void) {
 		self.crypto = crypto
-		crypto.unlock(password: password, completion: { success in
-			// Attempt to verify the password was correct before calling our caller's completion with success equals true.
-			guard success else {
+		let success = crypto.unlock(password: password)
+
+		// Attempt to verify the password was correct before calling our caller's completion with success equals true.
+		guard success else {
+			if crypto is Swl2Crypto {
+				// Try to fall back to SwlCrypto.
+				unlock(crypto: SwlCrypto(), password: password, completion: completion)
+			}
+			else {
+				completion(false)
+			}
+			return
+		}
+
+		do {
+			/* Harvest SwlIds for analysis:
+			 let templateFieldsToPrint: [TemplateField] = try self.database.select()
+			 .compactMap { $0 }
+			 templateFieldsToPrint.forEach { NSLog("swlid: \($0.id.hexString) TemplateField(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+			 let cardsToPrint: [Card] = try self.database.select()
+			 .compactMap { $0 }
+			 cardsToPrint.forEach { NSLog("swlid: \($0.id.hexString) Card(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+			 let cardAttachmentsToPrint: [CardAttachment] = try self.database.select()
+			 .compactMap { $0 }
+			 cardAttachmentsToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardAttachment(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+			 let cardDescriptionsToPrint: [CardDescription] = try self.database.select()
+			 .compactMap { $0 }
+			 cardDescriptionsToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardDescription(\(self.decryptString(bytes: $0.description ?? []) ?? "nil"))") }
+			 let cardFieldValuesToPrint: [CardFieldValue] = try self.database.select()
+			 .compactMap { $0 }
+			 cardFieldValuesToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardFieldValue(\($0.templateFieldId.hexString) \($0.cardId.hexString))") }
+			 let categorysToPrint: [Category] = try self.database.select()
+			 .compactMap { $0 }
+			 categorysToPrint.forEach { NSLog("swlid: \($0.id.hexString) Category(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+			 let templatesToPrint: [Template] = try self.database.select()
+			 .compactMap { $0 }
+			 templatesToPrint.forEach { NSLog("swlid: \($0.id.hexString) Template(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
+			  */
+
+			// There doesn't appear to be any mechanism for password validation in the database content. One workaround is to assume that the template fields must include one with the name "Password". This seems questionable in the cases of English not being the language of the content or the database being used to secure things that do not include passwords, but it's what we have so we will use it.
+			let templateFields: [TemplateField] = try database.select().compactMap { $0 }
+			let index = templateFields.firstIndex {
+				self.decryptString(bytes: $0.name) == "Password"
+			}
+			guard index != nil else {
 				if crypto is Swl2Crypto {
 					// Try to fall back to SwlCrypto.
-					self.unlock(crypto: SwlCrypto(), password: password, completion: completion)
+					unlock(crypto: SwlCrypto(), password: password, completion: completion)
 				}
 				else {
 					completion(false)
 				}
 				return
 			}
+		}
+		catch {
+			if crypto is Swl2Crypto {
+				// Try to fall back to SwlCrypto.
+				unlock(crypto: SwlCrypto(), password: password, completion: completion)
+			}
+			else {
+				completion(false)
+			}
+			return
+		}
 
-			do {
-				/* Harvest SwlIds for analysis:
-				 let templateFieldsToPrint: [TemplateField] = try self.database.select()
-				 .compactMap { $0 }
-				 templateFieldsToPrint.forEach { NSLog("swlid: \($0.id.hexString) TemplateField(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
-				 let cardsToPrint: [Card] = try self.database.select()
-				 .compactMap { $0 }
-				 cardsToPrint.forEach { NSLog("swlid: \($0.id.hexString) Card(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
-				 let cardAttachmentsToPrint: [CardAttachment] = try self.database.select()
-				 .compactMap { $0 }
-				 cardAttachmentsToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardAttachment(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
-				 let cardDescriptionsToPrint: [CardDescription] = try self.database.select()
-				 .compactMap { $0 }
-				 cardDescriptionsToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardDescription(\(self.decryptString(bytes: $0.description ?? []) ?? "nil"))") }
-				 let cardFieldValuesToPrint: [CardFieldValue] = try self.database.select()
-				 .compactMap { $0 }
-				 cardFieldValuesToPrint.forEach { NSLog("swlid: \($0.id.hexString) CardFieldValue(\($0.templateFieldId.hexString) \($0.cardId.hexString))") }
-				 let categorysToPrint: [Category] = try self.database.select()
-				 .compactMap { $0 }
-				 categorysToPrint.forEach { NSLog("swlid: \($0.id.hexString) Category(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
-				 let templatesToPrint: [Template] = try self.database.select()
-				 .compactMap { $0 }
-				 templatesToPrint.forEach { NSLog("swlid: \($0.id.hexString) Template(\(self.decryptString(bytes: $0.name) ?? "nil"))") }
-				  */
+		// Store that the user has seen the warning, now that we know the user is someone who can unlock the file.
+		acceptTerms(for: database.file)
 
-				// There doesn't appear to be any mechanism for password validation in the database content. One workaround is to assume that the template fields must include one with the name "Password". This seems questionable in the cases of English not being the language of the content or the database being used to secure things that do not include passwords, but it's what we have so we will use it.
-				let templateFields: [TemplateField] = try self.database.select().compactMap { $0 }
-				let index = templateFields.firstIndex {
-					self.decryptString(bytes: $0.name) == "Password"
+		if isWeakCrypto {
+			Alert.weakCrypto.show { response in
+				defer {
+					self.isUnlocked = true
+					completion(true)
 				}
-				guard index != nil else {
-					if crypto is Swl2Crypto {
-						// Try to fall back to SwlCrypto.
-						self.unlock(crypto: SwlCrypto(), password: password, completion: completion)
-					}
-					else {
-						completion(false)
-					}
+
+				guard response == "Encrypt" else {
 					return
 				}
+
+				let toCrypto = Swl2Crypto()
+				guard let fromCrypto = self.crypto,
+				      toCrypto.unlock(password: password)
+				else {
+					Alert.cryptoConversionFailed.show()
+					return
+				}
+
+				do {
+					try self.migrateCrypto(from: fromCrypto, to: toCrypto)
+				}
+				catch {
+					Alert.cryptoConversionFailed.show()
+					return
+				}
+
+				Alert.cryptoConversionCompleted.show()
+			}
+		}
+		else {
+			isUnlocked = true
+			completion(true)
+		}
+	}
+
+	private func migrateCrypto(from: CryptoProvider, to: CryptoProvider) throws {
+		do {
+			try database.beginTransaction()
+		}
+		catch {
+			throw Error.writeFailure
+		}
+
+		do {
+			let convert: ([UInt8]?) throws -> [UInt8]? = {
+				guard let input = $0 else {
+					return nil
+				}
+
+				guard input != [0, 0, 0, 0] else {
+					return input
+				}
+
+				let data = Data(input)
+				guard let decrypted = from.decryptData(data: data),
+				      let encrypted = to.encrypt(data: decrypted)
+				else {
+					throw Error.writeFailure
+				}
+
+				return [UInt8](encrypted)
+			}
+
+			let cards: [Card] = try database.select()
+				.compactMap { $0 }
+			try cards.forEach { card in
+				try update(id: card.id) { card -> Card? in
+					Card(id: card.id,
+					     name: try convert(card.name)!,
+					     description: try convert(card.description),
+					     cardViewID: card.cardViewID,
+					     hasOwnCardView: card.hasOwnCardView,
+					     templateID: card.templateID,
+					     parent: card.parent,
+					     iconID: card.iconID,
+					     hitCount: card.hitCount,
+					     syncID: card.syncID,
+					     createSyncID: card.createSyncID)
+				}
+			}
+
+			let cardAttachments: [CardAttachment] = try database.select()
+				.compactMap { $0 }
+			try cardAttachments.forEach { cardAttachment in
+				try update(id: cardAttachment.id) { cardAttachment -> CardAttachment? in
+					CardAttachment(id: cardAttachment.id,
+					               cardId: cardAttachment.cardId,
+					               name: try convert(cardAttachment.name)!,
+					               data: try convert(cardAttachment.data)!,
+					               syncID: cardAttachment.syncID,
+					               createSyncID: cardAttachment.createSyncID)
+				}
+			}
+
+			let cardFieldValues: [CardFieldValue] = try database.select()
+				.compactMap { $0 }
+			try cardFieldValues.forEach { cardFieldValue in
+				try update(id: cardFieldValue.id) { cardFieldValue -> CardFieldValue? in
+					CardFieldValue(id: cardFieldValue.id,
+					               cardId: cardFieldValue.cardId,
+					               templateFieldId: cardFieldValue.templateFieldId,
+					               value: try convert(cardFieldValue.value)!)
+				}
+			}
+
+			let categories: [Category] = try database.select()
+				.compactMap { $0 }
+			try categories.forEach { category in
+				try update(id: category.id) { category -> Category? in
+					Category(id: category.id,
+					         name: try convert(category.name)!,
+					         description: try convert(category.description),
+					         iconID: category.iconID,
+					         defaultTemplateID: category.defaultTemplateID,
+					         parent: category.parent,
+					         syncID: category.syncID,
+					         createSyncID: category.createSyncID)
+				}
+			}
+
+			let icons: [Icon] = try database.select()
+				.compactMap { $0 }
+			try icons.forEach { icon in
+				try update(id: icon.id) { icon -> Icon? in
+					Icon(id: icon.id,
+					     name: try convert(icon.name)!,
+					     data: try convert(icon.data),
+					     syncID: icon.syncID,
+					     createSyncID: icon.createSyncID)
+				}
+			}
+
+			let images: [Image] = try database.select()
+				.compactMap { $0 }
+			try images.forEach { image in
+				try update(id: image.id) { image -> Image? in
+					Image(id: image.id,
+					      name: try convert(image.name)!,
+					      data: try convert(image.data),
+					      syncID: image.syncID,
+					      createSyncID: image.createSyncID)
+				}
+			}
+
+			let templates: [Template] = try database.select()
+				.compactMap { $0 }
+			try templates.forEach { template in
+				try update(id: template.id) { template -> Template? in
+					Template(id: template.id,
+					         name: try convert(template.name)!,
+					         description: try convert(template.description),
+					         cardViewID: template.cardViewID,
+					         syncID: template.syncID,
+					         createSyncID: template.createSyncID)
+				}
+			}
+
+			let templateFields: [TemplateField] = try database.select()
+				.compactMap { $0 }
+			try templateFields.forEach { templateField in
+				try update(id: templateField.id) { templateField -> TemplateField? in
+					TemplateField(id: templateField.id,
+					              name: try convert(templateField.name)!,
+					              templateId: templateField.templateId,
+					              fieldTypeId: templateField.fieldTypeId,
+					              priority: templateField.priority,
+					              advancedInfo: templateField.advancedInfo)
+				}
+			}
+		}
+		catch {
+			do {
+				try database.rollbackTransaction()
 			}
 			catch {
-				if crypto is Swl2Crypto {
-					// Try to fall back to SwlCrypto.
-					self.unlock(crypto: SwlCrypto(), password: password, completion: completion)
-				}
-				else {
-					completion(false)
-				}
-				return
+				throw Error.writeFailureIndeterminite
 			}
+			throw Error.writeFailure
+		}
 
-			// Store that the user has seen the warning, now that we know the user is someone who can unlock the file.
-			self.acceptTerms(for: self.database.file)
+		do {
+			try database.commitTransaction()
+		}
+		catch {
+			throw Error.writeFailure
+		}
 
-			self.isUnlocked = true
-			completion(true)
-		})
+		crypto = to
 	}
 
 	private func disclaimerKey(for file: URL) -> String? {
@@ -133,6 +320,10 @@ class SwlDatabase {
 	private func acceptTerms(for file: URL) {
 		guard let disclaimerKey = disclaimerKey(for: file) else { return }
 		UserDefaults.standard.set(true, forKey: disclaimerKey)
+	}
+
+	var isWeakCrypto: Bool {
+		crypto is SwlCrypto
 	}
 
 	/// Closes the wallet by discarding the decryption key.
@@ -446,14 +637,14 @@ class SwlDatabase {
 	}
 
 	func update<T: SQLiteDatabaseItem & SQLiteQueryReadWritable & SwlIdentifiable>(id: SwlID,
-	                                                                               transform: (T) -> T?) throws
+	                                                                               transform: (T) throws -> T?) throws
 	{
 		let current: [T]? = try? database.select(where: "id \(id.queryCondition)").compactMap { $0 }
 		guard let current = current,
 		      current.count == 1,
 		      let current = current.first,
 		      current.id == id,
-		      let updated = transform(current)
+		      let updated = try transform(current)
 		else {
 			do {
 				try database.rollbackTransaction()

@@ -8,8 +8,9 @@
 import Foundation
 
 protocol CryptoProvider: AnyObject {
-	func unlock(password: String, completion: @escaping (Bool) -> Void)
+	func unlock(password: String) -> Bool
 	func decryptString(data: Data) -> String?
 	func decryptData(data: Data) -> Data?
 	func encrypt(_ string: String) -> Data?
+	func encrypt(data: Data) -> Data?
 }
