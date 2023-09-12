@@ -8,7 +8,7 @@
 import Foundation
 
 extension SwlDatabase {
-	/// An swl database card.
+	/// The swl database version record.
 	struct DatabaseVersion: Equatable {
 		/// The ID of this product.
 		let productID: Int32
