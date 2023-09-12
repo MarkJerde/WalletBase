@@ -21,6 +21,10 @@ struct SQLiteVarcharItem: Equatable {
 	private let arrayValue: [UInt8]?
 	private let stringValue: String?
 
+	var count: Int {
+		arrayValue?.count ?? stringValue?.count ?? 0
+	}
+
 	var queryEncoded: String {
 		if let stringValue = stringValue {
 			return "'\(stringValue.replacingOccurrences(of: "'", with: "''"))'"

@@ -171,6 +171,54 @@ class SQLiteDatabase {
 		return response
 	}
 
+	func create<T: SQLiteDatabaseItem>(record: T) throws where T: SQLiteQueryWritable {
+		guard canBackupDatabaseFile,
+		      try backupDatabaseFile()
+		else {
+			throw LayerError(site: .backup, problem: .generalError)
+		}
+
+		var statement: OpaquePointer?
+
+		let columns = record.encode().map { column in
+			let type: String
+			switch column.value {
+			case .integer:
+				type = "INTEGER NOT NULL"
+			case .varchar(let value):
+				type = "VARCHAR(\(value.count) NOT NULL"
+			case .blob:
+				type = "BLOB NOT NULL"
+			case .nullableVarchar(let value):
+				type = "VARCHAR(\(value?.count ?? 0)"
+			case .nullableBlob:
+				type = "BLOB NULL"
+			}
+			return """
+			\("    ")"\(column.key)" \(type)\((column.key == T.primary) ? " PRIMARY KEY" : "")
+			"""
+		}
+		.joined(separator: ",\n")
+		let statementText = """
+		CREATE TABLE IF NOT EXISTS "\(T.table.name)" (
+		\(columns)
+		);
+		"""
+		guard sqlite3_prepare_v2(database, statementText, -1, &statement, nil) == SQLITE_OK,
+		      let statement = statement
+		else {
+			throw DatabaseError(site: .prepare, database: database)
+		}
+
+		guard sqlite3_step(statement) == SQLITE_DONE else {
+			throw DatabaseError(site: .step, database: database)
+		}
+
+		guard sqlite3_finalize(statement) == SQLITE_OK else {
+			throw DatabaseError(site: .finalize, database: database)
+		}
+	}
+
 	func insert<T: SQLiteDatabaseItem>(record: T) throws where T: SQLiteQueryWritable {
 		try insert(into: T.table, values: record.insertionValues())
 	}

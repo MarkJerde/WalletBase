@@ -10,9 +10,9 @@ import Foundation
 
 enum Alert {
 	case useAtYourOwnRisk
-	case weakCrypto
+	case weakCrypto(iterations: UInt32)
 	case cryptoConversionFailed
-	case cryptoConversionCompleted
+	case cryptoConversionCompleted(iterations: UInt32)
 	case pasteFailed(errorText: String)
 	case delete(type: String, name: String)
 	case savePendingChanges
@@ -95,9 +95,20 @@ enum Alert {
 			             	"Cancel",
 			             ])
 
-		case .weakCrypto:
+		case .weakCrypto(let iterations):
+			let numberFormatter = NumberFormatter()
+			numberFormatter.numberStyle = .decimal
+			let formattedIterations = numberFormatter.string(from: NSNumber(value: iterations))
+			let iterationQualification: String
+			if iterations > 0,
+			   let formattedIterations
+			{
+				iterationQualification = "\(formattedIterations)-iteration "
+			} else {
+				iterationQualification = ""
+			}
 			return .init(title: "Your secrets are not safe.",
-			             body: "This wallet uses weak encryption with critical flaws that make it not recommended in the industry. Upgrade to modern 256-bit AES CBC encryption?",
+			             body: "This wallet uses weak encryption with critical flaws that make it not recommended in the industry. Upgrade to modern \(iterationQualification)256-bit AES CBC encryption?",
 			             buttons: [
 			             	"Encrypt",
 			             	"Skip",
@@ -109,9 +120,20 @@ enum Alert {
 			             body: "Failed to upgrade encryption.",
 			             style: .informational)
 
-		case .cryptoConversionCompleted:
+		case .cryptoConversionCompleted(let iterations):
+			let numberFormatter = NumberFormatter()
+			numberFormatter.numberStyle = .decimal
+			let formattedIterations = numberFormatter.string(from: NSNumber(value: iterations))
+			let iterationQualification: String
+			if iterations > 0,
+			   let formattedIterations
+			{
+				iterationQualification = "\(formattedIterations)-iteration "
+			} else {
+				iterationQualification = ""
+			}
 			return .init(title: "Done!",
-			             body: "Encryption upgraded to 256-bit AES CBC encryption.",
+			             body: "Encryption upgraded to \(iterationQualification)256-bit AES CBC encryption.",
 			             style: .informational)
 
 		case .pasteFailed(let errorText):

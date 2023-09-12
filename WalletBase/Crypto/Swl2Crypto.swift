@@ -33,6 +33,17 @@ extension [UInt8] {
 }
 
 class Swl2Crypto: CryptoProvider {
+	init(keyDerivation: KeyDerivation) {
+		self.keyDerivation = keyDerivation
+	}
+
+	enum KeyDerivation {
+		case sha256
+		case pbkdf2(iterations: Int32, salt: Data)
+	}
+
+	let keyDerivation: KeyDerivation
+
 	func unlock(password: String) -> Bool {
 		let password = "\(password)\0"
 
@@ -40,9 +51,21 @@ class Swl2Crypto: CryptoProvider {
 		guard let utf16leData = password.data(using: .utf16LittleEndian) else {
 			return false
 		}
-		let digest = utf16leData.sha256()
 
-		let key = Data(digest)
+		let key: Data?
+		switch keyDerivation {
+		case .sha256:
+			let digest = utf16leData.sha256()
+			key = Data(digest)
+		case .pbkdf2(let iterations, let salt):
+			// 512 even though we currently only need 256 based on somewhat old advice that hasn't been vetted relating to GPU processing being better suited for 32 bit values, making the 64-bit values for 512 less efficient. https://security.stackexchange.com/questions/17994/with-pbkdf2-what-is-an-optimal-hash-size-in-bytes-what-about-the-size-of-the-s
+			key = PBKDF2.sha512.pbkdf2(password: utf16leData,
+			                           salt: salt,
+			                           rounds: UInt32(iterations))
+		}
+
+		guard let key else { return false }
+
 		self.key = key
 		return true
 	}

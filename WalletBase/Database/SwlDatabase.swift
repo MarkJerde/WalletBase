@@ -41,7 +41,17 @@ class SwlDatabase {
 		}
 
 		password { password in
-			self.unlock(crypto: Swl2Crypto(), password: password, completion: completion)
+			let metadata: DatabaseMetadata? = try? self.database.select().compactMap { $0 }.first
+
+			let keyDerivation: Swl2Crypto.KeyDerivation
+			if let metadata {
+				keyDerivation = .pbkdf2(iterations: metadata.rounds, salt: Data(metadata.salt))
+			}
+			else {
+				keyDerivation = .sha256
+			}
+
+			self.unlock(crypto: Swl2Crypto(keyDerivation: keyDerivation), password: password, completion: completion)
 		}
 	}
 
@@ -117,7 +127,21 @@ class SwlDatabase {
 		acceptTerms(for: database.file)
 
 		if isWeakCrypto {
-			Alert.weakCrypto.show { response in
+			let password = "\(password)\0"
+
+			let metadata: DatabaseMetadata?
+			if let utf16leData = password.data(using: .utf16LittleEndian),
+			   // 128-bit salt per guidance here: https://security.stackexchange.com/questions/17994/with-pbkdf2-what-/
+			   let salt: [UInt8] = .cryptographicRandomBytes(count: 128)
+			{
+				let rounds = PBKDF2.sha512.calibrate(forPasswordBytes: utf16leData.count, saltBytes: salt.count, milliseconds: 500)
+				metadata = DatabaseMetadata(rounds: Int32(rounds), salt: salt)
+			}
+			else {
+				metadata = nil
+			}
+
+			Alert.weakCrypto(iterations: UInt32(metadata?.rounds ?? 0)).show { response in
 				defer {
 					self.isUnlocked = true
 					completion(true)
@@ -127,7 +151,18 @@ class SwlDatabase {
 					return
 				}
 
-				let toCrypto = Swl2Crypto()
+				let keyDerivation: Swl2Crypto.KeyDerivation
+				if let metadata,
+				   metadata.rounds > 0
+				{
+					keyDerivation = .pbkdf2(iterations: metadata.rounds,
+					                        salt: Data(metadata.salt))
+				}
+				else {
+					keyDerivation = .sha256
+				}
+
+				let toCrypto = Swl2Crypto(keyDerivation: keyDerivation)
 				guard let fromCrypto = self.crypto,
 				      toCrypto.unlock(password: password)
 				else {
@@ -143,7 +178,7 @@ class SwlDatabase {
 					return
 				}
 
-				Alert.cryptoConversionCompleted.show()
+				Alert.cryptoConversionCompleted(iterations: UInt32(metadata?.rounds ?? 0)).show()
 			}
 		}
 		else {
@@ -161,6 +196,27 @@ class SwlDatabase {
 		}
 
 		do {
+			// Update the metadata record if needed.
+			if let to = to as? Swl2Crypto {
+				switch to.keyDerivation {
+				case .pbkdf2(let iterations, let salt):
+					let metadata = DatabaseMetadata(rounds: Int32(iterations), salt: [UInt8](salt))
+					// Create the table if it doesn't exist.
+					try database.create(record: metadata)
+					// Remove everything old from the table.
+					try database.delete(from: DatabaseMetadata.table, where: "1=1")
+					// Insert the one record this table can have.
+					try database.insert(record: metadata)
+				default:
+					// Create a dummy metadata so we can clear the table.
+					let metadata = DatabaseMetadata(rounds: Int32(0), salt: [UInt8]())
+					// Create the table if it doesn't exist.
+					try database.create(record: metadata)
+					// Remove everything old from the table.
+					try database.delete(from: DatabaseMetadata.table, where: "1=1")
+				}
+			}
+
 			let convert: ([UInt8]?) throws -> [UInt8]? = {
 				guard let input = $0 else {
 					return nil
@@ -323,7 +379,13 @@ class SwlDatabase {
 	}
 
 	var isWeakCrypto: Bool {
-		crypto is SwlCrypto
+		guard let crypto = crypto as? Swl2Crypto else { return true }
+		switch crypto.keyDerivation {
+		case .sha256:
+			return true
+		case .pbkdf2(let iterations, _):
+			return iterations < 10000
+		}
 	}
 
 	/// Closes the wallet by discarding the decryption key.
@@ -887,6 +949,7 @@ class SwlDatabase {
 
 	enum Tables: String, SQLiteTable {
 		case databaseVersion = "spb_DatabaseVersion" // R/W
+		case databaseMetadata = "spbwlt_DatabaseMetadata" // R/W
 		case wallet = "spbwlt_Wallet" // R/W
 		case categories = "spbwlt_Category" // R/W
 		case cards = "spbwlt_Card" // R/W
