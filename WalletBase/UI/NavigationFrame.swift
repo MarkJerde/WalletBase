@@ -44,20 +44,19 @@ struct NavigationFrame<Content>: View where Content: View {
 				}
 				Spacer(minLength: 30)
 				if let onSearch = onSearch {
-					TextField("Search...", text: $searchTerm)
-						.foregroundColor(Color.black)
-						.background(
-							RoundedRectangle(cornerRadius: 4)
-								.fill(Color.gray)
-						)
-						.overlay(
-							// TextField has an opaque background in LightMode and a transparent background in DarkMode, so overlay the border so it doesn't have the LightMode background corners cutting into it.
-							RoundedRectangle(cornerRadius: 4)
-								.stroke(Color(NSColor.windowBackgroundColor), lineWidth: 2)
-						)
-						.onReceive(Just(searchTerm)) { _ in
-							onSearch(searchTerm)
-						}
+					TextField("Search...", text: $searchTerm.onChange { searchTerm in
+						onSearch(searchTerm)
+					})
+					.foregroundColor(Color.black)
+					.background(
+						RoundedRectangle(cornerRadius: 4)
+							.fill(Color.gray)
+					)
+					.overlay(
+						// TextField has an opaque background in LightMode and a transparent background in DarkMode, so overlay the border so it doesn't have the LightMode background corners cutting into it.
+						RoundedRectangle(cornerRadius: 4)
+							.stroke(Color(NSColor.windowBackgroundColor), lineWidth: 2)
+					)
 				}
 				Spacer(minLength: 50)
 				if let currentName = currentName {
