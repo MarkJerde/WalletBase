@@ -1,16 +1,16 @@
 # Wallet Base
 
 ## What is this?
-Wallet Base is an app which reads `swl` format encrypted information files. It does not create or edit them.
+Wallet Base is an app which reads `swl` format encrypted information files. It does not create them but has some capacity to edit them.
 
 ## Why does this exist?
-The software for that file format has long been out of production. I had a file I wanted to read and thought it would be a fun project to figure out the format and create a SwiftUI-based app to present the content.
+The software for that file format has long been out of production. I had a file I wanted to read and thought it would be a fun project to figure out the format and create a SwiftUI-based app to present the content. Since then it has just turned into a playground to practice SwiftUI and learn more about SQL, crypto, and other topics.
 
 ## So if you can read the encrypted file is it insecure?
 Not at all. I know the password required to decrypt the content.
 
 ## So is the file secure?
-Not really. It was fine for its time, but the form of AES (a good encryption mechanism) that it uses lacks some modern improvements which means it would be easier to crack. Also, and this depends on the content of the file, but it appears that in nearly all cases an attacker could use some analysis to find the encrypted form of text known to be the word "Password", which would be handy when identiying a simple target to check when attempting to crack the encryption. It might be reasonable to say that encrypting the names of common field types wasn't a good choice. But, you have one of these files and are trying to open it, so it's reasonable to assume you have already accepted the security of the file format.
+Not really. It was fine for its time, but the form of AES (a good encryption mechanism) that it uses lacks some modern improvements which means it would be easier to crack. Also, and this depends on the content of the file, but it appears that in nearly all cases an attacker could use some analysis to find the encrypted form of text known to be the word "Password", which would be handy when identiying a simple target to check when attempting to crack the encryption. It might be reasonable to say that encrypting the names of common field types wasn't a good choice. But, you have one of these files and are trying to open it, so it's reasonable to assume you have already accepted the security of the file format. This software can now upgrade the encryption on the file, which is probably better than the original encryption, but it was written by a hack so there could be a big flaw somewhere in the upgraded encryption for all I know.
 
 ## Is this software safe?
 It would require bad judgement for me to say it is safe. You read the code and decide how you feel about it. It certainly could be worse. It certainly could be better.
@@ -31,4 +31,4 @@ Sure. Feel free to submit PRs to add features, add support for other file format
 Yes please. I have missed basic documentation in some places, but as little free time as I have for this project it would never be publicly released if I waited until I thought it was perfect.
 
 ## How about unit tests?
-Yes please. I think the original software could be used to create a nice sample file with a known password which would 
+Yes please.
