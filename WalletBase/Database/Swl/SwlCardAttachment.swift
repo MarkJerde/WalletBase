@@ -16,7 +16,7 @@ extension SwlDatabase {
 		let cardId: SwlID
 		/// The encrypted name of this attachment.
 		let name: [UInt8]
-		/// The encrypted data of this attachment.
+		/// The zlib compressed then encrypted data of this attachment.
 		let data: [UInt8]
 		/// Something. Starts at -1.
 		let syncID: Int32

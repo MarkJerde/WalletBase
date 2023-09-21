@@ -162,12 +162,11 @@ enum Alert {
 
 		case .saveCompressedAttachement:
 			return .init(title: "Save compressed attachment?",
-			             body: "Attachments are compressed, though it's not clear what compression was used. But at least it's decrypted. Do you still want to save?",
 			             buttons: [
 			             	"OK",
 			             	"Cancel",
 			             ],
-			             style: .warning)
+			             style: .informational)
 
 		case .writeFailureIndeterminite:
 			return .init(title: "Save Failed",

@@ -225,7 +225,17 @@ struct CardView<Item: CardViewItem>: View {
 					guard dialog.runModal() == .OK,
 					      let url = dialog.url else { return }
 
-					try? item.decryptedData?.write(to: url)
+					// These are compressed with zlib and then wrapped with some custom stuff.
+					// 4 bytes uncompressed length, little endian.
+					// 2 bytes something (78 9c in all small and large examples observed)
+					// zlib
+					// 4 bytes something
+					// 0x06
+					guard let decryptedData = item.decryptedData,
+					      decryptedData.count > 11 else { return }
+
+					let zlibData = decryptedData.subdata(in: 6 ..< (decryptedData.count - 5)) as NSData
+					try? zlibData.decompressed(using: .zlib).write(to: url)
 				}
 			}
 		}
