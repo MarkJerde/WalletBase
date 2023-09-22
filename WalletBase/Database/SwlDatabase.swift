@@ -505,11 +505,11 @@ class SwlDatabase {
 	/// Obtains the decrypted card items in a given category.
 	/// - Parameter category: The category.
 	/// - Returns: The items.
-	func cards(in category: Category) -> [Item] {
+	func cards(in category: Category?) -> [Item] {
 		guard let crypto = crypto else { return [] }
 		do {
 			// Find everything that matches.
-			let cards: [Card] = try database.select(where: "ParentCategoryID \(category.id.queryCondition)").compactMap { $0 }
+			let cards: [Card] = try database.select(where: "ParentCategoryID \(category?.id.queryCondition ?? "like ''")").compactMap { $0 }
 
 			// Decrypt the item names and return.
 			return cards.compactMap { card in

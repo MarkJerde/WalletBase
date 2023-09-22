@@ -73,7 +73,7 @@ class AppState: ObservableObject {
 		let newCanCreateNewFolder: Bool
 		switch state {
 		case .browseContent:
-			newCanCreateNewCard = category != nil
+			newCanCreateNewCard = true
 			newCanCreateNewFolder = true
 		default:
 			newCanCreateNewCard = false
@@ -200,8 +200,7 @@ class AppState: ObservableObject {
 	///   - named: The card name.
 	///   - templateID: The template ID.
 	func createCard(named: String, templateID: SwlDatabase.SwlID) {
-		guard let (database, category) = currentDatabaseAndCategory(),
-		      let category else { return }
+		guard let (database, category) = currentDatabaseAndCategory() else { return }
 		// FIXME: Need an iconID. Just pick the most common.
 		guard let iconID = database.mostCommonID(selecting: { category in category.iconID } as (SwlDatabase.Card) -> SwlDatabase.SwlID)
 		else {
@@ -212,13 +211,14 @@ class AppState: ObservableObject {
 		      let description = database.encrypt(text: ""), // Strings are typically nullable in the swl database but in practice a X'00000000' value is used rather than NULL.
 		      let cardID = SwlDatabase.SwlID.new,
 		      let cardViewID = SwlDatabase.SwlID.new else { return }
+		let parent = category?.id ?? .rootCategory
 		let card = SwlDatabase.Card(id: cardID,
 		                            name: [UInt8](encryptedName),
 		                            description: [UInt8](description),
 		                            cardViewID: cardViewID,
 		                            hasOwnCardView: 0,
 		                            templateID: templateID,
-		                            parent: category.id,
+		                            parent: parent,
 		                            iconID: iconID,
 		                            hitCount: 0,
 		                            syncID: -1,
@@ -270,9 +270,6 @@ class AppState: ObservableObject {
 		}
 		switch currentCutItemType {
 		case .card:
-			guard let category else {
-				return "Cannot place cards in the topmost folder."
-			}
 			do {
 				try database.update(id: currentCutItemId) { current -> SwlDatabase.Card? in
 					SwlDatabase.Card(id: current.id,
@@ -281,7 +278,7 @@ class AppState: ObservableObject {
 					                 cardViewID: current.cardViewID,
 					                 hasOwnCardView: current.hasOwnCardView,
 					                 templateID: current.templateID,
-					                 parent: category.id,
+					                 parent: category?.id ?? .null,
 					                 iconID: current.iconID,
 					                 hitCount: current.hitCount,
 					                 syncID: current.syncID,
@@ -475,12 +472,7 @@ class AppState: ObservableObject {
 			swlCategory = category
 		}
 		let categories = database.categories(in: swlCategory).sorted(by: \.name)
-		let cards: [SwlDatabase.Item]
-		if let swlCategory = swlCategory {
-			cards = database.cards(in: swlCategory).sorted(by: \.name)
-		} else {
-			cards = []
-		}
+		let cards = database.cards(in: swlCategory).sorted(by: \.name)
 		return categories + cards
 	}
 
