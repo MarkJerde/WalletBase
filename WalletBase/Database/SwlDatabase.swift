@@ -111,6 +111,45 @@ class SwlDatabase {
 				}
 				return
 			}
+
+			/* Extract all images and save to demonstrate that these are encrypted and are zlib compressed and can be extracted.
+			 DispatchQueue.main.async {
+			 	do {
+			 		let images: [SwlDatabase.Image] = try self.database.select()
+			 			.compactMap { $0 }
+			 		images.forEach { image in
+			 			let name = crypto.decryptString(data: Data(image.name))
+			 			guard let imageData = image.data else {
+			 				return
+			 			}
+			 			let data = crypto.decryptData(data: Data(imageData))
+
+			 			let dialog = NSSavePanel()
+
+			 			dialog.title = "Save attachment"
+			 			dialog.nameFieldStringValue = name ?? "Unknown"
+			 			dialog.canCreateDirectories = true
+			 			dialog.showsResizeIndicator = true
+
+			 			guard dialog.runModal() == .OK,
+			 			      let url = dialog.url else { return }
+
+			 			// These are compressed with zlib and then wrapped with some custom stuff.
+			 			// 4 bytes uncompressed length, little endian.
+			 			// 2 bytes something (78 9c in all small and large examples observed)
+			 			// zlib
+			 			// 4 bytes something
+			 			// 0x06
+			 			guard let decryptedData = data,
+			 			      decryptedData.count > 11 else { return }
+
+			 			let zlibData = decryptedData.subdata(in: 6 ..< (decryptedData.count - 5)) as NSData
+			 			try? zlibData.decompressed(using: .zlib).write(to: url)
+			 		}
+			 	}
+			 	catch {}
+			 }
+			  */
 		}
 		catch {
 			if crypto is Swl2Crypto {

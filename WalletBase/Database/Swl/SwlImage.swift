@@ -14,7 +14,7 @@ extension SwlDatabase {
 		let id: SwlID
 		/// The encrypted name of this image.
 		let name: [UInt8]
-		/// The data of this image.
+		/// The zlib compressed then encrypted data of this image.
 		let data: [UInt8]?
 		/// Something. Starts at -1.
 		let syncID: Int32
