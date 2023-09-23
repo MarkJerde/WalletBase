@@ -543,6 +543,12 @@ class AppState: ObservableObject {
 	}
 
 	func showFailedToSaveAlert() {
+		if let (database, _) = currentDatabaseAndCategory(),
+		   !database.database.canBackupDatabaseFile
+		{
+			Alert.canOnlySaveImportedWallets.show()
+			return
+		}
 		Alert.failedToSave.show()
 	}
 

@@ -213,6 +213,10 @@ class SwlDatabase {
 					try self.migrateCrypto(from: fromCrypto, to: toCrypto)
 				}
 				catch {
+					guard self.database.canBackupDatabaseFile else {
+						Alert.canOnlySaveImportedWallets.show()
+						return
+					}
 					Alert.cryptoConversionFailed.show()
 					return
 				}

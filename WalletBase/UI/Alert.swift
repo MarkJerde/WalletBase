@@ -21,6 +21,7 @@ enum Alert {
 	case deleteError(itemType: String)
 	case deleteErrorNotEmpty(itemType: String)
 	case failedToSave
+	case canOnlySaveImportedWallets
 
 	func show(completion: ((String) -> Void)? = nil) {
 		DispatchQueue.main.async {
@@ -190,6 +191,11 @@ enum Alert {
 		case .failedToSave:
 			return .init(title: "Save Failed",
 			             body: "Something went wrong while trying to save. Please try again.",
+			             style: .warning)
+
+		case .canOnlySaveImportedWallets:
+			return .init(title: "Save Failed",
+			             body: "Only imported wallets can be saved. Lock this wallet and then use the Import button on the unlock screen to import it. This limitation only exists so that older wallet versions can be saved as backups, in case WalletBase completely trashes your wallet.",
 			             style: .warning)
 		}
 	}
