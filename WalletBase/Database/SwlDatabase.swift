@@ -171,7 +171,7 @@ class SwlDatabase {
 			let metadata: DatabaseMetadata?
 			if let utf16leData = password.data(using: .utf16LittleEndian),
 			   // 128-bit salt per guidance here: https://security.stackexchange.com/questions/17994/with-pbkdf2-what-/
-			   let salt: [UInt8] = .cryptographicRandomBytes(count: 128)
+			   let salt: [UInt8] = .cryptographicRandomBytes(count: 16)
 			{
 				let rounds = PBKDF2.sha512.calibrate(forPasswordBytes: utf16leData.count, saltBytes: salt.count, milliseconds: 500)
 				metadata = DatabaseMetadata(rounds: Int32(rounds), salt: salt)
