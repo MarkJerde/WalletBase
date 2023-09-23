@@ -97,11 +97,9 @@ class Swl2Crypto: CryptoProvider {
 
 	private var key: Data?
 
-	private func decrypt(data: Data) -> Data? {
-		guard !data.isEmpty,
+	private func decrypt(data dataIn: Data) -> Data? {
+		guard !dataIn.isEmpty,
 		      let key = key else { return nil }
-		let paddingSize = data[0]
-		let dataIn = data[4...]
 		var dataOut = Data(count: dataIn.count)
 		var numBytesDecrypted: size_t = 0
 		var successBytes = 0
@@ -127,22 +125,16 @@ class Swl2Crypto: CryptoProvider {
 				}
 			}
 		}
-		guard successBytes > paddingSize else { return nil }
+		guard successBytes > 0 else { return nil }
 
-		return dataOut[..<(successBytes - Int(paddingSize))]
+		return dataOut[..<successBytes]
 	}
 
-	func encrypt(data: Data) -> Data? {
+	func encrypt(data dataIn: Data) -> Data? {
 		// Ensure we have a key and can generate an iv.
 		guard let key = key,
 		      let ivArray: [UInt8] = .cryptographicRandomBytes(count: kCCBlockSizeAES128) else { return nil }
 		let iv = Data(ivArray)
-		var dataIn = data
-		var paddingSize: UInt8 = 0
-		while dataIn.count % 16 > 0 {
-			dataIn.append(0)
-			paddingSize += 1
-		}
 		// "A general rule for the size of the output buffer which must be provided by the caller is that for block ciphers, the output length is never larger than the input length plus the block size." (https://opensource.apple.com/source/CommonCrypto/CommonCrypto-60061/include/CommonCryptor.h#:~:text=A%20general%20rule%20for%20the,same%20as%20the%20input%20length.)
 		var dataOut = Data(count: dataIn.count + kCCBlockSizeAES128)
 		var numBytesEncrypted: size_t = 0
@@ -174,7 +166,6 @@ class Swl2Crypto: CryptoProvider {
 		guard successBytes > 0 else { return nil }
 
 		var response = Data(count: 0)
-		response.append(contentsOf: [paddingSize, 0, 0, 0])
 		response.append(iv) // Prefix on the iv.
 		response.append(dataOut[..<successBytes]) // Then the cipher data.
 		return response
