@@ -108,14 +108,15 @@ class Swl2Crypto: CryptoProvider {
 		dataOut.withUnsafeMutableBytes { dataOut in
 			dataIn.withUnsafeBytes { dataIn in
 				key.withUnsafeBytes { key in
+					guard let dataInBaseAddress = dataIn.baseAddress else { return }
 					let success = CCCrypt(CCOperation(kCCDecrypt),
 					                      CCAlgorithm(kCCAlgorithmAES),
 					                      CCOptions(kCCOptionPKCS7Padding),
 					                      key.baseAddress,
 					                      key.count,
-					                      nil,
-					                      dataIn.baseAddress,
-					                      dataIn.count,
+					                      dataInBaseAddress, // The iv
+					                      dataInBaseAddress + kCCBlockSizeAES128, // Advanced past the iv
+					                      dataIn.count - kCCBlockSizeAES128, // Byte count without the iv
 					                      dataOut.baseAddress,
 					                      dataOut.count,
 					                      &numBytesDecrypted)
@@ -128,12 +129,14 @@ class Swl2Crypto: CryptoProvider {
 		}
 		guard successBytes > paddingSize else { return nil }
 
-		dataOut.count = successBytes - Int(paddingSize)
-		return dataOut
+		return dataOut[..<(successBytes - Int(paddingSize))]
 	}
 
 	func encrypt(data: Data) -> Data? {
-		guard let key = key else { return nil }
+		// Ensure we have a key and can generate an iv.
+		guard let key = key,
+		      let ivArray: [UInt8] = .cryptographicRandomBytes(count: kCCBlockSizeAES128) else { return nil }
+		let iv = Data(ivArray)
 		var dataIn = data
 		var paddingSize: UInt8 = 0
 		while dataIn.count % 16 > 0 {
@@ -142,26 +145,28 @@ class Swl2Crypto: CryptoProvider {
 		}
 		// "A general rule for the size of the output buffer which must be provided by the caller is that for block ciphers, the output length is never larger than the input length plus the block size." (https://opensource.apple.com/source/CommonCrypto/CommonCrypto-60061/include/CommonCryptor.h#:~:text=A%20general%20rule%20for%20the,same%20as%20the%20input%20length.)
 		var dataOut = Data(count: dataIn.count + kCCBlockSizeAES128)
-		var numBytesDecrypted: size_t = 0
+		var numBytesEncrypted: size_t = 0
 		var successBytes = 0
 		dataOut.withUnsafeMutableBytes { dataOut in
 			dataIn.withUnsafeBytes { dataIn in
-				key.withUnsafeBytes { key in
-					let success = CCCrypt(CCOperation(kCCEncrypt),
-					                      CCAlgorithm(kCCAlgorithmAES),
-					                      CCOptions(kCCOptionPKCS7Padding),
-					                      key.baseAddress,
-					                      key.count,
-					                      nil,
-					                      dataIn.baseAddress,
-					                      dataIn.count,
-					                      dataOut.baseAddress,
-					                      dataOut.count,
-					                      &numBytesDecrypted)
+				iv.withUnsafeBytes { iv in
+					key.withUnsafeBytes { key in
+						let success = CCCrypt(CCOperation(kCCEncrypt),
+						                      CCAlgorithm(kCCAlgorithmAES),
+						                      CCOptions(kCCOptionPKCS7Padding),
+						                      key.baseAddress,
+						                      key.count,
+						                      iv.baseAddress,
+						                      dataIn.baseAddress,
+						                      dataIn.count,
+						                      dataOut.baseAddress,
+						                      dataOut.count,
+						                      &numBytesEncrypted)
 
-					guard Int32(success) == UInt32(kCCSuccess) else { return }
+						guard Int32(success) == UInt32(kCCSuccess) else { return }
 
-					successBytes = numBytesDecrypted
+						successBytes = numBytesEncrypted
+					}
 				}
 			}
 		}
@@ -170,7 +175,8 @@ class Swl2Crypto: CryptoProvider {
 
 		var response = Data(count: 0)
 		response.append(contentsOf: [paddingSize, 0, 0, 0])
-		response.append(dataOut)
+		response.append(iv) // Prefix on the iv.
+		response.append(dataOut[..<successBytes]) // Then the cipher data.
 		return response
 	}
 }
