@@ -81,6 +81,7 @@ class SQLiteDatabase {
 		let problem: Problem
 
 		enum Site {
+			case create
 			case insert
 			case update
 			case backup
@@ -171,7 +172,7 @@ class SQLiteDatabase {
 		return response
 	}
 
-	func create<T: SQLiteDatabaseItem>(record: T) throws where T: SQLiteQueryWritable {
+	func create<T: SQLiteDatabaseItem>(record: T) throws where T: SQLiteQueryWritable & SQLiteQuerySelectable {
 		guard canBackupDatabaseFile,
 		      try backupDatabaseFile()
 		else {
@@ -180,9 +181,13 @@ class SQLiteDatabase {
 
 		var statement: OpaquePointer?
 
-		let columns = record.encode().map { column in
+		// Get the encoding for this record so we can figure out what type the columns are.
+		let encodings = record.encode()
+		// Since the encoding is an unordered dictionary, use the columns array to create the table in order, as it would be unusable with randomly ordered fields.
+		let columns = try T.columns.map { column in
+			let encoding = encodings[column]
 			let type: String
-			switch column.value {
+			switch encoding {
 			case .integer:
 				type = "INTEGER NOT NULL"
 			case .varchar(let value):
@@ -193,9 +198,11 @@ class SQLiteDatabase {
 				type = "VARCHAR(\(value?.count ?? 0)"
 			case .nullableBlob:
 				type = "BLOB NULL"
+			case .none:
+				throw LayerError(site: .create, problem: .generalError)
 			}
 			return """
-			\("    ")"\(column.key)" \(type)\((column.key == T.primary) ? " PRIMARY KEY" : "")
+			\("    ")"\(column)" \(type)\((column == T.primary) ? " PRIMARY KEY" : "")
 			"""
 		}
 		.joined(separator: ",\n")
